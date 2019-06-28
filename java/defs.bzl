@@ -13,6 +13,15 @@
 # limitations under the License.
 """Starlark rules for building Java projects."""
 
+_MIGRATION_TAG = "__JAVA_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__"
+
+def _add_tags(attrs):
+    if "tags" in attrs and attrs["tags"] != None:
+        attrs["tags"] = attrs["tags"] + [_MIGRATION_TAG]
+    else:
+        attrs["tags"] = [_MIGRATION_TAG]
+    return attrs
+
 def java_binary(**attrs):
     """Bazel java_binary rule.
 
@@ -21,7 +30,7 @@ def java_binary(**attrs):
     Args:
       **attrs: Rule attributes
     """
-    native.java_binary(**attrs)
+    native.java_binary(**_add_tags(attrs))
 
 def java_import(**attrs):
     """Bazel java_import rule.
@@ -31,7 +40,7 @@ def java_import(**attrs):
     Args:
       **attrs: Rule attributes
     """
-    native.java_import(**attrs)
+    native.java_import(**_add_tags(attrs))
 
 def java_library(**attrs):
     """Bazel java_library rule.
@@ -41,7 +50,7 @@ def java_library(**attrs):
     Args:
       **attrs: Rule attributes
     """
-    native.java_library(**attrs)
+    native.java_library(**_add_tags(attrs))
 
 def java_lite_proto_library(**attrs):
     """Bazel java_lite_proto_library rule.
@@ -51,7 +60,7 @@ def java_lite_proto_library(**attrs):
     Args:
       **attrs: Rule attributes
     """
-    native.java_lite_proto_library(**attrs)
+    native.java_lite_proto_library(**_add_tags(attrs))
 
 def java_proto_library(**attrs):
     """Bazel java_proto_library rule.
@@ -61,7 +70,7 @@ def java_proto_library(**attrs):
     Args:
       **attrs: Rule attributes
     """
-    native.java_proto_library(**attrs)
+    native.java_proto_library(**_add_tags(attrs))
 
 def java_test(**attrs):
     """Bazel java_test rule.
@@ -71,7 +80,7 @@ def java_test(**attrs):
     Args:
       **attrs: Rule attributes
     """
-    native.java_test(**attrs)
+    native.java_test(**_add_tags(attrs))
 
 def java_package_configuration(**attrs):
     """Bazel java_package_configuration rule.
@@ -81,7 +90,7 @@ def java_package_configuration(**attrs):
     Args:
       **attrs: Rule attributes
     """
-    native.java_package_configuration(**attrs)
+    native.java_package_configuration(**_add_tags(attrs))
 
 def java_plugin(**attrs):
     """Bazel java_plugin rule.
@@ -91,7 +100,7 @@ def java_plugin(**attrs):
     Args:
       **attrs: Rule attributes
     """
-    native.java_plugin(**attrs)
+    native.java_plugin(**_add_tags(attrs))
 
 def java_runtime(**attrs):
     """Bazel java_runtime rule.
@@ -101,7 +110,7 @@ def java_runtime(**attrs):
     Args:
       **attrs: Rule attributes
     """
-    native.java_runtime(**attrs)
+    native.java_runtime(**_add_tags(attrs))
 
 def java_toolchain(**attrs):
     """Bazel java_toolchain rule.
@@ -111,4 +120,4 @@ def java_toolchain(**attrs):
     Args:
       **attrs: Rule attributes
     """
-    native.java_toolchain(**attrs)
+    native.java_toolchain(**_add_tags(attrs))
