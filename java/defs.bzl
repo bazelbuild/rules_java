@@ -15,7 +15,7 @@
 
 _MIGRATION_TAG = "__JAVA_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__"
 
-__USELESS_TAG__ = "Testing Copybara do not import."
+__USELESS_TAG__ = "Testing. Copybara."
 
 def _add_tags(attrs):
     if "tags" in attrs and attrs["tags"] != None:
