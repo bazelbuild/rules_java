@@ -12,6 +12,11 @@ filegroup(
 constraint_setting(name = "runtime")
 
 constraint_value(
+    name = "host",
+    constraint_setting = ":runtime",
+)
+
+constraint_value(
     name = "jdk8",
     constraint_setting = ":runtime",
 )
