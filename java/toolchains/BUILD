@@ -9,6 +9,7 @@ MACOS_CONSTRAINTS = ["@platforms//os:osx", "@platforms//cpu:x86_64",]
 
 HOST_CONSTRAINTS = ["@rules_java//java/constraints:host"]
 
+############################### javac toolchains ##############################
 toolchain(
     name = "javac_linux_toolchain",
     exec_compatible_with = LINUX_CONSTRAINTS,
@@ -20,9 +21,9 @@ toolchain(
 toolchain(
     name = "javac_windows_toolchain",
     exec_compatible_with = WINDOWS_CONSTRAINTS,
-   target_compatible_with = WINDOWS_CONSTRAINTS,
-   toolchain = "@remote_java_tools_windows//:toolchain",
-   toolchain_type = ":javac_toolchain_type"
+    target_compatible_with = WINDOWS_CONSTRAINTS,
+    toolchain = "@remote_java_tools_windows//:toolchain",
+    toolchain_type = ":javac_toolchain_type"
 )
 
 toolchain(
@@ -32,8 +33,6 @@ toolchain(
     toolchain = "@remote_java_tools_darwin//:toolchain",
     toolchain_type = ":javac_toolchain_type",
 )
-
-#####################################
 
 toolchain(
     name = "host_javac_linux_toolchain",
@@ -58,6 +57,8 @@ toolchain(
     toolchain = "@remote_java_tools_darwin//:toolchain",
     toolchain_type = ":javac_toolchain_type",
 )
+
+############################ java runtime toolchains ##########################
 
 toolchain(
     name = "java_runtime_toolchain",
