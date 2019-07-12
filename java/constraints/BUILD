@@ -12,7 +12,7 @@ filegroup(
 constraint_setting(name = "runtime")
 
 constraint_value(
-    name = "host",
+    name = "host_runtime",
     constraint_setting = ":runtime",
 )
 
@@ -42,6 +42,11 @@ constraint_value(
 )
 
 constraint_setting(name = "language")
+
+constraint_value(
+    name = "host_language",
+    constraint_setting = ":language",
+)
 
 # visibility
 constraint_value(
