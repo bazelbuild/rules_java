@@ -5,6 +5,7 @@ load("@local_config_platform//:constraints.bzl", 'HOST_CONSTRAINTS')
 platform(
     name = "host_java_platform",
     constraint_values = HOST_CONSTRAINTS + [
-        "@rules_java//java/constraints:host",
+        "@rules_java//java/constraints:host_runtime",
+        "@rules_java//java/constraints:host_language",
     ],
 )
