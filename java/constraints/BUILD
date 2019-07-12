@@ -68,3 +68,53 @@ constraint_value(
     name = "java12",
     constraint_setting = ":language",
 )
+
+platform(
+    name = "jdk8_linux_x86",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        ":jdk8",
+        ":java8"
+    ]
+)
+
+platform(
+    name = "jdk9_linux_x86",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        ":jdk9",
+        ":java8"
+    ]
+)
+
+platform(
+    name = "jdk10_linux_x86",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        ":jdk10",
+        ":java8"
+    ]
+)
+
+platform(
+    name = "jdk11_linux_x86",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        ":jdk11",
+        ":java8"
+    ]
+)
+
+platform(
+    name = "jdk12_linux_x86",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+        ":jdk12",
+        ":java8"
+    ]
+)
