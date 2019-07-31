@@ -34,7 +34,7 @@ def _java_tools_javac9_repos():
     )
     maybe(
         http_archive,
-        name = "remote_java_tools_javac9_darwin",
+        name = "remote_java_tools_javac9_macos",
         sha256 = "13a94ddf0c421332f0d3be1adbfc833e24a3a3715bab8f1152660f2df81e286a",
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/javac9/v3.0/java_tools_javac9_darwin-v3.0.zip",
@@ -44,28 +44,26 @@ def _java_tools_javac9_repos():
 def _java_tools_javac10_repos():
     maybe(
         http_archive,
-        "remote_java_tools_javac11_linux",
-        sha256 = "10d6f00c72e42b6fda378ad506cc93b1dc92e1aec6e2a490151032244b8b8df5",
+        name = "remote_java_tools_javac10_linux",
+        sha256 = "52e03d400d978e9af6321786cdf477694c3838d7e78c2e5b926d0244670b6d3c",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v3.0/java_tools_javac11_linux-v3.0.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/javac10/v5.0/java_tools_javac10_linux-v5.0.zip",
         ],
     )
-
     maybe(
         http_archive,
-        name = "remote_java_tools_javac11_windows",
-        sha256 = "b688155d81245b4d1ee52cac447aae5444b1c59dc77158fcbde05554a6bab48b",
+        name = "remote_java_tools_javac10_windows",
+        sha256 = "2e3fa82f5790917b56cec5f5d389ed5ff9592a00b5d66750a1f2b6387921d8be",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v3.0/java_tools_javac11_windows-v3.0.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/javac10/v5.0/java_tools_javac10_windows-v5.0.zip",
         ],
     )
-
     maybe(
         http_archive,
-        name = "remote_java_tools_javac11_darwin",
-        sha256 = "28989f78b1ce437c92dd27bb4943b2211ba4db916ccbb3aef83696a8f9b43724",
+        name = "remote_java_tools_javac10_macos",
+        sha256 = "d5503cc1700b3d544444302617ccc9b2c2780b7fa7bd013215da403148958c35",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v3.0/java_tools_javac11_darwin-v3.0.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/javac10/v5.0/java_tools_javac10_darwin-v5.0.zip",
         ],
     )
 
@@ -88,7 +86,7 @@ def _java_tools_javac11_repos():
     )
     maybe(
         http_archive,
-        name = "remote_java_tools_javac11_darwin",
+        name = "remote_java_tools_javac11_macos",
         sha256 = "28989f78b1ce437c92dd27bb4943b2211ba4db916ccbb3aef83696a8f9b43724",
         urls = [
              "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v3.0/java_tools_javac11_darwin-v3.0.zip",
@@ -112,7 +110,7 @@ def _java_tools_javac12_repos():
     )
     maybe(
         http_archive,
-        name = "remote_java_tools_javac12_darwin",
+        name = "remote_java_tools_javac12_macos",
         sha256 = "d73ff1de1fc2d3ea8403d54099dd2247a2a87390107e7cf81e3a383b0c687341",
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/javac12/v2.0/java_tools_javac12_darwin-v2.0.zip",
@@ -255,11 +253,12 @@ def _java_tools_repos():
     _java_tools_javac12_repos()
 
 def _bazel_skylib():
-    http_archive(
+    maybe(
+        http_archive,
         name = "bazel_skylib",
         type = "tar.gz",
         url = "https://github.com/bazelbuild/bazel-skylib/releases/download/0.9.0/bazel_skylib-0.9.0.tar.gz",
-            sha256 = "1dde365491125a3db70731e25658dfdd3bc5dbdfd11b840b3e987ecf043c7ca0",
+        sha256 = "1dde365491125a3db70731e25658dfdd3bc5dbdfd11b840b3e987ecf043c7ca0",
     )
 
 def rules_java_dependencies():
@@ -280,7 +279,7 @@ def rules_java_toolchains():
     native.register_toolchains("@rules_java//java/toolchains/javac/linux:all")
     native.register_toolchains("@rules_java//java/toolchains/javac/macos:all")
     native.register_toolchains("@rules_java//java/toolchains/javac/windows:all")
+    native.register_toolchains("@rules_java//java/toolchains/runtime:local_jdk")
     native.register_toolchains("@rules_java//java/toolchains/runtime/remote/linux:all")
     native.register_toolchains("@rules_java//java/toolchains/runtime/remote/macos:all")
     native.register_toolchains("@rules_java//java/toolchains/runtime/remote/windows:all")
-    native.register_toolchains("@rules_java//java/toolchains/runtime:local_jdk")
