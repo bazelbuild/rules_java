@@ -64,5 +64,3 @@ REMOTE_JDK10_CONSTRAINTS = ["@rules_java//java/constraints/runtime:remote_jdk10"
 REMOTE_JDK11_CONSTRAINTS = ["@rules_java//java/constraints/runtime:remote_jdk11"]
 
 REMOTE_JDK12_CONSTRAINTS = ["@rules_java//java/constraints/runtime:remote_jdk12"]
-
-
