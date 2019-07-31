@@ -1,0 +1,30 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+
+string_flag(
+	name = "version",
+	build_setting_default = "10",
+)
+
+constraint_setting(name = "javac")
+
+constraint_value(
+    name = "9",
+    constraint_setting = ":javac",
+)
+
+constraint_value(
+    name = "10",
+    constraint_setting = ":javac",
+)
+
+constraint_value(
+    name = "11",
+    constraint_setting = ":javac",
+)
+
+constraint_value(
+    name = "12",
+    constraint_setting = ":javac",
+)

@@ -1,30 +1,51 @@
-LINUX_CONSTRAINTS = ["@platforms//os:linux", "@platforms//cpu:x86_64",]
-WINDOWS_CONSTRAINTS = ["@platforms//os:windows", "@platforms//cpu:x86_64",]
-MACOS_CONSTRAINTS = ["@platforms//os:osx", "@platforms//cpu:x86_64",]
+load(
+    "@rules_java//java/constraints:constraints.bzl",
+    "LINUX_CONSTRAINTS",
+    "MACOS_CONSTRAINTS",
+    "WINDOWS_CONSTRAINTS",
+    "JAVAC9_LANGUAGE8_CONSTRAINTS",
+    "JAVAC10_LANGUAGE8_CONSTRAINTS",
+    "JAVAC11_LANGUAGE8_CONSTRAINTS",
+    "JAVAC12_LANGUAGE8_CONSTRAINTS",
+    "JDK9_CONSTRAINTS",
+    "JDK10_CONSTRAINTS",
+    "JDK11_CONSTRAINTS",
+    "JDK12_CONSTRAINTS",
+    "REMOTE_JDK9_CONSTRAINTS",
+    "REMOTE_JDK10_CONSTRAINTS",
+    "REMOTE_JDK11_CONSTRAINTS",
+    "REMOTE_JDK12_CONSTRAINTS",
+)
 
-JAVAC10_SOURCE10_TARGET10_CONSTRAINTS = [
-    "@rules_java//java/constraints:source_version10",
-    "@rules_java//java/constraints:target_version10",
-    "@rules_java//java/constraints:javac_version10",
-]
+JAVAC_TOOLCHAIN_CONSTRAINTS = select({
+  "@rules_java//java/config:javac9_language8": JAVAC9_LANGUAGE8_CONSTRAINTS,
+  "@rules_java//java/config:javac10_language8": JAVAC10_LANGUAGE8_CONSTRAINTS,
+  "@rules_java//java/config:javac11_language8": JAVAC11_LANGUAGE8_CONSTRAINTS,
+  "@rules_java//java/config:javac12_language8": JAVAC12_LANGUAGE8_CONSTRAINTS,
+})
 
-JAVAC10_SOURCE8_TARGET8_CONSTRAINTS = [
-    "@rules_java//java/constraints:source_version8",
-    "@rules_java//java/constraints:target_version8",
-    "@rules_java//java/constraints:javac_version10",
-]
-
+JAVA_RUNTIME_TOOLCHAIN_CONSTRAINTS = select({
+ "@rules_java//java/config:jdk9": JDK9_CONSTRAINTS,
+ "@rules_java//java/config:jdk10": JDK10_CONSTRAINTS,
+ "@rules_java//java/config:jdk11": JDK11_CONSTRAINTS,
+ "@rules_java//java/config:jdk12": JDK12_CONSTRAINTS,
+ "@rules_java//java/config:remote_jdk9": REMOTE_JDK9_CONSTRAINTS,
+ "@rules_java//java/config:remote_jdk10": REMOTE_JDK10_CONSTRAINTS,
+ "@rules_java//java/config:remote_jdk11": REMOTE_JDK11_CONSTRAINTS,
+ "@rules_java//java/config:remote_jdk12": REMOTE_JDK12_CONSTRAINTS,
+})
 
 platform(
     name = "linux_x86_64",
-    constraint_values = select({
-        "@rules_java//java/config:javac10_source_8_target_8": JAVAC10_SOURCE8_TARGET8_CONSTRAINTS,
-        "@rules_java//java/config:javac10_source_10_target_10": JAVAC10_SOURCE10_TARGET10_CONSTRAINTS,
-    }),
-    parents = ["@local_config_platform//:host"]
+    constraint_values = LINUX_CONSTRAINTS + JAVAC_TOOLCHAIN_CONSTRAINTS + JAVA_RUNTIME_TOOLCHAIN_CONSTRAINTS,
 )
 
 platform(
-    name = "linux_x86_64_only",
-    constraint_values = LINUX_CONSTRAINTS,
+    name = "windows_x86_64",
+    constraint_values = WINDOWS_CONSTRAINTS + JAVAC_TOOLCHAIN_CONSTRAINTS + JAVA_RUNTIME_TOOLCHAIN_CONSTRAINTS,
+)
+
+platform(
+    name = "macos_x86_64",
+    constraint_values = MACOS_CONSTRAINTS + JAVAC_TOOLCHAIN_CONSTRAINTS + JAVA_RUNTIME_TOOLCHAIN_CONSTRAINTS,
 )
