@@ -11,7 +11,6 @@ filegroup(
     srcs = ["BUILD"],
 )
 
-#
 constraint_setting(name = "runtime")
 
 constraint_value(
@@ -41,7 +40,7 @@ constraint_value(
 
 constraint_setting(name = "language")
 
- # visibility
+# visibility
 constraint_value(
     name = "java7",
     constraint_setting = ":language",
