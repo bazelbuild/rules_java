@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+licenses(["notice"])
+
 config_setting(
     name = "javac9_language8",
     flag_values = {

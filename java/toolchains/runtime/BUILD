@@ -1,3 +1,7 @@
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
 toolchain_type(name = "toolchain_type")
 
 load("@local_config_platform//:constraints.bzl", "HOST_CONSTRAINTS")

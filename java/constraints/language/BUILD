@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+licenses(["notice"])
+
 load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 
 string_flag(

@@ -1,3 +1,7 @@
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
 load(
     "@rules_java//java/constraints:constraints.bzl",
     "LINUX_CONSTRAINTS",
