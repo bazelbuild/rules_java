@@ -4,7 +4,7 @@ load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
 
 string_flag(
 	name = "version",
-	build_setting_default = "10",
+	build_setting_default = "11",
 )
 
 constraint_setting(name = "javac")
