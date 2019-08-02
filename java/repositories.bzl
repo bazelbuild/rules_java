@@ -15,7 +15,7 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-def _java_tools_javac9_repos():
+def java_tools_javac9_repos():
     maybe(
         http_archive,
         name = "remote_java_tools_javac9_linux",
@@ -41,7 +41,7 @@ def _java_tools_javac9_repos():
         ],
     )
 
-def _java_tools_javac10_repos():
+def java_tools_javac10_repos():
     maybe(
         http_archive,
         name = "remote_java_tools_javac10_linux",
@@ -67,7 +67,7 @@ def _java_tools_javac10_repos():
         ],
     )
 
-def _java_tools_javac11_repos():
+def java_tools_javac11_repos():
     maybe(
         http_archive,
         name = "remote_java_tools_javac11_linux",
@@ -93,7 +93,7 @@ def _java_tools_javac11_repos():
         ],
     )
 
-def _java_tools_javac12_repos():
+def java_tools_javac12_repos():
     maybe(
         http_archive,
         name = "remote_java_tools_javac12_linux",
@@ -117,7 +117,28 @@ def _java_tools_javac12_repos():
         ],
     )
 
-def _remote_jdk9_repos():
+def remote_jdk9_repos():
+    # OpenJDK distributions that should only be downloaded on demand (e.g. when
+    # building a java_library or a genrule that uses java make variables).
+    # This will allow us to stop bundling the full JDK with Bazel.
+    # Note that while these are currently the same as the openjdk_* rules in
+    # Bazel's WORKSPACE file, but they don't have to be the same.
+
+    # The source-code for this OpenJDK can be found at:
+    # https://openjdk.linaro.org/releases/jdk9-src-1708.tar.xz
+    maybe(
+        http_archive,
+        name = "remote_jdk9_linux_aarch64",
+        build_file = "@local_jdk//:BUILD.bazel",
+        sha256 = "72e7843902b0395e2d30e1e9ad2a5f05f36a4bc62529828bcbc698d54aec6022",
+        strip_prefix = "jdk9-server-release-1708",
+        urls = [
+            # When you update this, also update the link to the source-code above.
+            "https://mirror.bazel.build/openjdk.linaro.org/releases/jdk9-server-release-1708.tar.xz",
+            "http://openjdk.linaro.org/releases/jdk9-server-release-1708.tar.xz",
+        ],
+    )
+
     maybe(
         http_archive,
         name = "remote_jdk9_linux",
@@ -147,7 +168,21 @@ def _remote_jdk9_repos():
         ],
     )
 
-def _remote_jdk10_repos():
+def remote_jdk10_repos():
+    # The source-code for this OpenJDK can be found at:
+    # https://openjdk.linaro.org/releases/jdk10-src-1804.tar.xz
+    maybe(
+        http_archive,
+        name = "remote_jdk10_linux_aarch64",
+        build_file = "@local_jdk//:BUILD.bazel",
+        sha256 = "b7098b7aaf6ee1ffd4a2d0371a0be26c5a5c87f6aebbe46fe9a92c90583a84be",
+        strip_prefix = "jdk10-server-release-1804",
+        urls = [
+            # When you update this, also update the link to the source-code above.
+            "https://mirror.bazel.build/openjdk.linaro.org/releases/jdk10-server-release-1804.tar.xz",
+            "http://openjdk.linaro.org/releases/jdk10-server-release-1804.tar.xz",
+        ],
+    )
     maybe(
         http_archive,
         name = "remote_jdk10_linux",
@@ -177,7 +212,19 @@ def _remote_jdk10_repos():
         ],
     )
 
-def _remote_jdk11_repos():
+def remote_jdk11_repos():
+    # The source-code for this OpenJDK can be found at:
+    # https://openjdk.linaro.org/releases/jdk10-src-1804.tar.xz
+    maybe(
+        http_archive,
+        name = "remote_jdk11_linux_aarch64",
+        build_file = "@local_jdk//:BUILD.bazel",
+        sha256 = "3b0d91611b1bdc4d409afcf9eab4f0e7f4ae09f88fc01bd9f2b48954882ae69b",
+        strip_prefix = "zulu11.31.15-ca-jdk11.0.3-linux_aarch64",
+        urls = [
+            "https://mirror.bazel.build/openjdk/azul-zulu11.31.15-ca-jdk11.0.3/zulu11.31.15-ca-jdk11.0.3-linux_aarch64.tar.gz",
+        ],
+    )
     maybe(
         http_archive,
         "remote_jdk11_linux",
@@ -211,7 +258,7 @@ def _remote_jdk11_repos():
         ],
     )
 
-def _remote_jdk12_repos():
+def remote_jdk12_repos():
     maybe(
         http_archive,
         name = "remote_jdk12_linux",
@@ -240,17 +287,17 @@ def _remote_jdk12_repos():
         ],
     )
 
-def _remote_jdk_repos():
-    _remote_jdk9_repos()
-    _remote_jdk10_repos()
-    _remote_jdk11_repos()
-    _remote_jdk12_repos()
+def remote_jdk_repos():
+    remote_jdk9_repos()
+#    remote_jdk10_repos()
+    remote_jdk11_repos()
+#    remote_jdk12_repos()
 
-def _java_tools_repos():
-    _java_tools_javac9_repos()
-    _java_tools_javac10_repos()
-    _java_tools_javac11_repos()
-    _java_tools_javac12_repos()
+def java_tools_repos():
+#    java_tools_javac9_repos()
+#    java_tools_javac10_repos()
+    java_tools_javac11_repos()
+#    java_tools_javac12_repos()
 
 def _bazel_skylib():
     maybe(
@@ -266,8 +313,8 @@ def rules_java_dependencies():
 
     It doesn't do anything at the moment.
     """
-    _java_tools_repos()
-    _remote_jdk_repos()
+    java_tools_repos()
+    remote_jdk_repos()
     _bazel_skylib()
 
 def rules_java_toolchains():
