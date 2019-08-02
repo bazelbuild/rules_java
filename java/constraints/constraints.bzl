@@ -57,10 +57,22 @@ JDK11_CONSTRAINTS = ["@rules_java//java/constraints/runtime:jdk11"]
 
 JDK12_CONSTRAINTS = ["@rules_java//java/constraints/runtime:jdk12"]
 
-REMOTE_JDK9_CONSTRAINTS = ["@rules_java//java/constraints/runtime:remote_jdk9"]
+REMOTE_JDK9_CONSTRAINTS = [
+    "@rules_java//java/constraints/runtime:jdk9",
+    "@rules_java//java/constraints/runtime:remote",
+]
 
-REMOTE_JDK10_CONSTRAINTS = ["@rules_java//java/constraints/runtime:remote_jdk10"]
+REMOTE_JDK10_CONSTRAINTS = [
+    "@rules_java//java/constraints/runtime:jdk10",
+    "@rules_java//java/constraints/runtime:remote",
+]
 
-REMOTE_JDK11_CONSTRAINTS = ["@rules_java//java/constraints/runtime:remote_jdk11"]
+REMOTE_JDK11_CONSTRAINTS = [
+    "@rules_java//java/constraints/runtime:jdk11",
+    "@rules_java//java/constraints/runtime:remote",
+]
 
-REMOTE_JDK12_CONSTRAINTS = ["@rules_java//java/constraints/runtime:remote_jdk12"]
+REMOTE_JDK12_CONSTRAINTS = [
+    "@rules_java//java/constraints/runtime:jdk12",
+    "@rules_java//java/constraints/runtime:remote",
+]

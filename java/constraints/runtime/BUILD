@@ -9,6 +9,11 @@ string_flag(
 	build_setting_default = "11"
 )
 
+string_flag(
+	name = "host_version",
+	build_setting_default = "11"
+)
+
 constraint_setting(name = "runtime")
 
 constraint_value(
@@ -36,27 +41,24 @@ constraint_value(
     constraint_setting = ":runtime",
 )
 
-constraint_value(
-    name = "remote_jdk8",
-    constraint_setting = ":runtime",
+constraint_setting(name = "local_or_remote")
+
+string_flag(
+	name = "is_local",
+	build_setting_default = "local"
+)
+
+string_flag(
+	name = "is_host_local",
+	build_setting_default = "remote"
 )
 
 constraint_value(
-    name = "remote_jdk9",
-    constraint_setting = ":runtime",
+    name = "local",
+    constraint_setting = ":local_or_remote",
 )
 
 constraint_value(
-    name = "remote_jdk10",
-    constraint_setting = ":runtime",
-)
-
-constraint_value(
-    name = "remote_jdk11",
-    constraint_setting = ":runtime",
-)
-
-constraint_value(
-    name = "remote_jdk12",
-    constraint_setting = ":runtime",
+    name = "remote",
+    constraint_setting = ":local_or_remote",
 )

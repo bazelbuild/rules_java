@@ -65,27 +65,31 @@ config_setting(
 config_setting(
     name = "remote_jdk9",
     flag_values = {
-        "@rules_java//java/constraints/runtime:version": "remote_jdk9",
+        "@rules_java//java/constraints/runtime:version": "9",
+        "@rules_java//java/constraints/runtime:is_local": "remote",
     }
 )
 
 config_setting(
     name = "remote_jdk10",
     flag_values = {
-        "@rules_java//java/constraints/runtime:version": "remote_jdk10",
+        "@rules_java//java/constraints/runtime:version": "10",
+        "@rules_java//java/constraints/runtime:is_local": "remote",
     }
 )
 
 config_setting(
     name = "remote_jdk11",
     flag_values = {
-        "@rules_java//java/constraints/runtime:version": "remote_jdk11",
+        "@rules_java//java/constraints/runtime:version": "11",
+        "@rules_java//java/constraints/runtime:is_local": "remote",
     }
 )
 
 config_setting(
     name = "remote_jdk12",
     flag_values = {
-        "@rules_java//java/constraints/runtime:version": "remote_jdk12",
+        "@rules_java//java/constraints/runtime:version": "12",
+        "@rules_java//java/constraints/runtime:is_local": "remote",
     }
 )

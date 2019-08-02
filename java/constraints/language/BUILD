@@ -9,6 +9,11 @@ string_flag(
 	build_setting_default = "8",
 )
 
+string_flag(
+	name = "host_version",
+	build_setting_default = "8",
+)
+
 constraint_setting(name = "language")
 
 constraint_value(
