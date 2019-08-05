@@ -1,5 +1,11 @@
 # Package rules_java
 
 ```
-bazel run :print_rel_notes
+bazel build :print_rel_notes
+cat ../bazel-bin/distro/relnotes.txt
+tar tzf ../bazel-bin/distro/rules_java-*.tar.gz
 ```
+
+- Create a new release
+- Copy/paste relnotes.txt into the notes. Adjust as needed.
+- Upload the tar.gz file as an artifact.

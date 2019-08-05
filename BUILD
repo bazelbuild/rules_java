@@ -3,10 +3,9 @@ licenses(["notice"])
 exports_files(["LICENSE"])
 
 filegroup(
-    name = "standard_package",
+    name = "distribution",
     srcs = glob([
         "LICENSE",
-        "java/**",
     ]),
     visibility = ["@//distro:__pkg__"],
 )
