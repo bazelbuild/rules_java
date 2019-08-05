@@ -134,7 +134,7 @@ def remote_jdk9_repos():
         strip_prefix = "jdk9-server-release-1708",
         urls = [
             # When you update this, also update the link to the source-code above.
-            "https://mirror.bazel.build/openjdk.linaro.org/releases/jdk9-server-release-1708.tar.xz",
+            "https://mirror.bazel.build/openjdk.linaro.org/releases/jdk9-server-release-170bazel_skylib8.tar.xz",
             "http://openjdk.linaro.org/releases/jdk9-server-release-1708.tar.xz",
         ],
     )
