@@ -1,12 +1,11 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
 workspace(name = "rules_java")
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "bazel_federation",
-    url = "https://github.com/bazelbuild/bazel-federation/archive/d0bb2efce669b28b1bf3c6db98cea38704ced82d.zip",
-    sha256 = "0c8646a871d25b62a6f2cdd7c21a3dc617a37701adea2a4e678394a084966e8c",
-    strip_prefix = "bazel_federation-d0bb2efce669b28b1bf3c6db98cea38704ced82d",
+    url = "https://github.com/bazelbuild/bazel-federation/archive/ade5370cb2c8be9e88a2ba6a15037139ae409f9c.zip",
+    sha256 = "0239a8af3fe66d17464a3be706109c021df31c461df3c447995f25efb63a1b22",
+    strip_prefix = "bazel-federation-ade5370cb2c8be9e88a2ba6a15037139ae409f9c",
     type = "zip",
 )
 
