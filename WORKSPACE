@@ -3,9 +3,9 @@ workspace(name = "rules_java")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
     name = "bazel_federation",
-    url = "https://github.com/bazelbuild/bazel-federation/archive/ade5370cb2c8be9e88a2ba6a15037139ae409f9c.zip",
-    sha256 = "0239a8af3fe66d17464a3be706109c021df31c461df3c447995f25efb63a1b22",
-    strip_prefix = "bazel-federation-ade5370cb2c8be9e88a2ba6a15037139ae409f9c",
+    url = "https://github.com/bazelbuild/bazel-federation/archive/01dc3f937696174c9764e23978f9d2e7105fd855.zip",
+    sha256 = "64229f859bb0465fcdb654b31b3e547bbd5462005beaebbc09eb0ec735044cdd",
+    strip_prefix = "bazel-federation-01dc3f937696174c9764e23978f9d2e7105fd855",
     type = "zip",
 )
 
