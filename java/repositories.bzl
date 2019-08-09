@@ -12,6 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# WARNING: This file only exists for backwards-compatibility.
+# rules_java uses the Bazel federation, so please add any new dependencies to
+# rules_java_deps() in
+# https://github.com/bazelbuild/bazel-federation/blob/master/repositories.bzl
+# Java-only third party dependencies can be added to
+# https://github.com/bazelbuild/bazel-federation/blob/master/java_repositories.bzl
+# Ideally we'd remove anything in this file except for rules_java_toolchains(),
+# which is being invoked as part of the federation setup.
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
