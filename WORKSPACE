@@ -9,11 +9,19 @@ http_archive(
     type = "zip",
 )
 
-load("@bazel_federation//:repositories.bzl", "rules_java_deps")
-rules_java_deps()
+# Load the dependencies
+load("@bazel_federation//:repositories.bzl", "bazel_skylib")
+bazel_skylib()
 
-load("@bazel_federation//setup:rules_java.bzl", "rules_java_setup")
-rules_java_setup()
+load("@rules_java//java:repositories.bzl", "rules_java_dependencies", "rules_java_toolchains")
+rules_java_dependencies()
+rules_java_toolchains()
+
+# Set up the toolchains we need
+# TODO(aiuto): Define a standard annotation scheme so that the federation
+# maintainers can easily extract this to find create rules_java_setup()
+load("@rules_java//java:repositories.bzl", "rules_java_toolchains")
+rules_java_toolchains()
 
 #
 # Dependencies for development of rules_java itself.
