@@ -1,7 +1,7 @@
 # Package rules_java
 
 ```
-bazel build :print_rel_notes
+bazel build :relnotes
 cat ../bazel-bin/distro/relnotes.txt
 tar tzf ../bazel-bin/distro/rules_java-*.tar.gz
 ```
