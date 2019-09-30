@@ -27,4 +27,7 @@ print_rel_notes(
     outs = ["relnotes.txt"],
     repo = "rules_java",
     version = version,
+    setup_file = "java:repositories.bzl",
+    deps_method = "rules_java_dependencies",
+    toolchains_method = "rules_java_toolchains",
 )
