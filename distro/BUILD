@@ -25,6 +25,9 @@ pkg_tar(
 print_rel_notes(
     name = "relnotes",
     outs = ["relnotes.txt"],
+    deps_method = "rules_java_dependencies",
     repo = "rules_java",
+    setup_file = "java:repositories.bzl",
+    toolchains_method = "rules_java_toolchains",
     version = version,
 )
