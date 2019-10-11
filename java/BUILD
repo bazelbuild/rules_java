@@ -10,5 +10,6 @@ filegroup(
     ],
     visibility = [
         "@//distro:__pkg__",
+        "@rules_java//distro:__pkg__",
     ],
 )

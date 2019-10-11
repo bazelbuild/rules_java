@@ -9,5 +9,8 @@ filegroup(
         "LICENSE",
         "*.bzl",
     ]),
-    visibility = ["@//distro:__pkg__"],
+    visibility = [
+        "@//distro:__pkg__",
+        "@rules_java//distro:__pkg__",
+    ],
 )
