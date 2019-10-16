@@ -7,7 +7,8 @@ filegroup(
     srcs = [
         "BUILD",
         "LICENSE",
+    ] + glob([
         "*.bzl",
-    ],
+    ]),
     visibility = ["@//distro:__pkg__"],
 )
