@@ -4,9 +4,10 @@ exports_files(["LICENSE"])
 
 filegroup(
     name = "distribution",
-    srcs = glob([
+    srcs = [
         "BUILD",
         "LICENSE",
+    ] + glob([
         "*.bzl",
     ]),
     visibility = ["@//distro:__pkg__"],

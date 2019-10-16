@@ -21,6 +21,8 @@
 # Ideally we'd remove anything in this file except for rules_java_toolchains(),
 # which is being invoked as part of the federation setup.
 
+"""Development and production dependencies of rules_java."""
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
@@ -127,14 +129,16 @@ def java_tools_javac12_repos():
     )
 
 def remote_jdk9_repos():
-    # OpenJDK distributions that should only be downloaded on demand (e.g. when
-    # building a java_library or a genrule that uses java make variables).
-    # This will allow us to stop bundling the full JDK with Bazel.
-    # Note that while these are currently the same as the openjdk_* rules in
-    # Bazel's WORKSPACE file, but they don't have to be the same.
+    """OpenJDK distributions that should only be downloaded on demand.
 
-    # The source-code for this OpenJDK can be found at:
-    # https://openjdk.linaro.org/releases/jdk9-src-1708.tar.xz
+    E.g. when building a java_library or a genrule that uses java make
+    variables).  This will allow us to stop bundling the full JDK with Bazel.
+    Note that while these are currently the same as the openjdk_* rules in
+    Bazel's WORKSPACE file, but they don't have to be the same.
+
+    The source-code for this OpenJDK can be found at:
+    https://openjdk.linaro.org/releases/jdk9-src-1708.tar.xz
+    """
     maybe(
         http_archive,
         name = "remote_jdk9_linux_aarch64",
