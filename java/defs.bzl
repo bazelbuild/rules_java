@@ -32,6 +32,7 @@ def java_binary(**attrs):
     Args:
       **attrs: Rule attributes
     """
+    # buildifier: disable=native-java
     native.java_binary(**_add_tags(attrs))
 
 def java_import(**attrs):
@@ -42,6 +43,7 @@ def java_import(**attrs):
     Args:
       **attrs: Rule attributes
     """
+    # buildifier: disable=native-java
     native.java_import(**_add_tags(attrs))
 
 def java_library(**attrs):
@@ -52,6 +54,7 @@ def java_library(**attrs):
     Args:
       **attrs: Rule attributes
     """
+    # buildifier: disable=native-java
     native.java_library(**_add_tags(attrs))
 
 def java_lite_proto_library(**attrs):
@@ -62,6 +65,7 @@ def java_lite_proto_library(**attrs):
     Args:
       **attrs: Rule attributes
     """
+    # buildifier: disable=native-java
     native.java_lite_proto_library(**_add_tags(attrs))
 
 def java_proto_library(**attrs):
@@ -72,6 +76,7 @@ def java_proto_library(**attrs):
     Args:
       **attrs: Rule attributes
     """
+    # buildifier: disable=native-java
     native.java_proto_library(**_add_tags(attrs))
 
 def java_test(**attrs):
@@ -82,6 +87,7 @@ def java_test(**attrs):
     Args:
       **attrs: Rule attributes
     """
+    # buildifier: disable=native-java
     native.java_test(**_add_tags(attrs))
 
 def java_package_configuration(**attrs):
@@ -92,6 +98,7 @@ def java_package_configuration(**attrs):
     Args:
       **attrs: Rule attributes
     """
+    # buildifier: disable=native-java
     native.java_package_configuration(**_add_tags(attrs))
 
 def java_plugin(**attrs):
@@ -102,6 +109,7 @@ def java_plugin(**attrs):
     Args:
       **attrs: Rule attributes
     """
+    # buildifier: disable=native-java
     native.java_plugin(**_add_tags(attrs))
 
 def java_runtime(**attrs):
@@ -112,6 +120,7 @@ def java_runtime(**attrs):
     Args:
       **attrs: Rule attributes
     """
+    # buildifier: disable=native-java
     native.java_runtime(**_add_tags(attrs))
 
 def java_toolchain(**attrs):
@@ -122,4 +131,5 @@ def java_toolchain(**attrs):
     Args:
       **attrs: Rule attributes
     """
+    # buildifier: disable=native-java
     native.java_toolchain(**_add_tags(attrs))
