@@ -1,0 +1,9 @@
+load("//java:defs.bzl", "java_library")
+
+java_library(
+    name = "zip",
+    srcs = glob(["*.java"]),
+    visibility = [
+        "//java/org/bazelbuild/rules_java:__subpackages__",
+    ],
+)
