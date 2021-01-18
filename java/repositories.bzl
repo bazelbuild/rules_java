@@ -24,8 +24,8 @@
 """Development and production dependencies of rules_java."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/jdk:remote_java_repository.bzl", "remote_java_repository")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+load("@bazel_tools//tools/jdk:remote_java_repository.bzl", "remote_java_repository")
 
 def java_tools_repos():
     maybe(
@@ -38,7 +38,6 @@ def java_tools_repos():
         ],
     )
 
-    # This must be kept in sync with the top-level WORKSPACE file.
     maybe(
         http_archive,
         name = "remote_java_tools_linux",
@@ -49,7 +48,6 @@ def java_tools_repos():
         ],
     )
 
-    # This must be kept in sync with the top-level WORKSPACE file.
     maybe(
         http_archive,
         name = "remote_java_tools_windows",
@@ -60,7 +58,6 @@ def java_tools_repos():
         ],
     )
 
-    # This must be kept in sync with the top-level WORKSPACE file.
     maybe(
         http_archive,
         name = "remote_java_tools_darwin",
@@ -211,8 +208,17 @@ def remote_jdk9_repos():
     )
 
 def remote_jdk10_repos():
-    # The source-code for this OpenJDK can be found at:
-    # https://openjdk.linaro.org/releases/jdk10-src-1804.tar.xz
+    """OpenJDK distributions that should only be downloaded on demand.
+
+    E.g. when building a java_library or a genrule that uses java make
+    variables).  This will allow us to stop bundling the full JDK with Bazel.
+    Note that while these are currently the same as the openjdk_* rules in
+    Bazel's WORKSPACE file, but they don't have to be the same.
+
+    The source-code for this OpenJDK can be found at:
+    https://openjdk.linaro.org/releases/jdk10-src-1804.tar.xz
+    """
+
     maybe(
         remote_java_repository,
         name = "remote_jdk10_linux_aarch64",
@@ -271,6 +277,14 @@ def remote_jdk10_repos():
     )
 
 def remote_jdk11_repos():
+    """OpenJDK distributions that should only be downloaded on demand.
+
+    E.g. when building a java_library or a genrule that uses java make
+    variables).  This will allow us to stop bundling the full JDK with Bazel.
+    Note that while these are currently the same as the openjdk_* rules in
+    Bazel's WORKSPACE file, but they don't have to be the same.
+    """
+
     maybe(
         remote_java_repository,
         name = "remote_jdk11_linux_aarch64",
@@ -368,6 +382,13 @@ def remote_jdk11_repos():
     )
 
 def remote_jdk12_repos():
+    """OpenJDK distributions that should only be downloaded on demand.
+
+    E.g. when building a java_library or a genrule that uses java make
+    variables).  This will allow us to stop bundling the full JDK with Bazel.
+    Note that while these are currently the same as the openjdk_* rules in
+    Bazel's WORKSPACE file, but they don't have to be the same.
+    """
     maybe(
         remote_java_repository,
         name = "remote_jdk12_linux",
@@ -410,6 +431,13 @@ def remote_jdk12_repos():
     )
 
 def remote_jdk14_repos():
+    """OpenJDK distributions that should only be downloaded on demand.
+
+    E.g. when building a java_library or a genrule that uses java make
+    variables).  This will allow us to stop bundling the full JDK with Bazel.
+    Note that while these are currently the same as the openjdk_* rules in
+    Bazel's WORKSPACE file, but they don't have to be the same.
+    """
     maybe(
         remote_java_repository,
         name = "remote_jdk14_linux",
@@ -454,6 +482,13 @@ def remote_jdk14_repos():
     )
 
 def remote_jdk15_repos():
+    """OpenJDK distributions that should only be downloaded on demand.
+
+    E.g. when building a java_library or a genrule that uses java make
+    variables).  This will allow us to stop bundling the full JDK with Bazel.
+    Note that while these are currently the same as the openjdk_* rules in
+    Bazel's WORKSPACE file, but they don't have to be the same.
+    """
     maybe(
         remote_java_repository,
         name = "remote_jdk15_linux",
