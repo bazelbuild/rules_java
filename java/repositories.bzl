@@ -71,6 +71,76 @@ def java_tools_repos():
         ],
     )
 
+def remote_jdk8_repos():
+    """OpenJDK distributions that should only be downloaded on demand.
+
+    E.g. when building a java_library or a genrule that uses java make
+    variables).  This will allow us to stop bundling the full JDK with Bazel.
+    Note that while these are currently the same as the openjdk_* rules in
+    Bazel's WORKSPACE file, but they don't have to be the same.
+    """
+    maybe(
+        remote_java_repository,
+        name = "remote_jdk8_linux_aarch64",
+        exec_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:aarch64",
+        ],
+        sha256 = "f4072e82faa5a09fab2accf2892d4684324fc999d614583c3ff785e87c03963f",
+        strip_prefix = "zulu8.50.51.263-ca-jdk8.0.275-linux_aarch64",
+        urls = [
+            "https://mirror.bazel.build/openjdk/azul-zulu-8.50.0.51-ca-jdk8.0.275/zulu8.50.51.263-ca-jdk8.0.275-linux_aarch64.tar.gz",
+            "https://cdn.azul.com/zulu-embedded/bin/zulu8.50.51.263-ca-jdk8.0.275-linux_aarch64.tar.gz",
+        ],
+        version = "8",
+    )
+
+    maybe(
+        remote_java_repository,
+        name = "remote_jdk8_linux",
+        exec_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:x86_64",
+        ],
+        sha256 = "1db6b2fa642950ee1b4b1ec2b6bc8a9113d7a4cd723f79398e1ada7dab1c981c",
+        strip_prefix = "zulu8.50.0.51-ca-jdk8.0.275-linux_x64",
+        urls = [
+            "https://mirror.bazel.build/openjdk/azul-zulu-8.50.0.51-ca-jdk8.0.275/zulu8.50.0.51-ca-jdk8.0.275-linux_x64.tar.gz",
+            "https://cdn.azul.com/zulu/bin/zulu8.50.0.51-ca-jdk8.0.275-linux_x64.tar.gz",
+        ],
+        version = "8",
+    )
+    maybe(
+        remote_java_repository,
+        name = "remote_jdk8_macos",
+        exec_compatible_with = [
+            "@platforms//os:macos",
+            "@platforms//cpu:x86_64",
+        ],
+        sha256 = "b03176597734299c9a15b7c2cc770783cf14d121196196c1248e80c026b59c17",
+        strip_prefix = "zulu8.50.0.51-ca-jdk8.0.275-macosx_x64",
+        urls = [
+            "https://mirror.bazel.build/openjdk/azul-zulu-8.50.0.51-ca-jdk8.0.275/zulu8.50.0.51-ca-jdk8.0.275-macosx_x64.tar.gz",
+            "https://cdn.azul.com/zulu/bin/zulu8.50.0.51-ca-jdk8.0.275-macosx_x64.tar.gz",
+        ],
+        version = "8",
+    )
+    maybe(
+        remote_java_repository,
+        name = "remote_jdk8_windows",
+        exec_compatible_with = [
+            "@platforms//os:windows",
+            "@platforms//cpu:x86_64",
+        ],
+        sha256 = "49759b2bd2ab28231a21ff3a3bb45824ddef55d89b5b1a05a62e26a365da0774",
+        strip_prefix = "zulu8.50.0.51-ca-jdk8.0.275-win_x64",
+        urls = [
+            "https://mirror.bazel.build/openjdk/azul-zulu-8.50.0.51-ca-jdk8.0.275/zulu8.50.0.51-ca-jdk8.0.275-win_x64.zip",
+            "https://cdn.azul.com/zulu/bin/zulu8.50.0.51-ca-jdk8.0.275-win_x64.zip",
+        ],
+        version = "8",
+    )
+
 def remote_jdk9_repos():
     """OpenJDK distributions that should only be downloaded on demand.
 
