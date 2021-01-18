@@ -271,8 +271,6 @@ def remote_jdk10_repos():
     )
 
 def remote_jdk11_repos():
-    # The source-code for this OpenJDK can be found at:
-    # https://openjdk.linaro.org/releases/jdk10-src-1804.tar.xz
     maybe(
         remote_java_repository,
         name = "remote_jdk11_linux_aarch64",
@@ -280,13 +278,15 @@ def remote_jdk11_repos():
             "@platforms//os:linux",
             "@platforms//cpu:aarch64",
         ],
-        sha256 = "3b0d91611b1bdc4d409afcf9eab4f0e7f4ae09f88fc01bd9f2b48954882ae69b",
-        strip_prefix = "zulu11.31.15-ca-jdk11.0.3-linux_aarch64",
+        sha256 = "15f9e3512b2c011a33c36b4ff27a8e70fefc18805509d5d58b0bd3b6684cbe8e",
+        strip_prefix = "zulu11.43.100-ca-jdk11.0.9.1-linux_aarch64",
         urls = [
-            "https://mirror.bazel.build/openjdk/azul-zulu11.31.15-ca-jdk11.0.3/zulu11.31.15-ca-jdk11.0.3-linux_aarch64.tar.gz",
+            "https://mirror.bazel.build/openjdk/azul-zulu11.43.100-ca-jdk11.0.9.1/zulu11.43.100-ca-jdk11.0.9.1-linux_aarch64.tar.gz",
+            "https://cdn.azul.com/zulu-embedded/bin/zulu11.43.100-ca-jdk11.0.9.1-linux_aarch64.tar.gz",
         ],
         version = "11",
     )
+
     maybe(
         remote_java_repository,
         name = "remote_jdk11_linux",
@@ -294,10 +294,11 @@ def remote_jdk11_repos():
             "@platforms//os:linux",
             "@platforms//cpu:x86_64",
         ],
-        sha256 = "232b1c3511f0d26e92582b7c3cc363be7ac633e371854ca2f2e9f2b50eb72a75",
-        strip_prefix = "zulu11.2.3-jdk11.0.1-linux_x64",
+        sha256 = "6c79bfe8bb06c82b72ef2f293a14becef56b3078d298dc75fda4225cbb2d3d0c",
+        strip_prefix = "zulu11.43.55-ca-jdk11.0.9.1-linux_x64",
         urls = [
-            "https://mirror.bazel.build/openjdk/azul-zulu11.2.3-jdk11.0.1/zulu11.2.3-jdk11.0.1-linux_x64.tar.gz",
+            "https://mirror.bazel.build/openjdk/azul-zulu11.43.55-ca-jdk11.0.9.1/zulu11.43.55-ca-jdk11.0.9.1-linux_x64.tar.gz",
+            "https://cdn.azul.com/zulu/bin/zulu11.43.55-ca-jdk11.0.9.1-linux_x64.tar.gz",
         ],
         version = "11",
     )
@@ -309,10 +310,11 @@ def remote_jdk11_repos():
             "@platforms//os:macos",
             "@platforms//cpu:x86_64",
         ],
-        sha256 = "1edf366ee821e5db8e348152fcb337b28dfd6bf0f97943c270dcc6747cedb6cb",
-        strip_prefix = "zulu11.2.3-jdk11.0.1-macosx_x64",
+        sha256 = "11701b54e62d5cde81a4fa0211776448e38a368c1cfc4ad73bb3bbd628107563",
+        strip_prefix = "zulu11.43.55-ca-jdk11.0.9.1-macosx_x64",
         urls = [
-            "https://mirror.bazel.build/openjdk/azul-zulu11.2.3-jdk11.0.1/zulu11.2.3-jdk11.0.1-macosx_x64.tar.gz",
+            "https://mirror.bazel.build/openjdk/azul-zulu11.43.55-ca-jdk11.0.9.1/zulu11.43.55-ca-jdk11.0.9.1-macosx_x64.tar.gz",
+            "https://cdn.azul.com/zulu/bin/zulu11.43.55-ca-jdk11.0.9.1-macosx_x64.tar.gz",
         ],
         version = "11",
     )
@@ -324,17 +326,18 @@ def remote_jdk11_repos():
             "@platforms//os:windows",
             "@platforms//cpu:x86_64",
         ],
-        sha256 = "8e1e2b8347de6746f3fd1538840dd643201533ab113abc4ed93678e342d28aa3",
-        strip_prefix = "zulu11.2.3-jdk11.0.1-win_x64",
+        sha256 = "b619df7a6f625095ee4adb3add44839b0b1af2adc09a16c7312ca96bb2b61ec9",
+        strip_prefix = "zulu11.43.55-ca-jdk11.0.9.1-win_x64",
         urls = [
-            "https://mirror.bazel.build/openjdk/azul-zulu11.2.3-jdk11.0.1/zulu11.2.3-jdk11.0.1-win_x64.zip",
+            "https://mirror.bazel.build/openjdk/azul-zulu11.43.55-ca-jdk11.0.9.1/zulu11.43.55-ca-jdk11.0.9.1-win_x64.zip",
+            "https://cdn.azul.com/zulu/bin/zulu11.43.55-ca-jdk11.0.9.1-win_x64.zip",
         ],
         version = "11",
     )
 
     maybe(
         remote_java_repository,
-        name = "remotejdk11_linux_ppc64le",
+        name = "remote_jdk11_linux_ppc64le",
         exec_compatible_with = [
             "@platforms//os:linux",
             "@platforms//cpu:ppc",
@@ -348,10 +351,9 @@ def remote_jdk11_repos():
         version = "11",
     )
 
-    # This must be kept in sync with the top-level WORKSPACE file.
     maybe(
         remote_java_repository,
-        name = "remotejdk11_linux_s390x",
+        name = "remote_jdk11_linux_s390x",
         exec_compatible_with = [
             "@platforms//os:linux",
             "@platforms//cpu:s390x",
