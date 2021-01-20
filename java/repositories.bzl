@@ -266,6 +266,7 @@ def remote_jdk10_repos():
         http_archive,
         name = "remote_jdk10_macos",
         build_file_content = "java_runtime(name = 'runtime', srcs =  glob(['**']), visibility = ['//visibility:public'])",
+        sha256 = "7394d5f41804cfbdb47c609879c4e738bf53358484ea0995076190915b94c702",
         strip_prefix = "zulu10.2+3-jdk10.0.1-macosx_x64",
         urls = [
             "https://mirror.bazel.build/openjdk/azul-zulu10.2+3-jdk10.0.1/zulu10.2+3-jdk10.0.1-macosx_x64.tar.gz",
@@ -275,6 +276,7 @@ def remote_jdk10_repos():
         http_archive,
         name = "remote_jdk10_windows",
         build_file_content = "java_runtime(name = 'runtime', srcs =  glob(['**']), visibility = ['//visibility:public'])",
+        sha256 = "fd9456b53dab8b9f504ed0f0e2f6305bd0815978d0e02a41643d111290bf940c",
         strip_prefix = "zulu10.2+3-jdk10.0.1-win_x64",
         urls = [
             "https://mirror.bazel.build/openjdk/azul-zulu10.2+3-jdk10.0.1/zulu10.2+3-jdk10.0.1-win_x64.zip",
@@ -369,6 +371,7 @@ def remote_jdk12_repos():
         http_archive,
         name = "remote_jdk12_linux",
         build_file_content = "java_runtime(name = 'runtime', srcs =  glob(['**']), visibility = ['//visibility:public'])",
+        sha256 = "529c99841d69e11a85aea967ccfb9d0fd40b98c5b68dbe1d059002655e0a9c13",
         strip_prefix = "zulu12.2.3-ca-jdk12.0.1-linux_x64",
         urls = [
             "https://mirror.bazel.build/openjdk/azul-zulu12.2.3-ca-jdk12.0.1/zulu12.2.3-ca-jdk12.0.1-linux_x64.tar.gz",
@@ -378,6 +381,7 @@ def remote_jdk12_repos():
         http_archive,
         name = "remote_jdk12_macos",
         build_file_content = "java_runtime(name = 'runtime', srcs =  glob(['**']), visibility = ['//visibility:public'])",
+        sha256 = "67ca9d285056132ebb19fa237a14affda52132142e1171fe1c20e18974b3b8a5",
         strip_prefix = "zulu12.2.3-ca-jdk12.0.1-macosx_x64",
         urls = [
             "https://mirror.bazel.build/openjdk/azul-zulu12.2.3-ca-jdk12.0.1/zulu12.2.3-ca-jdk12.0.1-macosx_x64.tar.gz",
@@ -387,6 +391,7 @@ def remote_jdk12_repos():
         http_archive,
         name = "remote_jdk12_windows",
         build_file_content = "java_runtime(name = 'runtime', srcs =  glob(['**']), visibility = ['//visibility:public'])",
+        sha256 = "cf28404c23c3aa1115363ba6e796c30580a768e1d7d6681a7d053e516008e00d",
         strip_prefix = "zulu12.2.3-ca-jdk12.0.1-win_x64",
         urls = [
             "https://mirror.bazel.build/openjdk/azul-zulu12.2.3-ca-jdk12.0.1/zulu12.2.3-ca-jdk12.0.1-win_x64.zip",
