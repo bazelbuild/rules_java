@@ -56,7 +56,7 @@ def java_tools_javac10_repos():
     maybe(
         http_archive,
         name = "remote_java_tools_javac10_linux",
-        sha256 = "52e03d400d978e9af6321786cdf477694c3838d7e78c2e5b926d0244670b6d3c",
+        sha256 = "d4fbed2bb22634835e42568c2d26df34fdd7281d9a7061c537f32c9970316e38",
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/javac10/v5.0/java_tools_javac10_linux-v5.0.zip",
         ],
@@ -64,7 +64,7 @@ def java_tools_javac10_repos():
     maybe(
         http_archive,
         name = "remote_java_tools_javac10_windows",
-        sha256 = "2e3fa82f5790917b56cec5f5d389ed5ff9592a00b5d66750a1f2b6387921d8be",
+        sha256 = "ee3192ca33c1249ed785c755f84b5a989c22b4a6ca4cb1d7a37dd94104a9999d",
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/javac10/v5.0/java_tools_javac10_windows-v5.0.zip",
         ],
@@ -72,7 +72,7 @@ def java_tools_javac10_repos():
     maybe(
         http_archive,
         name = "remote_java_tools_javac10_macos",
-        sha256 = "d5503cc1700b3d544444302617ccc9b2c2780b7fa7bd013215da403148958c35",
+        sha256 = "d9311bdccb5cfcc8783b70b81a50ca72029fb35a19295dd056a7f7050d71033f",
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/javac10/v5.0/java_tools_javac10_darwin-v5.0.zip",
         ],
