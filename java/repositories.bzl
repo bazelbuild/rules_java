@@ -82,28 +82,28 @@ def java_tools_javac11_repos():
     maybe(
         http_archive,
         name = "remote_java_tools_linux",
-        sha256 = "69e65353c2cd65780abcbcce4daae973599298273b0f8b4d469eed822cb220d1",
+        sha256 = "355c27c603e8fc64bb0e2d7f809741f42576d5f4540f9ce28fd55922085af639",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v10.0/java_tools_javac11_linux-v10.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/javac11_v10.0/java_tools_javac11_linux-v10.0.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v10.5/java_tools_javac11_linux-v10.5.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/javac11_v10.5/java_tools_javac11_linux-v10.5.zip",
         ],
     )
     maybe(
         http_archive,
         name = "remote_java_tools_windows",
-        sha256 = "d2f62af8daa0a3d55789b605f6582e37038329c64843337c71e64515468e55c4",
+        sha256 = "0b4469ca1a9b3f26cb82fb0f4fd00096f0d839ec2fae097e7bdbb982e3a95a59",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v10.0/java_tools_javac11_windows-v10.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/javac11_v10.0/java_tools_javac11_windows-v10.0.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v10.5/java_tools_javac11_windows-v10.5.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/javac11_v10.5/java_tools_javac11_windows-v10.5.zip",
         ],
     )
     maybe(
         http_archive,
         name = "remote_java_tools_darwin",
-        sha256 = "64e5de2175dfccb96831573946b80d106edf3801d9db38b564514bf3581d466b",
+        sha256 = "95aae0a32a170c72a68abb0b9dd6bac7ea3e08c504a5d8c6e8bf7ac51628c98f",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v10.0/java_tools_javac11_darwin-v10.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/javac11_v10.0/java_tools_javac11_darwin-v10.0.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v10.5/java_tools_javac11_darwin-v10.5.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/javac11_v10.5/java_tools_javac11_darwin-v10.5.zip",
         ],
     )
 
