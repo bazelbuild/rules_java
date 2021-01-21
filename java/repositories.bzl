@@ -26,58 +26,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
-def java_tools_javac9_repos():
-    maybe(
-        http_archive,
-        name = "remote_java_tools_javac9_linux",
-        sha256 = "0bf678d9815c7212564ecc99b3bd3643450c17657becb12a7bbedcf97ece740d",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac9/v3.0/java_tools_javac9_linux-v3.0.zip",
-        ],
-    )
-    maybe(
-        http_archive,
-        name = "remote_java_tools_javac9_windows",
-        sha256 = "9b7e8de98ed2d64ea20a7512f986028ca6375b0fce7637f8d05d1517e7890867",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac9/v3.0/java_tools_javac9_windows-v3.0.zip",
-        ],
-    )
-    maybe(
-        http_archive,
-        name = "remote_java_tools_javac9_macos",
-        sha256 = "13a94ddf0c421332f0d3be1adbfc833e24a3a3715bab8f1152660f2df81e286a",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac9/v3.0/java_tools_javac9_darwin-v3.0.zip",
-        ],
-    )
-
-def java_tools_javac10_repos():
-    maybe(
-        http_archive,
-        name = "remote_java_tools_javac10_linux",
-        sha256 = "d4fbed2bb22634835e42568c2d26df34fdd7281d9a7061c537f32c9970316e38",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac10/v5.0/java_tools_javac10_linux-v5.0.zip",
-        ],
-    )
-    maybe(
-        http_archive,
-        name = "remote_java_tools_javac10_windows",
-        sha256 = "ee3192ca33c1249ed785c755f84b5a989c22b4a6ca4cb1d7a37dd94104a9999d",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac10/v5.0/java_tools_javac10_windows-v5.0.zip",
-        ],
-    )
-    maybe(
-        http_archive,
-        name = "remote_java_tools_javac10_macos",
-        sha256 = "d9311bdccb5cfcc8783b70b81a50ca72029fb35a19295dd056a7f7050d71033f",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac10/v5.0/java_tools_javac10_darwin-v5.0.zip",
-        ],
-    )
-
 def java_tools_javac11_repos():
     maybe(
         http_archive,
@@ -104,30 +52,6 @@ def java_tools_javac11_repos():
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v10.5/java_tools_javac11_darwin-v10.5.zip",
             "https://github.com/bazelbuild/java_tools/releases/download/javac11_v10.5/java_tools_javac11_darwin-v10.5.zip",
-        ],
-    )
-
-def java_tools_javac12_repos():
-    maybe(
-        http_archive,
-        name = "remote_java_tools_javac12_linux",
-        sha256 = "fc199be2c7873b0792e00743679fedc1d249fa779c3fe7676111f8d7ced9f2b4",
-        urls = ["https://mirror.bazel.build/bazel_java_tools/releases/javac12/v2.0/java_tools_javac12_linux-v2.0.zip"],
-    )
-    maybe(
-        http_archive,
-        name = "remote_java_tools_javac12_windows",
-        sha256 = "cab191830609838e99c9adc5e9628e8c839305674c5a9ecf1eea4ba0f6c0b0aa",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac12/v2.0/java_tools_javac12_windows-v2.0.zip",
-        ],
-    )
-    maybe(
-        http_archive,
-        name = "remote_java_tools_javac12_macos",
-        sha256 = "d73ff1de1fc2d3ea8403d54099dd2247a2a87390107e7cf81e3a383b0c687341",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac12/v2.0/java_tools_javac12_darwin-v2.0.zip",
         ],
     )
 
