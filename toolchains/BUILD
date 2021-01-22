@@ -4,10 +4,6 @@ licenses(["notice"])
 
 filegroup(
     name = "srcs",
-    srcs = glob([
-        "**",
-    ]) + [
-        "//java/constraints:srcs",
-    ],
+    srcs = glob(["**"]),
     visibility = ["@//:__pkg__"],
 )

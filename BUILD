@@ -7,8 +7,8 @@ filegroup(
     srcs = [
         "BUILD",
         "LICENSE",
-    ] + glob([
-        "*.bzl",
-    ]),
+        "//java:srcs",
+        "//toolchains:srcs",
+    ],
     visibility = ["@//distro:__pkg__"],
 )
