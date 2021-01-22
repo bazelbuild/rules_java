@@ -15,7 +15,7 @@
 
 _MIGRATION_TAG = "__JAVA_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__"
 
-version = "4.0.0"
+version = "4.1.0"
 
 def _add_tags(attrs):
     if "tags" in attrs and attrs["tags"] != None:
