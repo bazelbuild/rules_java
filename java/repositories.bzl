@@ -272,6 +272,10 @@ def remote_jdk11_repos():
         remote_java_repository,
         name = "remote_jdk11_linux_aarch64",
         sha256 = "a452f1b9682d9f83c1c14e54d1446e1c51b5173a3a05dcb013d380f9508562e4",
+        exec_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:aarch64",
+        ],
         strip_prefix = "zulu11.37.48-ca-jdk11.0.6-linux_aarch64",
         urls = [
             "https://mirror.bazel.build/openjdk/azul-zulu11.37.48-ca-jdk11.0.6/zulu11.37.48-ca-jdk11.0.6-linux_aarch64.tar.gz",
@@ -281,7 +285,6 @@ def remote_jdk11_repos():
     maybe(
         remote_java_repository,
         name = "remote_jdk11_linux",
-        build_file = "@bazel_tools//tools/jdk:jdk.BUILD",
         sha256 = "360626cc19063bc411bfed2914301b908a8f77a7919aaea007a977fa8fb3cde1",
         exec_compatible_with = [
             "@platforms//os:linux",
@@ -296,6 +299,10 @@ def remote_jdk11_repos():
         remote_java_repository,
         name = "remote_jdk11_macos",
         sha256 = "e1fe56769f32e2aaac95e0a8f86b5a323da5af3a3b4bba73f3086391a6cc056f",
+        exec_compatible_with = [
+            "@platforms//os:macos",
+            "@platforms//cpu:x86_64",
+        ],
         strip_prefix = "zulu11.37.17-ca-jdk11.0.6-macosx_x64",
         urls = [
             "https://mirror.bazel.build/openjdk/azul-zulu11.37.17-ca-jdk11.0.6/zulu11.37.17-ca-jdk11.0.6-macosx_x64.tar.gz",
@@ -306,6 +313,10 @@ def remote_jdk11_repos():
         remote_java_repository,
         name = "remote_jdk11_windows",
         sha256 = "a9695617b8374bfa171f166951214965b1d1d08f43218db9a2a780b71c665c18",
+        exec_compatible_with = [
+            "@platforms//os:windows",
+            "@platforms//cpu:x86_64",
+        ],
         strip_prefix = "zulu11.37.17-ca-jdk11.0.6-win_x64",
         urls = [
             "https://mirror.bazel.build/openjdk/azul-zulu11.37.17-ca-jdk11.0.6/zulu11.37.17-ca-jdk11.0.6-win_x64.zip",
