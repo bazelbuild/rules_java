@@ -7,7 +7,6 @@ licenses(["notice"])
 filegroup(
     name = "srcs",
     srcs = ["BUILD"],
-    visibility = ["@//java:__pkg__"],
 )
 
 constraint_setting(name = "runtime")

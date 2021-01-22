@@ -2,12 +2,15 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
+# TODO(aiuto): Find a way to strip this rule from the distribution tarball.
 filegroup(
-    name = "srcs",
+    name = "distribution",
     srcs = glob([
         "**",
     ]) + [
         "//java/constraints:srcs",
     ],
-    visibility = ["@//:__pkg__"],
+    visibility = [
+        "@//distro:__pkg__",
+    ],
 )
