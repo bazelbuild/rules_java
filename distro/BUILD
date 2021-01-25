@@ -9,10 +9,7 @@ package(
 # Build the artifact to put on the github release page.
 pkg_tar(
     name = "rules_java-%s" % version,
-    srcs = [
-        "//:distribution",
-        "//java:distribution",
-    ],
+    srcs = ["//:distribution"],
     extension = "tar.gz",
     # It is all source code, so make it read-only.
     mode = "0444",
