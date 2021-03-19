@@ -36,7 +36,10 @@ constraint_value(
     constraint_setting = ":runtime",
 )
 
-constraint_setting(name = "language")
+constraint_setting(
+    name = "language",
+    visibility = ["//visibility:private"],
+)
 
 # visibility
 constraint_value(
