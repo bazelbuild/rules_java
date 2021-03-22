@@ -35,39 +35,3 @@ constraint_value(
     name = "jdk12",
     constraint_setting = ":runtime",
 )
-
-constraint_setting(
-    name = "language",
-    visibility = ["//visibility:private"],
-)
-
-# visibility
-constraint_value(
-    name = "java7",
-    constraint_setting = ":language",
-)
-
-constraint_value(
-    name = "java8",
-    constraint_setting = ":language",
-)
-
-constraint_value(
-    name = "java9",
-    constraint_setting = ":language",
-)
-
-constraint_value(
-    name = "java10",
-    constraint_setting = ":language",
-)
-
-constraint_value(
-    name = "java11",
-    constraint_setting = ":language",
-)
-
-constraint_value(
-    name = "java12",
-    constraint_setting = ":language",
-)
