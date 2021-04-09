@@ -1,0 +1,21 @@
+load("//java:defs.bzl", "java_import")
+
+java_import(
+    name = "byte-buddy",
+    jars = [
+        "byte-buddy-1.10.6.jar",
+    ],
+    visibility = [
+        "//java/org/bazelbuild/rules_java/modules:__pkg__",
+    ],
+)
+
+java_import(
+    name = "javaparser-core",
+    jars = [
+        "javaparser-core-3.15.9.jar",
+    ],
+    visibility = [
+        "//java/org/bazelbuild/rules_java/modules:__pkg__",
+    ],
+)
