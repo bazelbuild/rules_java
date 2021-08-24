@@ -33,7 +33,7 @@ def java_tools_javac11_repos():
         name = "remote_java_tools_linux",
         sha256 = "014fe7305bb0cf2430ca7fc61a2939d4a547d10a1ad47ce909c16235f8f49f46",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v11.3/java_tools_javac11_linux-v11.3.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.3/java_tools_linux-v11.3.zip",
             "https://github.com/bazelbuild/java_tools/releases/download/javac11_v11.3/java_tools_javac11_linux-v11.3.zip",
         ],
     )
@@ -42,8 +42,8 @@ def java_tools_javac11_repos():
         name = "remote_java_tools_windows",
         sha256 = "ebb885cc75bfb72ab509de68883ed31638ba2c1a22181636e75c9c731f73fee3",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v11.3/java_tools_javac11_windows-v11.3.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/javac11_v11.3/java_tools_javac11_windows-v11.3.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.3/java_tools_windows-v11.3.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v11.3/java_tools_windows-v11.3.zip",
         ],
     )
     maybe(
@@ -51,8 +51,8 @@ def java_tools_javac11_repos():
         name = "remote_java_tools_darwin",
         sha256 = "d09141a35e2c7950f6b7ea344ebd67868146fd2d1ee2b7509cdc36a42786cca4",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/javac11/v11.3/java_tools_javac11_darwin-v11.3.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/javac11_v11.3/java_tools_javac11_darwin-v11.3.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.3/java_tools_darwin-v11.3.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v11.3/java_tools_darwin-v11.3.zip",
         ],
     )
 
