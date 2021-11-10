@@ -56,6 +56,12 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
       runtime_name: name of java_runtime target if it already exists.
       visibility: Visibility that will be applied to the java runtime target
     """
+
+    # The repository name in Bzlmod will be "<module canonical name>.<module extension name>.local_jdk"
+    # instead of "local_jdk", therefore we cannot just use it as the config_setting value,
+    # because it won't match the default value of --java_runtime_version (which is "local_jdk").
+    name = name.split(".")[-1]
+
     if runtime_name == None:
         runtime_name = name
         native.java_runtime(
@@ -168,7 +174,7 @@ local_java_runtime(
 
     repository_ctx.file(
         "BUILD.bazel",
-        'load("@bazel_tools//tools/jdk:local_java_repository.bzl", "local_java_runtime")\n' +
+        'load("@rules_java//toolchains:local_java_repository.bzl", "local_java_runtime")\n' +
         build_file +
         local_java_runtime_macro,
     )
@@ -178,7 +184,7 @@ local_java_runtime(
         repository_ctx.symlink(file, file.basename)
 
 # Build file template, when JDK does not exist
-_NOJDK_BUILD_TPL = '''load("@bazel_tools//tools/jdk:fail_rule.bzl", "fail_rule")
+_NOJDK_BUILD_TPL = '''load("@rules_java//toolchains:fail_rule.bzl", "fail_rule")
 fail_rule(
    name = "jdk",
    header = "Auto-Configuration Error:",
@@ -229,4 +235,3 @@ def local_java_repository(name, java_home, version = "", build_file = None):
       version: optionally java version
     """
     _local_java_repository_rule(name = name, java_home = java_home, version = version, build_file = build_file)
-    native.register_toolchains("@" + name + "//:runtime_toolchain_definition")

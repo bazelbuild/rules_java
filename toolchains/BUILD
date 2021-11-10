@@ -1,5 +1,5 @@
 load(
-    "@bazel_tools//tools/jdk:default_java_toolchain.bzl",
+    "//toolchains:default_java_toolchain.bzl",
     "DEFAULT_TOOLCHAIN_CONFIGURATION",
     "JVM8_TOOLCHAIN_CONFIGURATION",
     "PREBUILT_TOOLCHAIN_CONFIGURATION",
@@ -9,12 +9,13 @@ load(
     "java_runtime_files",
 )
 load(
-    "//tools/jdk:java_toolchain_alias.bzl",
+    "//toolchains:java_toolchain_alias.bzl",
     "java_host_runtime_alias",
     "java_runtime_alias",
     "java_runtime_version_alias",
     "java_toolchain_alias",
 )
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -26,16 +27,13 @@ filegroup(
     visibility = ["@//:__pkg__"],
 )
 
-
-load("//tools/python:private/defs.bzl", "py_binary", "py_test")
-
-package(default_visibility = ["//visibility:public"])
-
 # Used to distinguish toolchains used for Java development, ie the JavaToolchainProvider.
-toolchain_type(name = "toolchain_type")
+# TODO: migrate away from using @bazel_tools//tools/jdk:toolchain_type ?
+# toolchain_type(name = "toolchain_type")
 
 # Used to distinguish toolchains used for Java execution, ie the JavaRuntimeInfo.
-toolchain_type(name = "runtime_toolchain_type")
+# TODO: migrate away from using @bazel_tools//tools/jdk:runtime_toolchain_type ?
+# toolchain_type(name = "runtime_toolchain_type")
 
 # Points to toolchain[":runtime_toolchain_type"] (was :legacy_current_java_runtime)
 java_runtime_alias(name = "current_java_runtime")
@@ -57,7 +55,7 @@ java_plugins_flag_alias(
 # *before* the transition.
 alias(
     name = "java_runtime_alias",
-    actual = "//tools/jdk:current_java_runtime",
+    actual = ":current_java_runtime",
 )
 
 # These individual jni_* targets are exposed for legacy reasons.
@@ -102,29 +100,29 @@ java_runtime_files(
 cc_library(
     name = "jni",
     hdrs = [":jni_header"] + select({
-        "//src/conditions:linux_aarch64": [":jni_md_header-linux"],
-        "//src/conditions:linux_ppc64le": [":jni_md_header-linux"],
-        "//src/conditions:linux_s390x": [":jni_md_header-linux"],
-        "//src/conditions:linux_mips64": [":jni_md_header-linux"],
-        "//src/conditions:linux_riscv64": [":jni_md_header-linux"],
-        "//src/conditions:linux_x86_64": [":jni_md_header-linux"],
-        "//src/conditions:darwin": [":jni_md_header-darwin"],
-        "//src/conditions:freebsd": [":jni_md_header-freebsd"],
-        "//src/conditions:openbsd": [":jni_md_header-openbsd"],
-        "//src/conditions:windows": [":jni_md_header-windows"],
+        "@bazel_tools//src/conditions:linux_aarch64": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:linux_ppc64le": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:linux_s390x": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:linux_mips64": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:linux_riscv64": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:linux_x86_64": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:darwin": [":jni_md_header-darwin"],
+        "@bazel_tools//src/conditions:freebsd": [":jni_md_header-freebsd"],
+        "@bazel_tools//src/conditions:openbsd": [":jni_md_header-openbsd"],
+        "@bazel_tools//src/conditions:windows": [":jni_md_header-windows"],
         "//conditions:default": [],
     }),
     includes = ["include"] + select({
-        "//src/conditions:linux_aarch64": ["include/linux"],
-        "//src/conditions:linux_ppc64le": ["include/linux"],
-        "//src/conditions:linux_s390x": ["include/linux"],
-        "//src/conditions:linux_mips64": [":include/linux"],
-        "//src/conditions:linux_riscv64": [":include/linux"],
-        "//src/conditions:linux_x86_64": ["include/linux"],
-        "//src/conditions:darwin": ["include/darwin"],
-        "//src/conditions:freebsd": ["include/freebsd"],
-        "//src/conditions:openbsd": ["include/openbsd"],
-        "//src/conditions:windows": ["include/win32"],
+        "@bazel_tools//src/conditions:linux_aarch64": ["include/linux"],
+        "@bazel_tools//src/conditions:linux_ppc64le": ["include/linux"],
+        "@bazel_tools//src/conditions:linux_s390x": ["include/linux"],
+        "@bazel_tools//src/conditions:linux_mips64": [":include/linux"],
+        "@bazel_tools//src/conditions:linux_riscv64": [":include/linux"],
+        "@bazel_tools//src/conditions:linux_x86_64": ["include/linux"],
+        "@bazel_tools//src/conditions:darwin": ["include/darwin"],
+        "@bazel_tools//src/conditions:freebsd": ["include/freebsd"],
+        "@bazel_tools//src/conditions:openbsd": ["include/openbsd"],
+        "@bazel_tools//src/conditions:windows": ["include/win32"],
         "//conditions:default": [],
     }),
 )
@@ -180,9 +178,9 @@ alias(
 alias(
     name = "ijar_prebuilt_binary_or_cc_binary",
     actual = select({
-        "//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
-        "//src/conditions:darwin": ":ijar_prebuilt_binary_darwin",
-        "//src/conditions:windows": ":ijar_prebuilt_binary_windows",
+        "@bazel_tools//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
+        "@bazel_tools//src/conditions:darwin": ":ijar_prebuilt_binary_darwin",
+        "@bazel_tools//src/conditions:windows": ":ijar_prebuilt_binary_windows",
         "//conditions:default": "@remote_java_tools//:ijar_cc_binary",
     }),
 )
@@ -190,9 +188,9 @@ alias(
 alias(
     name = "ijar_prebuilt_binary",
     actual = select({
-        "//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
-        "//src/conditions:darwin": ":ijar_prebuilt_binary_darwin",
-        "//src/conditions:windows": ":ijar_prebuilt_binary_windows",
+        "@bazel_tools//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
+        "@bazel_tools//src/conditions:darwin": ":ijar_prebuilt_binary_darwin",
+        "@bazel_tools//src/conditions:windows": ":ijar_prebuilt_binary_windows",
     }),
 )
 
@@ -210,9 +208,9 @@ alias(
 alias(
     name = "singlejar_prebuilt_or_cc_binary",
     actual = select({
-        "//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
-        "//src/conditions:darwin": ":prebuilt_singlejar_darwin",
-        "//src/conditions:windows": ":prebuilt_singlejar_windows",
+        "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
+        "@bazel_tools//src/conditions:darwin": ":prebuilt_singlejar_darwin",
+        "@bazel_tools//src/conditions:windows": ":prebuilt_singlejar_windows",
         "//conditions:default": "@remote_java_tools//:singlejar_cc_bin",
     }),
 )
@@ -220,9 +218,9 @@ alias(
 alias(
     name = "prebuilt_singlejar",
     actual = select({
-        "//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
-        "//src/conditions:darwin": ":prebuilt_singlejar_darwin",
-        "//src/conditions:windows": ":prebuilt_singlejar_windows",
+        "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
+        "@bazel_tools//src/conditions:darwin": ":prebuilt_singlejar_darwin",
+        "@bazel_tools//src/conditions:windows": ":prebuilt_singlejar_windows",
     }),
 )
 
@@ -372,20 +370,11 @@ RELEASES = (8, 9, 10, 11)
     for release in RELEASES
 ]
 
-# A toolchain that targets java 14.
-default_java_toolchain(
-    name = "toolchain_jdk_14",
-    configuration = dict(),
-    java_runtime = "@bazel_tools//tools/jdk:remotejdk_14",
-    source_version = "14",
-    target_version = "14",
-)
-
 # A toolchain that targets java 15.
 default_java_toolchain(
     name = "toolchain_jdk_15",
     configuration = dict(),
-    java_runtime = "@bazel_tools//tools/jdk:remotejdk_15",
+    java_runtime = "//toolchains:remotejdk_15",
     source_version = "15",
     target_version = "15",
 )
@@ -394,7 +383,7 @@ default_java_toolchain(
 default_java_toolchain(
     name = "toolchain_jdk_16",
     configuration = dict(),
-    java_runtime = "@bazel_tools//tools/jdk:remotejdk_16",
+    java_runtime = "//toolchains:remotejdk_16",
     source_version = "16",
     target_version = "16",
 )
@@ -403,7 +392,7 @@ default_java_toolchain(
 default_java_toolchain(
     name = "toolchain_jdk_17",
     configuration = dict(),
-    java_runtime = "@bazel_tools//tools/jdk:remotejdk_17",
+    java_runtime = "//toolchains:remotejdk_17",
     source_version = "17",
     target_version = "17",
 )

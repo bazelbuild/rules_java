@@ -62,16 +62,16 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
     genclass = ["@remote_java_tools//:GenClass"],
     header_compiler = ["@remote_java_tools//:TurbineDirect"],
     header_compiler_direct = ["@remote_java_tools//:TurbineDirect"],
-    ijar = ["@bazel_tools//tools/jdk:ijar"],
+    ijar = ["//toolchains:ijar"],
     javabuilder = ["@remote_java_tools//:JavaBuilder"],
     javac_supports_workers = True,
     jacocorunner = "@remote_java_tools//:jacoco_coverage_runner_filegroup",
     jvm_opts = BASE_JDK9_JVM_OPTS,
     misc = DEFAULT_JAVACOPTS,
-    singlejar = ["@bazel_tools//tools/jdk:singlejar"],
+    singlejar = ["//toolchains:singlejar"],
     # Code to enumerate target JVM boot classpath uses host JVM. Because
     # java_runtime-s are involved, its implementation is in @bazel_tools.
-    bootclasspath = ["@bazel_tools//tools/jdk:platformclasspath"],
+    bootclasspath = ["//toolchains:platformclasspath"],
     source_version = "8",
     target_version = "8",
     reduced_classpath_incompatible_processors = [
@@ -82,7 +82,7 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
 JVM8_TOOLCHAIN_CONFIGURATION = dict(
     tools = ["@remote_java_tools//:javac_jar"],
     jvm_opts = ["-Xbootclasspath/p:$(location @remote_java_tools//:javac_jar)"],
-    java_runtime = "@bazel_tools//tools/jdk:jdk_8",
+    java_runtime = "//toolchains:jdk_8",
 )
 
 DEFAULT_TOOLCHAIN_CONFIGURATION = dict(
@@ -98,7 +98,7 @@ DEFAULT_TOOLCHAIN_CONFIGURATION = dict(
         "@remote_java_tools//:java_compiler_jar",
         "@remote_java_tools//:jdk_compiler_jar",
     ],
-    java_runtime = "@bazel_tools//tools/jdk:remote_jdk11",
+    java_runtime = "//toolchains:remote_jdk11",
 )
 
 # The 'vanilla' toolchain is an unsupported alternative to the default.
@@ -137,9 +137,9 @@ PREBUILT_TOOLCHAIN_CONFIGURATION = dict(
         "@remote_java_tools//:java_compiler_jar",
         "@remote_java_tools//:jdk_compiler_jar",
     ],
-    ijar = ["@bazel_tools//tools/jdk:ijar_prebuilt_binary"],
-    singlejar = ["@bazel_tools//tools/jdk:prebuilt_singlejar"],
-    java_runtime = "@bazel_tools//tools/jdk:remote_jdk11",
+    ijar = ["//toolchains:ijar_prebuilt_binary"],
+    singlejar = ["//toolchains:prebuilt_singlejar"],
+    java_runtime = "//toolchains:remote_jdk11",
 )
 
 # The new toolchain is using all the tools from sources.
@@ -158,7 +158,7 @@ NONPREBUILT_TOOLCHAIN_CONFIGURATION = dict(
     ],
     ijar = ["@remote_java_tools//:ijar_cc_binary"],
     singlejar = ["@remote_java_tools//:singlejar_cc_bin"],
-    java_runtime = "@bazel_tools//tools/jdk:remote_jdk11",
+    java_runtime = "//toolchains:remote_jdk11",
 )
 
 def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION, toolchain_definition = True, **kwargs):
@@ -194,8 +194,8 @@ def java_runtime_files(name, srcs):
     for src in srcs:
         native.genrule(
             name = "gen_%s" % src,
-            srcs = ["@bazel_tools//tools/jdk:current_java_runtime"],
-            toolchains = ["@bazel_tools//tools/jdk:current_java_runtime"],
+            srcs = ["//toolchains:current_java_runtime"],
+            toolchains = ["//toolchains:current_java_runtime"],
             cmd = "cp $(JAVABASE)/%s $@" % src,
             outs = [src],
         )

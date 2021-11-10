@@ -55,7 +55,7 @@ java_host_runtime_alias = rule(
     implementation = _java_host_runtime_alias,
     attrs = {
         "_runtime": attr.label(
-            default = Label("@bazel_tools//tools/jdk:current_java_runtime"),
+            default = Label("//toolchains:current_java_runtime"),
             providers = [
                 java_common.JavaRuntimeInfo,
                 platform_common.TemplateVariableInfo,
