@@ -1,4 +1,4 @@
-# Copyright 2020 The Bazel Authors. All rights reserved.
+# Copyright 2021 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 """Rules for importing and registering a local JDK."""
 
+load("@rules_java//java:defs.bzl", "java_runtime")
 load(":default_java_toolchain.bzl", "JVM8_TOOLCHAIN_CONFIGURATION", "default_java_toolchain")
 
 def _detect_java_version(repository_ctx, java_bin):
@@ -64,7 +65,7 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
 
     if runtime_name == None:
         runtime_name = name
-        native.java_runtime(
+        java_runtime(
             name = runtime_name,
             java_home = java_home,
             visibility = visibility,
@@ -120,17 +121,57 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
 
     # else version is not recognized and no compilation toolchains are predefined
 
+def _is_macos(repository_ctx):
+    return repository_ctx.os.name.lower().find("mac os x") != -1
+
+def _is_windows(repository_ctx):
+    return repository_ctx.os.name.lower().find("windows") != -1
+
+def _with_os_extension(repository_ctx, binary):
+    return binary + (".exe" if _is_windows(repository_ctx) else "")
+
+def _determine_java_home(repository_ctx):
+    """Determine the java home path.
+
+    If the `java_home` attribute is specified, then use the given path,
+    otherwise, try to detect the java home path on the system.
+
+    Args:
+      repository_ctx: repository context
+    """
+    java_home = repository_ctx.attr.java_home
+    if java_home:
+        java_home_path = repository_ctx.path(java_home)
+        if not java_home_path.exists:
+            fail('The path indicated by the "java_home" attribute "%s" (absolute: "%s") ' +
+                 "does not exist." % (java_home, str(java_home_path)))
+        return java_home_path
+    if "JAVA_HOME" in repository_ctx.os.environ:
+        return repository_ctx.path(repository_ctx.os.environ["JAVA_HOME"])
+
+    if _is_macos(repository_ctx):
+        # Replicate GetSystemJavabase() in src/main/cpp/blaze_util_darwin.cc
+        result = repository_ctx.execute(["/usr/libexec/java_home", "-v", "1.11+"])
+        if result.return_code == 0:
+            return repository_ctx.path(result.stdout.strip())
+    else:
+        # Calculate java home by locating the javac binary
+        # javac should exists at ${JAVA_HOME}/bin/javac
+        # Replicate GetSystemJavabase() in src/main/cpp/blaze_util_linux.cc
+        # This logic should also work on Windows.
+        javac_path = repository_ctx.which(_with_os_extension(repository_ctx, "javac"))
+        if javac_path:
+            return javac_path.realpath.dirname.dirname
+    return repository_ctx.path("./nosystemjdk")
+
 def _local_java_repository_impl(repository_ctx):
     """Repository rule local_java_repository implementation.
 
     Args:
       repository_ctx: repository context
     """
-    java_home = repository_ctx.attr.java_home
-    java_home_path = repository_ctx.path(java_home)
-    if not java_home_path.exists:
-        fail('The path indicated by the "java_home" attribute "%s" (absolute: "%s") ' +
-             "does not exist." % (java_home, str(java_home_path)))
+
+    java_home = _determine_java_home(repository_ctx)
 
     repository_ctx.file(
         "WORKSPACE",
@@ -138,8 +179,7 @@ def _local_java_repository_impl(repository_ctx):
         "workspace(name = \"{name}\")\n".format(name = repository_ctx.name),
     )
 
-    extension = ".exe" if repository_ctx.os.name.lower().find("windows") != -1 else ""
-    java_bin = java_home_path.get_child("bin").get_child("java" + extension)
+    java_bin = java_home.get_child("bin").get_child(_with_os_extension(repository_ctx, "java"))
 
     if not java_bin.exists:
         # Java binary does not exist
@@ -147,7 +187,7 @@ def _local_java_repository_impl(repository_ctx):
             "BUILD.bazel",
             _NOJDK_BUILD_TPL.format(
                 local_jdk = repository_ctx.name,
-                java_binary = "bin/java" + extension,
+                java_binary = _with_os_extension(repository_ctx, "bin/java"),
                 java_home = java_home,
             ),
             False,
@@ -180,7 +220,7 @@ local_java_runtime(
     )
 
     # Symlink all files
-    for file in repository_ctx.path(java_home).readdir():
+    for file in java_home.readdir():
         repository_ctx.symlink(file, file.basename)
 
 # Build file template, when JDK does not exist
@@ -209,14 +249,15 @@ _local_java_repository_rule = repository_rule(
     implementation = _local_java_repository_impl,
     local = True,
     configure = True,
+    environ = ["JAVA_HOME"],
     attrs = {
+        "build_file": attr.label(),
         "java_home": attr.string(),
         "version": attr.string(),
-        "build_file": attr.label(),
     },
 )
 
-def local_java_repository(name, java_home, version = "", build_file = None):
+def local_java_repository(name, java_home = "", version = "", build_file = None):
     """Registers a runtime toolchain for local JDK and creates an unregistered compile toolchain.
 
     Toolchain resolution is constrained with --java_runtime_version flag
