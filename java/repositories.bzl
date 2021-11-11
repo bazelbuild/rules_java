@@ -25,6 +25,7 @@
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+load("//toolchains:local_java_repository.bzl", "local_java_repository")
 load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
 def java_tools_javac11_repos():
@@ -46,7 +47,6 @@ def java_tools_javac11_repos():
         ],
     )
 
-
     http_archive(
         name = "remote_java_tools_windows",
         sha256 = "36766802f7ec684cecb1a14c122428de6be9784e88419e2ab5912ad4b59a8c7d",
@@ -63,6 +63,12 @@ def java_tools_javac11_repos():
             "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.5/java_tools_darwin-v11.5.zip",
             "https://github.com/bazelbuild/java_tools/releases/download/java_v11.5/java_tools_darwin-v11.5.zip",
         ],
+    )
+
+def local_jdk_repo():
+    local_java_repository(
+        name = "local_jdk",
+        build_file = Label("//toolchains:jdk.BUILD"),
     )
 
 def remote_jdk11_repos():
@@ -363,19 +369,51 @@ def bazel_skylib():
         sha256 = "1dde365491125a3db70731e25658dfdd3bc5dbdfd11b840b3e987ecf043c7ca0",
     )
 
+def rules_python():
+    maybe(
+        http_archive,
+        name = "rules_python",
+        type = "tar.gz",
+        url = "https://github.com/bazelbuild/rules_python/releases/download/0.4.0/rules_python-0.4.0.tar.gz",
+        sha256 = "954aa89b491be4a083304a2cb838019c8b8c3720a7abb9c4cb81ac7a24230cea",
+    )
+
 def rules_java_dependencies():
     """An utility method to load all dependencies of rules_java.
 
     Loads the remote repositories used by default in Bazel.
     """
 
+    local_jdk_repo()
     remote_jdk11_repos()
-    java_tools_javac11_repos()
-    bazel_skylib()
+    remote_jdk15_repos()
+    remote_jdk16_repos()
+    remote_jdk17_repos()
 
-def rules_java_toolchains():
+    # TODO: load this will break compatibility with Bazel 4.2.1
+    # java_tools_javac11_repos()
+    bazel_skylib()
+    rules_python()
+
+def rules_java_toolchains(name = "toolchains"):
     """An utility method to load all Java toolchains.
 
-    It doesn't do anything at the moment.
+    Args:
+        name: The name of this macro (not used)
     """
-    pass
+    JDK_VERSIONS = ["11", "15", "16", "17"]
+    PLATFORMS = ["linux", "macos", "macos_aarch64", "win"]
+
+    # Remote JDK repos for those Linux platforms are only defined for JDK 11.
+    EXTRA_REMOTE_JDK11_REPOS = [
+        "remotejdk11_linux_aarch64",
+        "remotejdk11_linux_ppc64le",
+        "remotejdk11_linux_s390x",
+    ]
+
+    REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDK_VERSIONS for platform in PLATFORMS] + EXTRA_REMOTE_JDK11_REPOS
+    native.register_toolchains("//toolchains:all")
+
+    native.register_toolchains("@local_jdk//:runtime_toolchain_definition")
+    for name in REMOTE_JDK_REPOS:
+        native.register_toolchains("@" + name + "_toolchain_config_repo//:toolchain")
