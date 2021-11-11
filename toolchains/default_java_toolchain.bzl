@@ -1,4 +1,4 @@
-# Copyright 2017 The Bazel Authors. All rights reserved.
+# Copyright 2021 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Bazel rules for creating Java toolchains."""
+"""Rules for defining default_java_toolchain"""
+
+load("@rules_java//java:defs.bzl", "java_toolchain")
 
 JDK8_JVM_OPTS = [
     "-Xbootclasspath/p:$(location @remote_java_tools//:javac_jar)",
@@ -162,12 +164,19 @@ NONPREBUILT_TOOLCHAIN_CONFIGURATION = dict(
 )
 
 def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION, toolchain_definition = True, **kwargs):
-    """Defines a remote java_toolchain with appropriate defaults for Bazel."""
+    """Defines a remote java_toolchain with appropriate defaults for Bazel.
+
+    Args:
+        name: The name of the toolchain
+        configuration: Toolchain configuration
+        toolchain_definition: Whether to define toolchain target and its config setting
+        **kwargs: More arguments for the java_toolchain target
+    """
 
     toolchain_args = dict(_BASE_TOOLCHAIN_CONFIGURATION)
     toolchain_args.update(configuration)
     toolchain_args.update(kwargs)
-    native.java_toolchain(
+    java_toolchain(
         name = name,
         **toolchain_args
     )
@@ -274,6 +283,7 @@ _bootclasspath = rule(
             cfg = "host",
             providers = [java_common.JavaRuntimeInfo],
         ),
+        "output_jar": attr.output(mandatory = True),
         "src": attr.label(
             cfg = "host",
             allow_single_file = True,
@@ -281,7 +291,6 @@ _bootclasspath = rule(
         "target_javabase": attr.label(
             providers = [java_common.JavaRuntimeInfo],
         ),
-        "output_jar": attr.output(mandatory = True),
     },
 )
 

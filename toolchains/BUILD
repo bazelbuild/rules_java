@@ -1,9 +1,11 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_java//java:defs.bzl", "java_import")
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 load(
     "//toolchains:default_java_toolchain.bzl",
     "DEFAULT_TOOLCHAIN_CONFIGURATION",
     "JVM8_TOOLCHAIN_CONFIGURATION",
     "PREBUILT_TOOLCHAIN_CONFIGURATION",
-    "VANILLA_TOOLCHAIN_CONFIGURATION",
     "bootclasspath",
     "default_java_toolchain",
     "java_runtime_files",
@@ -15,7 +17,6 @@ load(
     "java_runtime_version_alias",
     "java_toolchain_alias",
 )
-load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -100,27 +101,27 @@ java_runtime_files(
 cc_library(
     name = "jni",
     hdrs = [":jni_header"] + select({
-        "@bazel_tools//src/conditions:linux_aarch64": [":jni_md_header-linux"],
-        "@bazel_tools//src/conditions:linux_ppc64le": [":jni_md_header-linux"],
-        "@bazel_tools//src/conditions:linux_s390x": [":jni_md_header-linux"],
-        "@bazel_tools//src/conditions:linux_mips64": [":jni_md_header-linux"],
-        "@bazel_tools//src/conditions:linux_riscv64": [":jni_md_header-linux"],
-        "@bazel_tools//src/conditions:linux_x86_64": [":jni_md_header-linux"],
         "@bazel_tools//src/conditions:darwin": [":jni_md_header-darwin"],
         "@bazel_tools//src/conditions:freebsd": [":jni_md_header-freebsd"],
+        "@bazel_tools//src/conditions:linux_aarch64": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:linux_mips64": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:linux_ppc64le": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:linux_riscv64": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:linux_s390x": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:linux_x86_64": [":jni_md_header-linux"],
         "@bazel_tools//src/conditions:openbsd": [":jni_md_header-openbsd"],
         "@bazel_tools//src/conditions:windows": [":jni_md_header-windows"],
         "//conditions:default": [],
     }),
     includes = ["include"] + select({
-        "@bazel_tools//src/conditions:linux_aarch64": ["include/linux"],
-        "@bazel_tools//src/conditions:linux_ppc64le": ["include/linux"],
-        "@bazel_tools//src/conditions:linux_s390x": ["include/linux"],
-        "@bazel_tools//src/conditions:linux_mips64": [":include/linux"],
-        "@bazel_tools//src/conditions:linux_riscv64": [":include/linux"],
-        "@bazel_tools//src/conditions:linux_x86_64": ["include/linux"],
         "@bazel_tools//src/conditions:darwin": ["include/darwin"],
         "@bazel_tools//src/conditions:freebsd": ["include/freebsd"],
+        "@bazel_tools//src/conditions:linux_aarch64": ["include/linux"],
+        "@bazel_tools//src/conditions:linux_mips64": [":include/linux"],
+        "@bazel_tools//src/conditions:linux_ppc64le": ["include/linux"],
+        "@bazel_tools//src/conditions:linux_riscv64": [":include/linux"],
+        "@bazel_tools//src/conditions:linux_s390x": ["include/linux"],
+        "@bazel_tools//src/conditions:linux_x86_64": ["include/linux"],
         "@bazel_tools//src/conditions:openbsd": ["include/openbsd"],
         "@bazel_tools//src/conditions:windows": ["include/win32"],
         "//conditions:default": [],
@@ -178,8 +179,8 @@ alias(
 alias(
     name = "ijar_prebuilt_binary_or_cc_binary",
     actual = select({
-        "@bazel_tools//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
         "@bazel_tools//src/conditions:darwin": ":ijar_prebuilt_binary_darwin",
+        "@bazel_tools//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
         "@bazel_tools//src/conditions:windows": ":ijar_prebuilt_binary_windows",
         "//conditions:default": "@remote_java_tools//:ijar_cc_binary",
     }),
@@ -188,8 +189,8 @@ alias(
 alias(
     name = "ijar_prebuilt_binary",
     actual = select({
-        "@bazel_tools//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
         "@bazel_tools//src/conditions:darwin": ":ijar_prebuilt_binary_darwin",
+        "@bazel_tools//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
         "@bazel_tools//src/conditions:windows": ":ijar_prebuilt_binary_windows",
     }),
 )
@@ -208,8 +209,8 @@ alias(
 alias(
     name = "singlejar_prebuilt_or_cc_binary",
     actual = select({
-        "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
         "@bazel_tools//src/conditions:darwin": ":prebuilt_singlejar_darwin",
+        "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
         "@bazel_tools//src/conditions:windows": ":prebuilt_singlejar_windows",
         "//conditions:default": "@remote_java_tools//:singlejar_cc_bin",
     }),
@@ -218,8 +219,8 @@ alias(
 alias(
     name = "prebuilt_singlejar",
     actual = select({
-        "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
         "@bazel_tools//src/conditions:darwin": ":prebuilt_singlejar_darwin",
+        "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
         "@bazel_tools//src/conditions:windows": ":prebuilt_singlejar_windows",
     }),
 )
@@ -310,14 +311,6 @@ alias(
     name = "proguard",
     actual = "@remote_java_tools//:proguard",
 )
-
-BOOTCLASS_JARS = [
-    "rt.jar",
-    "resources.jar",
-    "jsse.jar",
-    "jce.jar",
-    "charsets.jar",
-]
 
 # TODO(cushon): this isn't compatible with JDK 9
 alias(

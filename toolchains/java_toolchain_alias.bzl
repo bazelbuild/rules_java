@@ -96,6 +96,8 @@ def _java_toolchain_alias(ctx):
     """An experimental implementation of java_toolchain_alias using toolchain resolution."""
     toolchain_info = ctx.toolchains["@bazel_tools//tools/jdk:toolchain_type"]
     toolchain = toolchain_info.java
+
+    # buildifier: disable=rule-impl-return
     return struct(
         providers = [
             toolchain_info,
