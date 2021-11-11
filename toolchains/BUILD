@@ -45,11 +45,6 @@ java_host_runtime_alias(name = "current_host_java_runtime")
 # Points to toolchain[":toolchain_type"] (was :legacy_current_java_toolchain)
 java_toolchain_alias(name = "current_java_toolchain")
 
-# Aliases value of --plugins flag as a JavaPluginInfo
-java_plugins_flag_alias(
-    name = "java_plugins_flag_alias",
-)
-
 # This is necessary to get the *host* Java runtime. Depending on
 # //tools/jdk:current_java_runtime from an attribute with the host transition
 # does not work because the dependency is determined based on the configuration
