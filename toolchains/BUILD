@@ -1,10 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
-load("@rules_java//java:defs.bzl", "java_import")
-load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 load(
     "//toolchains:default_java_toolchain.bzl",
     "DEFAULT_TOOLCHAIN_CONFIGURATION",
-    "JVM8_TOOLCHAIN_CONFIGURATION",
     "PREBUILT_TOOLCHAIN_CONFIGURATION",
     "bootclasspath",
     "default_java_toolchain",
@@ -44,15 +41,6 @@ java_host_runtime_alias(name = "current_host_java_runtime")
 
 # Points to toolchain[":toolchain_type"] (was :legacy_current_java_toolchain)
 java_toolchain_alias(name = "current_java_toolchain")
-
-# This is necessary to get the *host* Java runtime. Depending on
-# //tools/jdk:current_java_runtime from an attribute with the host transition
-# does not work because the dependency is determined based on the configuration
-# *before* the transition.
-alias(
-    name = "java_runtime_alias",
-    actual = ":current_java_runtime",
-)
 
 # These individual jni_* targets are exposed for legacy reasons.
 # Most users should depend on :jni.
@@ -121,26 +109,6 @@ cc_library(
         "@bazel_tools//src/conditions:windows": ["include/win32"],
         "//conditions:default": [],
     }),
-)
-
-alias(
-    name = "java",
-    actual = "@local_jdk//:java",
-)
-
-alias(
-    name = "jar",
-    actual = "@local_jdk//:jar",
-)
-
-alias(
-    name = "javac",
-    actual = "@local_jdk//:javac",
-)
-
-alias(
-    name = "javadoc",
-    actual = "@local_jdk//:javadoc",
 )
 
 [
@@ -220,114 +188,6 @@ alias(
     }),
 )
 
-exports_files(["BUILD.java_tools"])
-
-alias(
-    name = "genclass",
-    actual = "@remote_java_tools//:GenClass",
-)
-
-alias(
-    name = "GenClass_deploy.jar",
-    actual = "@remote_java_tools//:GenClass",
-)
-
-alias(
-    name = "turbine",
-    actual = "@remote_java_tools//:Turbine",
-)
-
-alias(
-    name = "turbine_deploy.jar",
-    actual = "@remote_java_tools//:Turbine",
-)
-
-alias(
-    name = "turbine_direct",
-    actual = "@remote_java_tools//:TurbineDirect",
-)
-
-alias(
-    name = "turbine_direct_binary_deploy.jar",
-    actual = "@remote_java_tools//:TurbineDirect",
-)
-
-alias(
-    name = "javabuilder",
-    actual = "@remote_java_tools//:JavaBuilder",
-)
-
-alias(
-    name = "JavaBuilder_deploy.jar",
-    actual = "@remote_java_tools//:JavaBuilder",
-)
-
-alias(
-    name = "vanillajavabuilder",
-    actual = "@remote_java_tools//:VanillaJavaBuilder",
-)
-
-alias(
-    name = "javac_jar",
-    actual = "@remote_java_tools//:javac_jar",
-)
-
-alias(
-    name = "jdk_compiler_jar",
-    actual = "@remote_java_tools//:jdk_compiler_jar",
-)
-
-alias(
-    name = "java_compiler_jar",
-    actual = "@remote_java_tools//:java_compiler_jar",
-)
-
-alias(
-    name = "JacocoCoverageRunner",
-    actual = "@remote_java_tools//:jacoco_coverage_runner",
-)
-
-alias(
-    name = "JacocoCoverage",
-    actual = "@remote_java_tools//:jacoco_coverage_runner",
-)
-
-java_import(
-    name = "TestRunner",
-    jars = ["@remote_java_tools//:Runner"],
-)
-
-alias(
-    name = "TestRunner_deploy.jar",
-    actual = "@remote_java_tools//:Runner",
-)
-
-alias(
-    name = "proguard",
-    actual = "@remote_java_tools//:proguard",
-)
-
-# TODO(cushon): this isn't compatible with JDK 9
-alias(
-    name = "bootclasspath",
-    actual = "@local_jdk//:bootclasspath",
-)
-
-alias(
-    name = "jre",
-    actual = "@local_jdk//:jre",
-)
-
-alias(
-    name = "jdk",
-    actual = "@local_jdk//:jdk",
-)
-
-alias(
-    name = "host_jdk",
-    actual = ":remote_jdk11",
-)
-
 bootclasspath(
     name = "platformclasspath",
     src = "DumpPlatformClassPath.java",
@@ -385,17 +245,6 @@ default_java_toolchain(
     target_version = "17",
 )
 
-# Deprecated, do not use.
-# It will be removed after migration to Java toolchain resolution.
-default_java_toolchain(
-    name = "toolchain_hostjdk8",
-    configuration = JVM8_TOOLCHAIN_CONFIGURATION,
-    java_runtime = ":current_host_java_runtime",
-    source_version = "8",
-    target_version = "8",
-    toolchain_definition = False,
-)
-
 default_java_toolchain(
     name = "prebuilt_toolchain",
     configuration = PREBUILT_TOOLCHAIN_CONFIGURATION,
@@ -406,25 +255,6 @@ filegroup(
     name = "bzl_srcs",
     srcs = glob(["*.bzl"]),
     visibility = ["//tools:__pkg__"],
-)
-
-py_binary(
-    name = "proguard_whitelister",
-    srcs = [
-        "proguard_whitelister.py",
-    ],
-    deps = [
-        "//third_party/py/abseil",
-    ],
-)
-
-py_test(
-    name = "proguard_whitelister_test",
-    srcs = ["proguard_whitelister_test.py"],
-    data = ["proguard_whitelister_test_input.pgcfg"],
-    deps = [
-        ":proguard_whitelister",
-    ],
 )
 
 # Aliases for JDKs, so that they are only downloaded when needed.

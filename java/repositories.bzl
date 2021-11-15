@@ -24,7 +24,6 @@
 """Development and production dependencies of rules_java."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("//toolchains:local_java_repository.bzl", "local_java_repository")
 load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
@@ -360,24 +359,6 @@ def remote_jdk17_repos():
         version = "17",
     )
 
-def bazel_skylib():
-    maybe(
-        http_archive,
-        name = "bazel_skylib",
-        type = "tar.gz",
-        url = "https://github.com/bazelbuild/bazel-skylib/releases/download/0.9.0/bazel_skylib-0.9.0.tar.gz",
-        sha256 = "1dde365491125a3db70731e25658dfdd3bc5dbdfd11b840b3e987ecf043c7ca0",
-    )
-
-def rules_python():
-    maybe(
-        http_archive,
-        name = "rules_python",
-        type = "tar.gz",
-        url = "https://github.com/bazelbuild/rules_python/releases/download/0.4.0/rules_python-0.4.0.tar.gz",
-        sha256 = "954aa89b491be4a083304a2cb838019c8b8c3720a7abb9c4cb81ac7a24230cea",
-    )
-
 def rules_java_dependencies():
     """An utility method to load all dependencies of rules_java.
 
@@ -392,8 +373,6 @@ def rules_java_dependencies():
 
     # TODO: load this will break compatibility with Bazel 4.2.1
     # java_tools_javac11_repos()
-    bazel_skylib()
-    rules_python()
 
 def rules_java_toolchains(name = "toolchains"):
     """An utility method to load all Java toolchains.
@@ -412,8 +391,8 @@ def rules_java_toolchains(name = "toolchains"):
     ]
 
     REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDK_VERSIONS for platform in PLATFORMS] + EXTRA_REMOTE_JDK11_REPOS
-    native.register_toolchains("//toolchains:all")
 
+    native.register_toolchains("//toolchains:all")
     native.register_toolchains("@local_jdk//:runtime_toolchain_definition")
     for name in REMOTE_JDK_REPOS:
         native.register_toolchains("@" + name + "_toolchain_config_repo//:toolchain")

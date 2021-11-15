@@ -1,6 +1,6 @@
 build:bzlmod --experimental_enable_bzlmod
 # @local_config_cc and @local_config_xcode are no longer available as canonical repo name,
 # therefore we have to override the default value of the following flags.
-# TODO: Figure out a way to get rid of this.
+# TODO: Remove after fixing https://github.com/bazelbuild/bazel/issues/14279
 build:bzlmod --crosstool_top=@rules_cc.0.0.1.cc_configure.local_config_cc//:toolchain
 build:bzlmod --xcode_version_config=@rules_cc.0.0.1.cc_configure.local_config_xcode//:host_xcodes

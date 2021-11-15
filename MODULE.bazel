@@ -22,11 +22,11 @@ module(
     ] + REMOTE_JAVA_TOOLCHAINS,
 )
 
-bazel_dep(name = "bazel_skylib", version = "1.0.3")
 bazel_dep(name = "platforms", version = "0.0.4")
 bazel_dep(name = "rules_cc", version = "0.0.1")
+# rules_proto is required by @remote_java_tools, which is loaded via module extension.
+# TODO: perhaps java tools should have its own Bazel module, then we don't need this in rules_java.
 bazel_dep(name = "rules_proto", version = "4.0.0")
-bazel_dep(name = "rules_python", version = "0.4.0")
 
 toolchains = use_extension("//java:extensions.bzl", "toolchains")
 
