@@ -27,7 +27,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("//toolchains:local_java_repository.bzl", "local_java_repository")
 load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
-def java_tools_javac11_repos():
+def java_tools_repos():
     http_archive(
         name = "remote_java_tools",
         sha256 = "b763ee80e5754e593fd6d5be6d7343f905bc8b73d661d36d842b024ca11b6793",
@@ -372,7 +372,7 @@ def rules_java_dependencies():
     remote_jdk17_repos()
 
     # TODO: load this will break compatibility with Bazel 4.2.1
-    # java_tools_javac11_repos()
+    # java_tools_repos()
 
 def rules_java_toolchains(name = "toolchains"):
     """An utility method to load all Java toolchains.

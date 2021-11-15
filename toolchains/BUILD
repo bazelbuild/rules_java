@@ -313,9 +313,3 @@ java_runtime_version_alias(
     runtime_version = "remotejdk_17",
     visibility = ["//visibility:public"],
 )
-
-java_runtime_version_alias(
-    name = "jdk_8",
-    runtime_version = "8",
-    visibility = ["//visibility:public"],
-)
