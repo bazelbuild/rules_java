@@ -251,44 +251,6 @@ default_java_toolchain(
     toolchain_definition = False,
 )
 
-filegroup(
-    name = "bzl_srcs",
-    srcs = glob(["*.bzl"]),
-    visibility = ["//tools:__pkg__"],
-)
-
-# Aliases for JDKs, so that they are only downloaded when needed.
-_JDKS = [
-    "remotejdk11_macos",
-    "remotejdk11_macos_aarch64",
-    "remotejdk11_win",
-    "remotejdk11_linux_aarch64",
-    "remotejdk11_linux",
-    "remotejdk11_linux_ppc64le",
-    "remotejdk11_linux_s390x",
-    "remotejdk15_macos",
-    "remotejdk15_macos_aarch64",
-    "remotejdk15_win",
-    "remotejdk15_linux",
-    "remotejdk16_macos",
-    "remotejdk16_macos_aarch64",
-    "remotejdk16_win",
-    "remotejdk16_linux",
-    "remotejdk17_macos",
-    "remotejdk17_macos_aarch64",
-    "remotejdk17_win",
-    "remotejdk17_linux",
-]
-
-[
-    alias(
-        name = JDK,
-        actual = "@%s//:jdk" % JDK,
-        visibility = ["//visibility:private"],
-    )
-    for JDK in _JDKS
-]
-
 # A JDK 11 for use as a --host_javabase.
 java_runtime_version_alias(
     name = "remote_jdk11",

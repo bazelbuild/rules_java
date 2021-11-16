@@ -24,11 +24,13 @@
 """Development and production dependencies of rules_java."""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("//toolchains:local_java_repository.bzl", "local_java_repository")
 load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
 def java_tools_repos():
-    http_archive(
+    maybe(
+        http_archive,
         name = "remote_java_tools",
         sha256 = "b763ee80e5754e593fd6d5be6d7343f905bc8b73d661d36d842b024ca11b6793",
         urls = [
@@ -37,7 +39,8 @@ def java_tools_repos():
         ],
     )
 
-    http_archive(
+    maybe(
+        http_archive,
         name = "remote_java_tools_linux",
         sha256 = "ae1eca4546eac6487c6e565f9b409536609c273207220c51e5c94f2a058a5a56",
         urls = [
@@ -46,7 +49,8 @@ def java_tools_repos():
         ],
     )
 
-    http_archive(
+    maybe(
+        http_archive,
         name = "remote_java_tools_windows",
         sha256 = "36766802f7ec684cecb1a14c122428de6be9784e88419e2ab5912ad4b59a8c7d",
         urls = [
@@ -55,7 +59,8 @@ def java_tools_repos():
         ],
     )
 
-    http_archive(
+    maybe(
+        http_archive,
         name = "remote_java_tools_darwin",
         sha256 = "792bc1352e736073b152528175ed424687f86a9f6f5f461f07d8b26806762738",
         urls = [
@@ -65,14 +70,91 @@ def java_tools_repos():
     )
 
 def local_jdk_repo():
-    local_java_repository(
+    maybe(
+        local_java_repository,
         name = "local_jdk",
         build_file = Label("//toolchains:jdk.BUILD"),
     )
 
+def remote_jdk8_repos(name = ""):
+    """Imports OpenJDK 8 repositories.
+
+    Args:
+        name: The name of this macro (not used)
+    """
+    maybe(
+        remote_java_repository,
+        name = "remote_jdk8_linux_aarch64",
+        exec_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:aarch64",
+        ],
+        sha256 = "f4072e82faa5a09fab2accf2892d4684324fc999d614583c3ff785e87c03963f",
+        strip_prefix = "zulu8.50.51.263-ca-jdk8.0.275-linux_aarch64",
+        urls = [
+            "https://mirror.bazel.build/openjdk/azul-zulu-8.50.0.51-ca-jdk8.0.275/zulu8.50.51.263-ca-jdk8.0.275-linux_aarch64.tar.gz",
+            "https://cdn.azul.com/zulu-embedded/bin/zulu8.50.51.263-ca-jdk8.0.275-linux_aarch64.tar.gz",
+        ],
+        version = "8",
+    )
+    maybe(
+        remote_java_repository,
+        name = "remote_jdk8_linux",
+        exec_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:x86_64",
+        ],
+        sha256 = "1db6b2fa642950ee1b4b1ec2b6bc8a9113d7a4cd723f79398e1ada7dab1c981c",
+        strip_prefix = "zulu8.50.0.51-ca-jdk8.0.275-linux_x64",
+        urls = [
+            "https://mirror.bazel.build/openjdk/azul-zulu-8.50.0.51-ca-jdk8.0.275/zulu8.50.0.51-ca-jdk8.0.275-linux_x64.tar.gz",
+            "https://cdn.azul.com/zulu/bin/zulu8.50.0.51-ca-jdk8.0.275-linux_x64.tar.gz",
+        ],
+        version = "8",
+    )
+    maybe(
+        remote_java_repository,
+        name = "remote_jdk8_macos",
+        exec_compatible_with = [
+            "@platforms//os:macos",
+            "@platforms//cpu:x86_64",
+        ],
+        sha256 = "b03176597734299c9a15b7c2cc770783cf14d121196196c1248e80c026b59c17",
+        strip_prefix = "zulu8.50.0.51-ca-jdk8.0.275-macosx_x64",
+        urls = [
+            "https://mirror.bazel.build/openjdk/azul-zulu-8.50.0.51-ca-jdk8.0.275/zulu8.50.0.51-ca-jdk8.0.275-macosx_x64.tar.gz",
+            "https://cdn.azul.com/zulu/bin/zulu8.50.0.51-ca-jdk8.0.275-macosx_x64.tar.gz",
+        ],
+        version = "8",
+    )
+    maybe(
+        remote_java_repository,
+        name = "remote_jdk8_windows",
+        exec_compatible_with = [
+            "@platforms//os:windows",
+            "@platforms//cpu:x86_64",
+        ],
+        sha256 = "49759b2bd2ab28231a21ff3a3bb45824ddef55d89b5b1a05a62e26a365da0774",
+        strip_prefix = "zulu8.50.0.51-ca-jdk8.0.275-win_x64",
+        urls = [
+            "https://mirror.bazel.build/openjdk/azul-zulu-8.50.0.51-ca-jdk8.0.275/zulu8.50.0.51-ca-jdk8.0.275-win_x64.zip",
+            "https://cdn.azul.com/zulu/bin/zulu8.50.0.51-ca-jdk8.0.275-win_x64.zip",
+        ],
+        version = "8",
+    )
+    REMOTE_JDK8_REPOS = [
+        "remote_jdk8_linux_aarch64",
+        "remote_jdk8_linux",
+        "remote_jdk8_macos",
+        "remote_jdk8_windows",
+    ]
+    for name in REMOTE_JDK8_REPOS:
+        native.register_toolchains("@" + name + "_toolchain_config_repo//:toolchain")
+
 def remote_jdk11_repos():
     """Imports OpenJDK 11 repositories."""
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk11_linux",
         exec_compatible_with = [
             "@platforms//os:linux",
@@ -86,7 +168,8 @@ def remote_jdk11_repos():
         version = "11",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk11_linux_aarch64",
         exec_compatible_with = [
             "@platforms//os:linux",
@@ -100,7 +183,8 @@ def remote_jdk11_repos():
         version = "11",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk11_linux_ppc64le",
         exec_compatible_with = [
             "@platforms//os:linux",
@@ -115,7 +199,8 @@ def remote_jdk11_repos():
         version = "11",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk11_linux_s390x",
         exec_compatible_with = [
             "@platforms//os:linux",
@@ -130,7 +215,8 @@ def remote_jdk11_repos():
         version = "11",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk11_macos",
         exec_compatible_with = [
             "@platforms//os:macos",
@@ -144,7 +230,8 @@ def remote_jdk11_repos():
         version = "11",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk11_macos_aarch64",
         exec_compatible_with = [
             "@platforms//os:macos",
@@ -159,7 +246,8 @@ def remote_jdk11_repos():
         version = "11",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk11_win",
         exec_compatible_with = [
             "@platforms//os:windows",
@@ -175,7 +263,8 @@ def remote_jdk11_repos():
 
 def remote_jdk15_repos():
     """Imports OpenJDK 15 repositories."""
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk15_linux",
         exec_compatible_with = [
             "@platforms//os:linux",
@@ -190,7 +279,8 @@ def remote_jdk15_repos():
         version = "15",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk15_macos",
         exec_compatible_with = [
             "@platforms//os:macos",
@@ -205,7 +295,8 @@ def remote_jdk15_repos():
         version = "15",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk15_macos_aarch64",
         exec_compatible_with = [
             "@platforms//os:macos",
@@ -220,7 +311,8 @@ def remote_jdk15_repos():
         version = "15",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk15_win",
         exec_compatible_with = [
             "@platforms//os:windows",
@@ -237,7 +329,8 @@ def remote_jdk15_repos():
 
 def remote_jdk16_repos():
     """Imports OpenJDK 16 repositories."""
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk16_linux",
         exec_compatible_with = [
             "@platforms//os:linux",
@@ -252,7 +345,8 @@ def remote_jdk16_repos():
         version = "16",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk16_macos",
         exec_compatible_with = [
             "@platforms//os:macos",
@@ -267,7 +361,8 @@ def remote_jdk16_repos():
         version = "16",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk16_macos_aarch64",
         exec_compatible_with = [
             "@platforms//os:macos",
@@ -282,7 +377,8 @@ def remote_jdk16_repos():
         version = "16",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk16_win",
         exec_compatible_with = [
             "@platforms//os:windows",
@@ -299,7 +395,8 @@ def remote_jdk16_repos():
 
 def remote_jdk17_repos():
     """Imports OpenJDK 17 repositories."""
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk17_linux",
         exec_compatible_with = [
             "@platforms//os:linux",
@@ -314,7 +411,8 @@ def remote_jdk17_repos():
         version = "17",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk17_macos",
         exec_compatible_with = [
             "@platforms//os:macos",
@@ -329,7 +427,8 @@ def remote_jdk17_repos():
         version = "17",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk17_macos_aarch64",
         exec_compatible_with = [
             "@platforms//os:macos",
@@ -344,7 +443,8 @@ def remote_jdk17_repos():
         version = "17",
     )
 
-    remote_java_repository(
+    maybe(
+        remote_java_repository,
         name = "remotejdk17_win",
         exec_compatible_with = [
             "@platforms//os:windows",
@@ -371,7 +471,8 @@ def rules_java_dependencies():
     remote_jdk16_repos()
     remote_jdk17_repos()
 
-    # TODO: load this will break compatibility with Bazel 4.2.1
+    # TODO: load this will break compatibility with Bazel 4.2.1,
+    # Enable this when Bazel 5.0.0 is released.
     # java_tools_repos()
 
 def rules_java_toolchains(name = "toolchains"):
