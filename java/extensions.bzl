@@ -16,8 +16,8 @@
 load("//java:repositories.bzl", "java_tools_repos", "local_jdk_repo", "remote_jdk11_repos", "remote_jdk15_repos", "remote_jdk16_repos", "remote_jdk17_repos")
 
 def _toolchains_impl(ctx):
-    local_jdk_repo()
     java_tools_repos()
+    local_jdk_repo()
     remote_jdk11_repos()
     remote_jdk15_repos()
     remote_jdk16_repos()
