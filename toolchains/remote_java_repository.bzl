@@ -47,7 +47,7 @@ def remote_java_repository(name, version, exec_compatible_with, prefix = "remote
     """
     http_archive(
         name = name,
-        build_file = "@bazel_tools//tools/jdk:jdk.BUILD",
+        build_file = Label("//toolchains:jdk.BUILD"),
         **kwargs
     )
     _toolchain_config(
@@ -85,4 +85,3 @@ toolchain(
             toolchain = "@{repo}//:jdk".format(repo = name),
         ),
     )
-    native.register_toolchains("@" + name + "_toolchain_config_repo//:toolchain")
