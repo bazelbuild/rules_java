@@ -71,6 +71,7 @@ java_host_runtime_alias = rule(
 )
 
 def _java_runtime_transition_impl(settings, attr):
+    _unused = settings
     return {"//command_line_option:java_runtime_version": attr.runtime_version}
 
 _java_runtime_transition = transition(
