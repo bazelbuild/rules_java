@@ -70,7 +70,7 @@ java_host_runtime_alias = rule(
     ],
 )
 
-def _java_runtime_transition_impl(settings, attr):
+def _java_runtime_transition_impl(_settings, attr):
     return {"//command_line_option:java_runtime_version": attr.runtime_version}
 
 _java_runtime_transition = transition(
