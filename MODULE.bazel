@@ -61,3 +61,4 @@ use_repo(toolchains, "local_jdk")
 
 # Dev dependencies
 bazel_dep(name = "rules_pkg", dev_dependency = True, version = "0.5.1")
+bazel_dep(name = "bazel_skylib", dev_dependency = True, version = "1.2.0")
