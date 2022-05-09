@@ -14,8 +14,7 @@
 """Starlark rules for building Java projects."""
 
 _MIGRATION_TAG = "__JAVA_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__"
-
-version = "4.1.0"
+version = "5.0.0"
 
 def _add_tags(attrs):
     if "tags" in attrs and attrs["tags"] != None:
