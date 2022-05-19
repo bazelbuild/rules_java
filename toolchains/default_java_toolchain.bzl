@@ -229,13 +229,12 @@ def _bootclasspath_impl(ctx):
 
     args = ctx.actions.args()
     args.add("-source")
-    args.add("11")
+    args.add("8")
     args.add("-target")
-    args.add("11")
+    args.add("8")
     args.add("-Xlint:-options")
-    args.add("--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
-    args.add("--add-exports=jdk.compiler/com.sun.tools.javac.platform=ALL-UNNAMED")
-    args.add("--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
+    args.add("-cp")
+    args.add("%s/lib/tools.jar" % host_javabase.java_home)
     args.add("-d")
     args.add(class_outputs[0].dirname)
     args.add(ctx.file.src)
@@ -257,7 +256,11 @@ def _bootclasspath_impl(ctx):
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.platform=ALL-UNNAMED")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
-    args.add("-cp", class_outputs[0].dirname)
+    args.add_joined(
+        "-cp",
+        [class_outputs[0].dirname, "%s/lib/tools.jar" % host_javabase.java_home],
+        join_with = ctx.configuration.host_path_separator,
+    )
     args.add("DumpPlatformClassPath")
     args.add(bootclasspath)
 
