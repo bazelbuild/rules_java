@@ -16,10 +16,6 @@
 
 load("@rules_java//java:defs.bzl", "java_toolchain")
 
-JDK8_JVM_OPTS = [
-    "-Xbootclasspath/p:$(location @remote_java_tools//:javac_jar)",
-]
-
 # JVM options, without patching java.compiler and jdk.compiler modules.
 BASE_JDK9_JVM_OPTS = [
     # Allow JavaBuilder to access internal javac APIs.
@@ -83,12 +79,6 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
     reduced_classpath_incompatible_processors = [
         "dagger.hilt.processor.internal.root.RootProcessor",  # see b/21307381
     ],
-)
-
-JVM8_TOOLCHAIN_CONFIGURATION = dict(
-    tools = ["@remote_java_tools//:javac_jar"],
-    jvm_opts = ["-Xbootclasspath/p:$(location @remote_java_tools//:javac_jar)"],
-    java_runtime = "//toolchains:jdk_8",
 )
 
 DEFAULT_TOOLCHAIN_CONFIGURATION = dict(
