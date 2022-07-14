@@ -13,6 +13,8 @@
 # limitations under the License.
 """Starlark rules for building Java projects."""
 
+# Do not touch: This line marks the end of loads; needed for PR importing.
+
 _MIGRATION_TAG = "__JAVA_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__"
 version = "5.0.0"
 
