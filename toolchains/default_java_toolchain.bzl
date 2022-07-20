@@ -253,6 +253,7 @@ _bootclasspath = rule(
             cfg = "exec",
             providers = [java_common.JavaRuntimeInfo],
         ),
+        "output_jar": attr.output(mandatory = True),
         "src": attr.label(
             cfg = "exec",
             allow_single_file = True,
@@ -260,7 +261,6 @@ _bootclasspath = rule(
         "target_javabase": attr.label(
             providers = [java_common.JavaRuntimeInfo],
         ),
-        "output_jar": attr.output(mandatory = True),
     },
 )
 
