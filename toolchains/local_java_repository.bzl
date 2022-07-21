@@ -58,10 +58,10 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
       visibility: Visibility that will be applied to the java runtime target
     """
 
-    # The repository name in Bzlmod will be "<module canonical name>.<module extension name>.local_jdk"
+    # The repository name in Bzlmod will be "@~<module canonical name>~<module extension name>~local_jdk"
     # instead of "local_jdk", therefore we cannot just use it as the config_setting value,
     # because it won't match the default value of --java_runtime_version (which is "local_jdk").
-    name = name.split(".")[-1]
+    name = name.split("~")[-1]
 
     if runtime_name == None:
         runtime_name = name
@@ -89,9 +89,9 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
     native.alias(
         name = name + "_settings_alias",
         actual = select({
-            name + "_name_setting": name + "_name_setting",
-            name + "_version_setting": name + "_version_setting",
-            "//conditions:default": name + "_name_version_setting",
+            ":" + name + "_name_setting": ":" + name + "_name_setting",
+            ":" + name + "_version_setting": ":" + name + "_version_setting",
+            "//conditions:default": ":" + name + "_name_version_setting",
         }),
         visibility = ["//visibility:private"],
     )
