@@ -256,7 +256,7 @@ def remote_jdk11_repos():
             "@platforms//cpu:aarch64",
         ],
         sha256 = "6bb0d2c6e8a29dcd9c577bbb2986352ba12481a9549ac2c0bcfd00ed60e538d2",
-        strip_prefix = "zulu11.50.19-ca-jdk11.0.12-macosx_aarch64",
+        strip_prefix = "zulu11.56.19-ca-jdk11.0.15-macosx_aarch64",
         urls = [
             "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu11.56.19-ca-jdk11.0.15-macosx_aarch64.tar.gz",
             "https://cdn.azul.com/zulu/bin/zulu11.56.19-ca-jdk11.0.15-macosx_aarch64.tar.gz",
