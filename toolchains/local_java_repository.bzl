@@ -238,9 +238,9 @@ _local_java_repository_rule = repository_rule(
     configure = True,
     environ = ["JAVA_HOME"],
     attrs = {
-        "target_name": attr.string(),
         "build_file": attr.label(),
         "java_home": attr.string(),
+        "target_name": attr.string(),
         "version": attr.string(),
     },
 )
