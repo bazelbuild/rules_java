@@ -114,6 +114,20 @@ def remote_jdk8_repos(name = ""):
     )
     maybe(
         remote_java_repository,
+        name = "remote_jdk8_macos_aarch64",
+        target_compatible_with = [
+            "@platforms//os:macos",
+            "@platforms//cpu:aarch64",
+        ],
+        sha256 = "e5c84a46bbd985c3a53358db9c97a6fd4930f92b833c3163a0d1e47dab59768c",
+        strip_prefix = "zulu8.62.0.19-ca-jdk8.0.332-macosx_aarch64",
+        urls = [
+            "https://cdn.azul.com/zulu/bin/zulu8.62.0.19-ca-jdk8.0.332-macosx_aarch64.tar.gz",
+        ],
+        version = "8",
+    )
+    maybe(
+        remote_java_repository,
         name = "remote_jdk8_macos",
         target_compatible_with = [
             "@platforms//os:macos",
@@ -145,6 +159,7 @@ def remote_jdk8_repos(name = ""):
     REMOTE_JDK8_REPOS = [
         "remote_jdk8_linux_aarch64",
         "remote_jdk8_linux",
+        "remote_jdk8_macos_aarch64",
         "remote_jdk8_macos",
         "remote_jdk8_windows",
     ]
