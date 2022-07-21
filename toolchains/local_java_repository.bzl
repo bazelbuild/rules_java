@@ -58,11 +58,6 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
       visibility: Visibility that will be applied to the java runtime target
     """
 
-    # The repository name in Bzlmod will be "@~<module canonical name>~<module extension name>~local_jdk"
-    # instead of "local_jdk", therefore we cannot just use it as the config_setting value,
-    # because it won't match the default value of --java_runtime_version (which is "local_jdk").
-    name = name.split("~")[-1]
-
     if runtime_name == None:
         runtime_name = name
         java_runtime(
@@ -202,7 +197,7 @@ local_java_runtime(
     java_home = "%s",
     version = "%s",
 )
-""" % (repository_ctx.name, runtime_name, java_home, version)
+""" % (repository_ctx.attr.target_name, runtime_name, java_home, version)
 
     repository_ctx.file(
         "BUILD.bazel",
@@ -243,6 +238,7 @@ _local_java_repository_rule = repository_rule(
     configure = True,
     environ = ["JAVA_HOME"],
     attrs = {
+        "target_name": attr.string(),
         "build_file": attr.label(),
         "java_home": attr.string(),
         "version": attr.string(),
@@ -267,4 +263,10 @@ def local_java_repository(name, java_home = "", version = "", build_file = None)
       build_file: optionally BUILD file template
       version: optionally java version
     """
-    _local_java_repository_rule(name = name, java_home = java_home, version = version, build_file = build_file)
+    _local_java_repository_rule(
+        name = name,
+        target_name = name,
+        java_home = java_home,
+        version = version,
+        build_file = build_file,
+    )
