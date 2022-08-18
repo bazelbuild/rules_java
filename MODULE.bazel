@@ -1,7 +1,7 @@
 module(
     name = "rules_java",
     compatibility_level = 1,
-    version = "4.0.0",
+    version = "5.1.0",
 )
 
 bazel_dep(name = "platforms", version = "0.0.4")
@@ -25,6 +25,7 @@ use_repo(toolchains, "remote_java_tools_darwin")
 
 # Declare local jdk repo
 use_repo(toolchains, "local_jdk")
+
 register_toolchains("@local_jdk//:runtime_toolchain_definition")
 
 # Declare all remote jdk toolchain config repos
@@ -50,6 +51,7 @@ EXTRA_REMOTE_JDK11_REPOS = [
 ]
 
 REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDK_VERSIONS for platform in PLATFORMS] + EXTRA_REMOTE_JDK11_REPOS
+
 [use_repo(
     toolchains,
     repo + "_toolchain_config_repo",
