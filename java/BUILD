@@ -14,4 +14,5 @@ bzl_library(
     name = "rules",
     srcs = ["defs.bzl"],
     visibility = ["//visibility:public"],
+    deps = ["//java/private"],
 )

@@ -14,8 +14,9 @@
 
 """Dependencies that are needed for rules_java tests and tools."""
 
-load("@bazel_federation//:repositories.bzl", "rules_pkg")
+load("@bazel_federation//:repositories.bzl", "bazel_skylib", "rules_pkg")
 
 def rules_java_internal_deps():
     """Fetches all required dependencies for rules_java tests and tools."""
+    bazel_skylib()
     rules_pkg()

@@ -13,6 +13,8 @@
 # limitations under the License.
 """Starlark rules for building Java projects."""
 
+load("//java/private:native.bzl", "NativeJavaInfo", "NativeJavaPluginInfo", "native_java_common")
+
 # Do not touch: This line marks the end of loads; needed for PR importing.
 
 _MIGRATION_TAG = "__JAVA_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__"
@@ -144,3 +146,9 @@ def java_toolchain(**attrs):
 
     # buildifier: disable=native-java
     native.java_toolchain(**_add_tags(attrs))
+
+java_common = native_java_common
+
+JavaInfo = NativeJavaInfo
+
+JavaPluginInfo = NativeJavaPluginInfo
