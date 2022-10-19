@@ -5,6 +5,7 @@ exports_files(["LICENSE"])
 filegroup(
     name = "distribution",
     srcs = [
+        "AUTHORS",
         "BUILD",
         "LICENSE",
         "//java:srcs",
