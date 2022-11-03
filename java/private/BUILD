@@ -5,5 +5,11 @@ licenses(["notice"])
 bzl_library(
     name = "private",
     srcs = ["native.bzl"],
-    visibility = ["//visibility:public"],
+    visibility = ["@//java:__pkg__"],
+)
+
+filegroup(
+    name = "srcs",
+    srcs = glob(["**"]),
+    visibility = ["@//java:__pkg__"],
 )
