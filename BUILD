@@ -8,6 +8,7 @@ filegroup(
         "AUTHORS",
         "BUILD",
         "LICENSE",
+        "MODULE.bazel",
         "//java:srcs",
         "//toolchains:srcs",
     ],
