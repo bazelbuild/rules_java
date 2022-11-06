@@ -18,7 +18,7 @@ load("//java/private:native.bzl", "NativeJavaInfo", "NativeJavaPluginInfo", "nat
 # Do not touch: This line marks the end of loads; needed for PR importing.
 
 _MIGRATION_TAG = "__JAVA_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__"
-version = "5.3.2"
+version = "5.3.3"
 
 def _add_tags(attrs):
     if "tags" in attrs and attrs["tags"] != None:
