@@ -6,6 +6,7 @@ module(
 
 bazel_dep(name = "platforms", version = "0.0.4")
 bazel_dep(name = "rules_cc", version = "0.0.1")
+bazel_dep(name = "bazel_skylib", version = "1.2.0")
 
 # rules_proto is required by @remote_java_tools, which is loaded via module extension.
 bazel_dep(name = "rules_proto", version = "4.0.0")
@@ -61,4 +62,3 @@ REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDK_
 
 # Dev dependencies
 bazel_dep(name = "rules_pkg", dev_dependency = True, version = "0.5.1")
-bazel_dep(name = "bazel_skylib", dev_dependency = True, version = "1.2.0")
