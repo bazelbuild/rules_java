@@ -6,8 +6,8 @@ licenses(["notice"])
 
 filegroup(
     name = "srcs",
-    srcs = glob(["**"]) + ["@//java/private:srcs"],
-    visibility = ["@//:__pkg__"],
+    srcs = glob(["**"]) + ["//java/private:srcs"],
+    visibility = ["//:__pkg__"],
 )
 
 bzl_library(

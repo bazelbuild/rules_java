@@ -22,7 +22,7 @@ licenses(["notice"])
 filegroup(
     name = "srcs",
     srcs = glob(["**"]),
-    visibility = ["@//:__pkg__"],
+    visibility = ["//:__pkg__"],
 )
 
 # Used to distinguish toolchains used for Java development, ie the JavaToolchainProvider.
