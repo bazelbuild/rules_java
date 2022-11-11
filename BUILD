@@ -12,5 +12,5 @@ filegroup(
         "//java:srcs",
         "//toolchains:srcs",
     ],
-    visibility = ["@//distro:__pkg__"],
+    visibility = ["//distro:__pkg__"],
 )

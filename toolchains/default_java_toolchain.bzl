@@ -177,6 +177,7 @@ def java_runtime_files(name, srcs):
     native.filegroup(
         name = name,
         srcs = srcs,
+        tags = ["manual"],
     )
     for src in srcs:
         native.genrule(
@@ -185,6 +186,7 @@ def java_runtime_files(name, srcs):
             toolchains = ["//toolchains:current_java_runtime"],
             cmd = "cp $(JAVABASE)/%s $@" % src,
             outs = [src],
+            tags = ["manual"],
         )
 
 def _bootclasspath_impl(ctx):
