@@ -518,10 +518,7 @@ def rules_java_dependencies():
     remote_jdk15_repos()
     remote_jdk16_repos()
     remote_jdk17_repos()
-
-    # TODO: load this will break compatibility with Bazel 4.2.1,
-    # Enable this when Bazel 5.0.0 is released.
-    # java_tools_repos()
+    java_tools_repos()
 
 def rules_java_toolchains(name = "toolchains"):
     """An utility method to load all Java toolchains.
