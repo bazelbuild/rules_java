@@ -60,5 +60,10 @@ REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDK_
 
 [register_toolchains("@" + name + "_toolchain_config_repo//:toolchain") for name in REMOTE_JDK_REPOS]
 
+# Register defaults last
+DEFAULT_VERSION="11"
+DEFAULT_REMOTE_JDK_REPOS = [("remotejdk" + DEFAULT_VERSION + "_" + platform) for platform in PLATFORMS] + EXTRA_REMOTE_JDK11_REPOS
+[register_toolchains("@" + name + "_toolchain_config_repo//:toolchain_without_constraints") for name in DEFAULT_REMOTE_JDK_REPOS]
+
 # Dev dependencies
 bazel_dep(name = "rules_pkg", dev_dependency = True, version = "0.5.1")

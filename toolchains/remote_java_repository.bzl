@@ -78,6 +78,13 @@ toolchain(
     toolchain_type = "@bazel_tools//tools/jdk:runtime_toolchain_type",
     toolchain = "{toolchain}",
 )
+toolchain(
+    name = "toolchain_without_constraints",
+    target_compatible_with = {target_compatible_with},
+    toolchain_type = "@bazel_tools//tools/jdk:runtime_toolchain_type",
+    toolchain = "{toolchain}",
+)
+
 """.format(
             prefix = prefix,
             version = version,
