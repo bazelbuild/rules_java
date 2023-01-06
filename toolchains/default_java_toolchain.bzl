@@ -64,7 +64,7 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
     genclass = ["@remote_java_tools//:GenClass"],
     header_compiler = ["@remote_java_tools//:TurbineDirect"],
     header_compiler_direct = ["@remote_java_tools//:TurbineDirect"],
-    ijar = ["//toolchains:ijar"],
+    ijar = [Label("//toolchains:ijar")],
     javabuilder = ["@remote_java_tools//:JavaBuilder"],
     javac_supports_workers = True,
     jacocorunner = "@remote_java_tools//:jacoco_coverage_runner_filegroup",
@@ -74,16 +74,16 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
         "-XX:+UseParallelGC",
     ],
     misc = DEFAULT_JAVACOPTS,
-    singlejar = ["//toolchains:singlejar"],
+    singlejar = [Label("//toolchains:singlejar")],
     # Code to enumerate target JVM boot classpath uses host JVM. Because
     # java_runtime-s are involved, its implementation is in @bazel_tools.
-    bootclasspath = ["//toolchains:platformclasspath"],
+    bootclasspath = [Label("//toolchains:platformclasspath")],
     source_version = "8",
     target_version = "8",
     reduced_classpath_incompatible_processors = [
         "dagger.hilt.processor.internal.root.RootProcessor",  # see b/21307381
     ],
-    java_runtime = "//toolchains:remotejdk_17",
+    java_runtime = Label("//toolchains:remotejdk_17"),
 )
 
 DEFAULT_TOOLCHAIN_CONFIGURATION = _BASE_TOOLCHAIN_CONFIGURATION
@@ -113,8 +113,8 @@ VANILLA_TOOLCHAIN_CONFIGURATION = dict(
 # same, otherwise the binaries will not work on the execution
 # platform.
 PREBUILT_TOOLCHAIN_CONFIGURATION = dict(
-    ijar = ["//toolchains:ijar_prebuilt_binary"],
-    singlejar = ["//toolchains:prebuilt_singlejar"],
+    ijar = [Label("//toolchains:ijar_prebuilt_binary")],
+    singlejar = [Label("//toolchains:prebuilt_singlejar")],
 )
 
 # The new toolchain is using all the tools from sources.
@@ -186,8 +186,8 @@ def java_runtime_files(name, srcs):
     for src in srcs:
         native.genrule(
             name = "gen_%s" % src,
-            srcs = ["//toolchains:current_java_runtime"],
-            toolchains = ["//toolchains:current_java_runtime"],
+            srcs = [Label("//toolchains:current_java_runtime")],
+            toolchains = [Label("//toolchains:current_java_runtime")],
             cmd = "cp $(JAVABASE)/%s $@" % src,
             outs = [src],
             tags = ["manual"],
