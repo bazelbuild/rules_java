@@ -3,28 +3,29 @@ workspace(name = "rules_java")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
-    name = "bazel_federation",
-    sha256 = "0d6893f0d18f417a3324ce7f0ed2e6e5b825d6d5ab42f0f3d7877cb313f36453",
-    strip_prefix = "bazel-federation-6ad33bc586701e9836a2bf4432c7aff1235b04d2",
-    type = "zip",
-    url = "https://github.com/bazelbuild/bazel-federation/archive/6ad33bc586701e9836a2bf4432c7aff1235b04d2.zip",  # 2021-07-12
+    name = "bazel_skylib",
+    sha256 = "af87959afe497dc8dfd4c6cb66e1279cb98ccc84284619ebfec27d9c09a903de",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.2.0/bazel-skylib-1.2.0.tar.gz",
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/1.2.0/bazel-skylib-1.2.0.tar.gz",
+    ],
 )
 
-load("@bazel_federation//:repositories.bzl", "rules_java_deps")
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
-rules_java_deps()
+bazel_skylib_workspace()
 
-load("@bazel_federation//setup:rules_java.bzl", "rules_java_setup")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-rules_java_setup()
+http_archive(
+    name = "rules_pkg",
+    sha256 = "a89e203d3cf264e564fcb96b6e06dd70bc0557356eb48400ce4b5d97c2c3720d",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.5.1/rules_pkg-0.5.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/0.5.1/rules_pkg-0.5.1.tar.gz",
+    ],
+)
 
-#
-# Dependencies for development of rules_java itself.
-#
-load("//:internal_deps.bzl", "rules_java_internal_deps")
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
-rules_java_internal_deps()
-
-load("//:internal_setup.bzl", "rules_java_internal_setup")
-
-rules_java_internal_setup()
+rules_pkg_dependencies()
