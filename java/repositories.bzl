@@ -23,40 +23,40 @@ def java_tools_repos():
     maybe(
         http_archive,
         name = "remote_java_tools",
-        sha256 = "8fb4d3138bd92a9d3324dae29c9f70d91ca2db18cd0bf1997446eed4657d19b3",
+        sha256 = "b95903c3659d28c159c719449e201b83db475491031b620d021458b982400a22",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.8/java_tools-v11.8.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v11.8/java_tools-v11.8.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.11/java_tools-v11.11.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v11.11/java_tools-v11.11.zip",
         ],
     )
 
     maybe(
         http_archive,
         name = "remote_java_tools_linux",
-        sha256 = "41502b293eea292b0577b46e8d7738bfe88180562acbf99ed620b5387a60efee",
+        sha256 = "644c887e6e64ca0dd5271d42709b93c07d7ef5dbf42047b823c214a79f9b05f3",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.8/java_tools_linux-v11.8.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v11.8/java_tools_linux-v11.8.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.11/java_tools_linux-v11.11.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v11.11/java_tools_linux-v11.11.zip",
         ],
     )
 
     maybe(
         http_archive,
         name = "remote_java_tools_windows",
-        sha256 = "056ed8ba64920409eab63e3c4888c1970a523d2c03965784fc3243e37195318b",
+        sha256 = "e08acc5c1b43a29335a2a5257e16741a4a4efcdaaf1fdf05c00cce81c4b0ced8",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.8/java_tools_windows-v11.8.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v11.8/java_tools_windows-v11.8.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.11/java_tools_windows-v11.11.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v11.11/java_tools_windows-v11.11.zip",
         ],
     )
 
     maybe(
         http_archive,
         name = "remote_java_tools_darwin",
-        sha256 = "0dcf4500cc4a1de8e563c1d48a079a7a0cf77cc246e39fd37fcc78ddf409ed26",
+        sha256 = "af62d4070263d0f80186abd44c9ae4df83e1a64aa5133163dca11a05bb7f2d4f",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.8/java_tools_darwin-v11.8.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v11.8/java_tools_darwin-v11.8.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.11/java_tools_darwin-v11.11.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v11.11/java_tools_darwin-v11.11.zip",
         ],
     )
 
