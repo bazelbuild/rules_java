@@ -45,7 +45,7 @@ def java_tools_repos():
         name = "remote_java_tools_windows",
         sha256 = "43432ce4814513d6497661b4fede691982b3bdef7a1907808b096291f56a8001",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.12/java_tools_windows-v11.12zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v11.12/java_tools_windows-v11.12.zip",
             "https://github.com/bazelbuild/java_tools/releases/download/java_v11.12/java_tools_windows-v11.12.zip",
         ],
     )
