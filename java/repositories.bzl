@@ -90,6 +90,20 @@ def remote_jdk8_repos(name = ""):
     )
     maybe(
         remote_java_repository,
+        name = "remote_jdk8_linux_s390x",
+        target_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:s390x",
+        ],
+        sha256 = "276a431c79b7e94bc1b1b4fd88523383ae2d635ea67114dfc8a6174267f8fb2c",
+        strip_prefix = "jdk8u292-b10",
+        urls = [
+            "https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jdk_s390x_linux_hotspot_8u292b10.tar.gz",
+        ],
+        version = "8",
+    )
+    maybe(
+        remote_java_repository,
         name = "remote_jdk8_linux",
         target_compatible_with = [
             "@platforms//os:linux",
@@ -149,6 +163,7 @@ def remote_jdk8_repos(name = ""):
     )
     REMOTE_JDK8_REPOS = [
         "remote_jdk8_linux_aarch64",
+        "remote_jdk8_linux_s390x",
         "remote_jdk8_linux",
         "remote_jdk8_macos_aarch64",
         "remote_jdk8_macos",
@@ -306,6 +321,22 @@ def remote_jdk17_repos():
 
     maybe(
         remote_java_repository,
+        name = "remotejdk17_linux_s390x",
+        target_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:s390x",
+        ],
+        sha256 = "fdc82f4b06c880762503b0cb40e25f46cf8190d06011b3b768f4091d3334ef7f",
+        strip_prefix = "jdk-17.0.4.1+1",
+        urls = [
+            "https://mirror.bazel.build/github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.4.1%2B1/OpenJDK17U-jdk_s390x_linux_hotspot_17.0.4.1_1.tar.gz",
+            "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.4.1%2B1/OpenJDK17U-jdk_s390x_linux_hotspot_17.0.4.1_1.tar.gz",
+        ],
+        version = "17",
+    )
+
+    maybe(
+        remote_java_repository,
         name = "remotejdk17_macos",
         target_compatible_with = [
             "@platforms//os:macos",
@@ -386,6 +417,21 @@ def remote_jdk19_repos():
 
     maybe(
         remote_java_repository,
+        name = "remotejdk19_linux_s390x",
+        target_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:s390x",
+        ],
+        sha256 = "f2512f9a8e9847dd5d3557c39b485a8e7a1ef37b601dcbcb748d22e49f44815c",
+        strip_prefix = "jdk-19.0.2+7",
+        urls = [
+            "https://github.com/adoptium/temurin19-binaries/releases/download/jdk-19.0.2%2B7/OpenJDK19U-jdk_s390x_linux_hotspot_19.0.2_7.tar.gz",
+        ],
+        version = "19",
+    )
+
+    maybe(
+        remote_java_repository,
         name = "remotejdk19_macos",
         target_compatible_with = [
             "@platforms//os:macos",
@@ -449,13 +495,12 @@ def rules_java_toolchains(name = "toolchains"):
         name: The name of this macro (not used)
     """
     JDK_VERSIONS = ["11", "17", "19"]
-    PLATFORMS = ["linux", "macos", "macos_aarch64", "win"]
+    PLATFORMS = ["linux", "linux_s390x", "macos", "macos_aarch64", "win"]
 
     # Remote JDK repos for those Linux platforms are only defined for JDK 11.
     EXTRA_REMOTE_JDK11_REPOS = [
         "remotejdk11_linux_aarch64",
         "remotejdk11_linux_ppc64le",
-        "remotejdk11_linux_s390x",
     ]
 
     REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDK_VERSIONS for platform in PLATFORMS] + EXTRA_REMOTE_JDK11_REPOS
