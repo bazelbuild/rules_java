@@ -1,7 +1,7 @@
 module(
     name = "rules_java",
+    version = "5.4.1",
     compatibility_level = 1,
-    version = "5.4.0",
 )
 
 bazel_dep(name = "platforms", version = "0.0.4")
@@ -17,11 +17,8 @@ toolchains = use_extension("//java:extensions.bzl", "toolchains")
 
 # Declare remote java tools repos
 use_repo(toolchains, "remote_java_tools")
-
 use_repo(toolchains, "remote_java_tools_linux")
-
 use_repo(toolchains, "remote_java_tools_windows")
-
 use_repo(toolchains, "remote_java_tools_darwin")
 
 # Declare local jdk repo
@@ -61,4 +58,4 @@ REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDK_
 [register_toolchains("@" + name + "_toolchain_config_repo//:toolchain") for name in REMOTE_JDK_REPOS]
 
 # Dev dependencies
-bazel_dep(name = "rules_pkg", dev_dependency = True, version = "0.5.1")
+bazel_dep(name = "rules_pkg", version = "0.5.1", dev_dependency = True)
