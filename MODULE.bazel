@@ -29,9 +29,8 @@ register_toolchains("@local_jdk//:runtime_toolchain_definition")
 # Declare all remote jdk toolchain config repos
 JDK_VERSIONS = [
     "11",
-    "15",
-    "16",
     "17",
+    "19",
 ]
 
 PLATFORMS = [
