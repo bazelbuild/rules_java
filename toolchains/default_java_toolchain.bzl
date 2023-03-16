@@ -64,13 +64,13 @@ DEFAULT_JAVACOPTS = [
 # Default java_toolchain parameters
 _BASE_TOOLCHAIN_CONFIGURATION = dict(
     forcibly_disable_header_compilation = False,
-    genclass = ["@remote_java_tools//:GenClass"],
-    header_compiler = ["@remote_java_tools//:TurbineDirect"],
-    header_compiler_direct = ["@remote_java_tools//:TurbineDirect"],
+    genclass = [Label("@remote_java_tools//:GenClass")],
+    header_compiler = [Label("@remote_java_tools//:TurbineDirect")],
+    header_compiler_direct = [Label("@remote_java_tools//:TurbineDirect")],
     ijar = [Label("//toolchains:ijar")],
-    javabuilder = ["@remote_java_tools//:JavaBuilder"],
+    javabuilder = [Label("@remote_java_tools//:JavaBuilder")],
     javac_supports_workers = True,
-    jacocorunner = "@remote_java_tools//:jacoco_coverage_runner_filegroup",
+    jacocorunner = Label("@remote_java_tools//:jacoco_coverage_runner_filegroup"),
     jvm_opts = BASE_JDK9_JVM_OPTS,
     turbine_jvm_opts = [
         # Turbine is not a worker and parallel GC is faster for short-lived programs.
@@ -105,7 +105,7 @@ DEFAULT_TOOLCHAIN_CONFIGURATION = _BASE_TOOLCHAIN_CONFIGURATION
 # However it does allow using a wider range of `--host_javabase`s, including
 # versions newer than the current JDK.
 VANILLA_TOOLCHAIN_CONFIGURATION = dict(
-    javabuilder = ["@remote_java_tools//:VanillaJavaBuilder"],
+    javabuilder = [Label("@remote_java_tools//:VanillaJavaBuilder")],
     jvm_opts = [],
     java_runtime = None,
 )
@@ -122,8 +122,8 @@ PREBUILT_TOOLCHAIN_CONFIGURATION = dict(
 
 # The new toolchain is using all the tools from sources.
 NONPREBUILT_TOOLCHAIN_CONFIGURATION = dict(
-    ijar = ["@remote_java_tools//:ijar_cc_binary"],
-    singlejar = ["@remote_java_tools//:singlejar_cc_bin"],
+    ijar = [Label("@remote_java_tools//:ijar_cc_binary")],
+    singlejar = [Label("@remote_java_tools//:singlejar_cc_bin")],
 )
 
 _DEFAULT_SOURCE_VERSION = "8"
@@ -159,7 +159,7 @@ def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION
             )
             native.toolchain(
                 name = name + "_default_definition",
-                toolchain_type = "@bazel_tools//tools/jdk:toolchain_type",
+                toolchain_type = Label("@bazel_tools//tools/jdk:toolchain_type"),
                 target_settings = [name + "_default_version_setting"],
                 toolchain = name,
             )
@@ -171,7 +171,7 @@ def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION
         )
         native.toolchain(
             name = name + "_definition",
-            toolchain_type = "@bazel_tools//tools/jdk:toolchain_type",
+            toolchain_type = Label("@bazel_tools//tools/jdk:toolchain_type"),
             target_settings = [name + "_version_setting"],
             toolchain = name,
             exec_compatible_with = exec_compatible_with,
