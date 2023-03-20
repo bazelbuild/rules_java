@@ -20,6 +20,7 @@ load("//toolchains:local_java_repository.bzl", "local_java_repository")
 load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
 def java_tools_repos():
+    """ Declares the remote java_tools repositories """
     maybe(
         http_archive,
         name = "remote_java_tools",
