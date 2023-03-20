@@ -52,6 +52,16 @@ def java_tools_repos():
 
     maybe(
         http_archive,
+        name = "remote_java_tools_darwin",
+        sha256 = "abc434be713ee9e1fd6525d7a7bd9d7cdff6e27ae3ca9d96420490e7ff6e28a3",
+        urls = [
+                "https://mirror.bazel.build/bazel_java_tools/releases/java/v12.0/java_tools_darwin_x86_64-v12.0.zip",
+                "https://github.com/bazelbuild/java_tools/releases/download/java_v12.0/java_tools_darwin_x86_64-v12.0.zip",
+        ],
+    )
+
+    maybe(
+        http_archive,
         name = "remote_java_tools_darwin_x86_64",
         sha256 = "abc434be713ee9e1fd6525d7a7bd9d7cdff6e27ae3ca9d96420490e7ff6e28a3",
         urls = [
