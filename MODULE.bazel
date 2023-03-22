@@ -31,7 +31,7 @@ register_toolchains("@local_jdk//:runtime_toolchain_definition")
 JDK_VERSIONS = [
     "11",
     "17",
-    "19",
+    "20",
 ]
 
 PLATFORMS = [
