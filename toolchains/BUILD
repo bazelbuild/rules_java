@@ -126,7 +126,8 @@ cc_library(
     )
     for OS in [
         "linux",
-        "darwin",
+        "darwin_x86_64",
+        "darwin_arm64",
         "windows",
     ]
 ]
@@ -142,7 +143,8 @@ alias(
 alias(
     name = "ijar_prebuilt_binary_or_cc_binary",
     actual = select({
-        "@bazel_tools//src/conditions:darwin": ":ijar_prebuilt_binary_darwin",
+        "@bazel_tools//src/conditions:darwin_arm64": ":ijar_prebuilt_binary_darwin_arm64",
+        "@bazel_tools//src/conditions:darwin_x86_64": ":ijar_prebuilt_binary_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
         "@bazel_tools//src/conditions:windows": ":ijar_prebuilt_binary_windows",
         "//conditions:default": "@remote_java_tools//:ijar_cc_binary",
@@ -152,7 +154,8 @@ alias(
 alias(
     name = "ijar_prebuilt_binary",
     actual = select({
-        "@bazel_tools//src/conditions:darwin": ":ijar_prebuilt_binary_darwin",
+        "@bazel_tools//src/conditions:darwin_arm64": ":ijar_prebuilt_binary_darwin_arm64",
+        "@bazel_tools//src/conditions:darwin_x86_64": ":ijar_prebuilt_binary_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
         "@bazel_tools//src/conditions:windows": ":ijar_prebuilt_binary_windows",
     }),
@@ -172,7 +175,8 @@ alias(
 alias(
     name = "singlejar_prebuilt_or_cc_binary",
     actual = select({
-        "@bazel_tools//src/conditions:darwin": ":prebuilt_singlejar_darwin",
+        "@bazel_tools//src/conditions:darwin_arm64": ":prebuilt_singlejar_darwin_arm64",
+        "@bazel_tools//src/conditions:darwin_x86_64": ":prebuilt_singlejar_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
         "@bazel_tools//src/conditions:windows": ":prebuilt_singlejar_windows",
         "//conditions:default": "@remote_java_tools//:singlejar_cc_bin",
@@ -182,7 +186,8 @@ alias(
 alias(
     name = "prebuilt_singlejar",
     actual = select({
-        "@bazel_tools//src/conditions:darwin": ":prebuilt_singlejar_darwin",
+        "@bazel_tools//src/conditions:darwin_arm64": ":prebuilt_singlejar_darwin_arm64",
+        "@bazel_tools//src/conditions:darwin_x86_64": ":prebuilt_singlejar_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
         "@bazel_tools//src/conditions:windows": ":prebuilt_singlejar_windows",
     }),

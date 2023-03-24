@@ -64,29 +64,29 @@ DEFAULT_JAVACOPTS = [
 # Default java_toolchain parameters
 _BASE_TOOLCHAIN_CONFIGURATION = dict(
     forcibly_disable_header_compilation = False,
-    genclass = ["@remote_java_tools//:GenClass"],
-    header_compiler = ["@remote_java_tools//:TurbineDirect"],
-    header_compiler_direct = ["@remote_java_tools//:TurbineDirect"],
-    ijar = ["//toolchains:ijar"],
-    javabuilder = ["@remote_java_tools//:JavaBuilder"],
+    genclass = [Label("@remote_java_tools//:GenClass")],
+    header_compiler = [Label("@remote_java_tools//:TurbineDirect")],
+    header_compiler_direct = [Label("@remote_java_tools//:TurbineDirect")],
+    ijar = [Label("//toolchains:ijar")],
+    javabuilder = [Label("@remote_java_tools//:JavaBuilder")],
     javac_supports_workers = True,
-    jacocorunner = "@remote_java_tools//:jacoco_coverage_runner_filegroup",
+    jacocorunner = Label("@remote_java_tools//:jacoco_coverage_runner_filegroup"),
     jvm_opts = BASE_JDK9_JVM_OPTS,
     turbine_jvm_opts = [
         # Turbine is not a worker and parallel GC is faster for short-lived programs.
         "-XX:+UseParallelGC",
     ],
     misc = DEFAULT_JAVACOPTS,
-    singlejar = ["//toolchains:singlejar"],
+    singlejar = [Label("//toolchains:singlejar")],
     # Code to enumerate target JVM boot classpath uses host JVM. Because
     # java_runtime-s are involved, its implementation is in @bazel_tools.
-    bootclasspath = ["//toolchains:platformclasspath"],
+    bootclasspath = [Label("//toolchains:platformclasspath")],
     source_version = "8",
     target_version = "8",
     reduced_classpath_incompatible_processors = [
         "dagger.hilt.processor.internal.root.RootProcessor",  # see b/21307381
     ],
-    java_runtime = "//toolchains:remotejdk_17",
+    java_runtime = Label("//toolchains:remotejdk_17"),
 )
 
 DEFAULT_TOOLCHAIN_CONFIGURATION = _BASE_TOOLCHAIN_CONFIGURATION
@@ -105,7 +105,7 @@ DEFAULT_TOOLCHAIN_CONFIGURATION = _BASE_TOOLCHAIN_CONFIGURATION
 # However it does allow using a wider range of `--host_javabase`s, including
 # versions newer than the current JDK.
 VANILLA_TOOLCHAIN_CONFIGURATION = dict(
-    javabuilder = ["@remote_java_tools//:VanillaJavaBuilder"],
+    javabuilder = [Label("@remote_java_tools//:VanillaJavaBuilder")],
     jvm_opts = [],
     java_runtime = None,
 )
@@ -116,14 +116,14 @@ VANILLA_TOOLCHAIN_CONFIGURATION = dict(
 # same, otherwise the binaries will not work on the execution
 # platform.
 PREBUILT_TOOLCHAIN_CONFIGURATION = dict(
-    ijar = ["//toolchains:ijar_prebuilt_binary"],
-    singlejar = ["//toolchains:prebuilt_singlejar"],
+    ijar = [Label("//toolchains:ijar_prebuilt_binary")],
+    singlejar = [Label("//toolchains:prebuilt_singlejar")],
 )
 
 # The new toolchain is using all the tools from sources.
 NONPREBUILT_TOOLCHAIN_CONFIGURATION = dict(
-    ijar = ["@remote_java_tools//:ijar_cc_binary"],
-    singlejar = ["@remote_java_tools//:singlejar_cc_bin"],
+    ijar = [Label("@remote_java_tools//:ijar_cc_binary")],
+    singlejar = [Label("@remote_java_tools//:singlejar_cc_bin")],
 )
 
 _DEFAULT_SOURCE_VERSION = "8"
@@ -159,7 +159,7 @@ def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION
             )
             native.toolchain(
                 name = name + "_default_definition",
-                toolchain_type = "@bazel_tools//tools/jdk:toolchain_type",
+                toolchain_type = Label("@bazel_tools//tools/jdk:toolchain_type"),
                 target_settings = [name + "_default_version_setting"],
                 toolchain = name,
             )
@@ -171,7 +171,7 @@ def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION
         )
         native.toolchain(
             name = name + "_definition",
-            toolchain_type = "@bazel_tools//tools/jdk:toolchain_type",
+            toolchain_type = Label("@bazel_tools//tools/jdk:toolchain_type"),
             target_settings = [name + "_version_setting"],
             toolchain = name,
             exec_compatible_with = exec_compatible_with,
@@ -189,8 +189,8 @@ def java_runtime_files(name, srcs):
     for src in srcs:
         native.genrule(
             name = "gen_%s" % src,
-            srcs = ["//toolchains:current_java_runtime"],
-            toolchains = ["//toolchains:current_java_runtime"],
+            srcs = [Label("//toolchains:current_java_runtime")],
+            toolchains = [Label("//toolchains:current_java_runtime")],
             cmd = "cp $(JAVABASE)/%s $@" % src,
             outs = [src],
             tags = ["manual"],
