@@ -173,7 +173,10 @@ filegroup(
 
 filegroup(
     name = "jdk-include",
-    srcs = glob(["include/**"]),
+    srcs = glob(
+        ["include/**"],
+        allow_empty = True,
+    ),
 )
 
 filegroup(
