@@ -497,6 +497,7 @@ def rules_java_dependencies():
     local_jdk_repo()
     remote_jdk11_repos()
     remote_jdk17_repos()
+    remote_jdk19_repos()
     java_tools_repos()
 
 def rules_java_toolchains(name = "toolchains"):
