@@ -211,7 +211,7 @@ alias(
     actual = ":toolchain",
 )
 
-RELEASES = (8, 9, 10, 11)
+RELEASES = (8, 9, 10)
 
 [
     default_java_toolchain(
@@ -222,6 +222,15 @@ RELEASES = (8, 9, 10, 11)
     )
     for release in RELEASES
 ]
+
+# A toolchain that targets java 11.
+default_java_toolchain(
+    name = "toolchain_jdk_11",
+    configuration = dict(),
+    java_runtime = "//toolchains:remote_jdk11",
+    source_version = "11",
+    target_version = "11",
+)
 
 # A toolchain that targets java 15.
 default_java_toolchain(
