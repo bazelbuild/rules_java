@@ -1,6 +1,9 @@
 licenses(["notice"])
 
-exports_files(["LICENSE"])
+exports_files([
+    "LICENSE",
+    "WORKSPACE",
+])
 
 filegroup(
     name = "distribution",
