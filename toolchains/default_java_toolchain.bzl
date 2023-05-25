@@ -43,6 +43,11 @@ BASE_JDK9_JVM_OPTS = [
 
     # Compact strings make JavaBuilder slightly slower.
     "-XX:-CompactStrings",
+
+    # Since https://bugs.openjdk.org/browse/JDK-8153723, JVM logging goes to stdout. This
+    # makes it go to stderr instead.
+    "-Xlog:disable",
+    "-Xlog:all=warning:stderr:uptime,level,tags",
 ]
 
 JDK9_JVM_OPTS = BASE_JDK9_JVM_OPTS
@@ -162,6 +167,8 @@ def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION
                 toolchain_type = Label("@bazel_tools//tools/jdk:toolchain_type"),
                 target_settings = [name + "_default_version_setting"],
                 toolchain = name,
+                exec_compatible_with = exec_compatible_with,
+                target_compatible_with = target_compatible_with,
             )
 
         native.config_setting(
@@ -228,10 +235,14 @@ def _bootclasspath_impl(ctx):
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.platform=ALL-UNNAMED")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
-    args.add("-cp", class_dir.path)
+    args.add_all("-cp", [class_dir], expand_directories = False)
     args.add("DumpPlatformClassPath")
     args.add(bootclasspath)
 
+    system_files = ("release", "modules", "jrt-fs.jar")
+    system = [f for f in ctx.files.target_javabase if f.basename in system_files]
+    if len(system) != len(system_files):
+        system = None
     if ctx.attr.target_javabase:
         inputs.extend(ctx.files.target_javabase)
         args.add(ctx.attr.target_javabase[java_common.JavaRuntimeInfo].java_home)
@@ -245,6 +256,10 @@ def _bootclasspath_impl(ctx):
     )
     return [
         DefaultInfo(files = depset([bootclasspath])),
+        java_common.BootClassPathInfo(
+            bootclasspath = [bootclasspath],
+            system = system,
+        ),
         OutputGroupInfo(jar = [bootclasspath]),
     ]
 
