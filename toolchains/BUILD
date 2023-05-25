@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load(
-    "//toolchains:default_java_toolchain.bzl",
+    ":default_java_toolchain.bzl",
     "DEFAULT_TOOLCHAIN_CONFIGURATION",
     "PREBUILT_TOOLCHAIN_CONFIGURATION",
     "bootclasspath",
@@ -8,7 +8,7 @@ load(
     "java_runtime_files",
 )
 load(
-    "//toolchains:java_toolchain_alias.bzl",
+    ":java_toolchain_alias.bzl",
     "java_host_runtime_alias",
     "java_runtime_alias",
     "java_runtime_version_alias",
@@ -108,6 +108,7 @@ cc_library(
         "@bazel_tools//src/conditions:windows": ["include/win32"],
         "//conditions:default": [],
     }),
+    tags = ["nobuilder"],
 )
 
 [
