@@ -260,7 +260,7 @@ _local_java_repository_rule = repository_rule(
     },
 )
 
-def local_java_repository(name, java_home = "", version = "", build_file = None, build_file_content = None):
+def local_java_repository(name, java_home = "", version = "", build_file = None, build_file_content = None, **kwargs):
     """Registers a runtime toolchain for local JDK and creates an unregistered compile toolchain.
 
     Toolchain resolution is constrained with --java_runtime_version flag
@@ -278,5 +278,6 @@ def local_java_repository(name, java_home = "", version = "", build_file = None,
       build_file: optionally BUILD file template
       build_file_content: optional BUILD file template as a string
       version: optionally java version
+      **kwargs: additional arguments for repository rule
     """
-    _local_java_repository_rule(name = name, java_home = java_home, version = version, build_file = build_file, build_file_content = build_file_content)
+    _local_java_repository_rule(name = name, java_home = java_home, version = version, build_file = build_file, build_file_content = build_file_content, **kwargs)
