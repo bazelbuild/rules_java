@@ -24,6 +24,11 @@ filegroup(
     srcs = glob(["**"]),
 )
 
+filegroup(
+    name = "bzl_srcs",
+    srcs = glob(["*.bzl"]),
+)
+
 # Used to distinguish toolchains used for Java development, ie the JavaToolchainProvider.
 # TODO: migrate away from using @bazel_tools//tools/jdk:toolchain_type ?
 # toolchain_type(name = "toolchain_type")
