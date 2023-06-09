@@ -33,7 +33,10 @@ _toolchain_config = repository_rule(
 )
 
 def remote_java_repository(name, version, target_compatible_with = None, prefix = "remotejdk", **kwargs):
-    """Imports and registers a JDK from a http archive.
+    """Imports a JDK from a http archive and creates runtime toolchain definitions for it.
+
+    Register the toolchains defined by this macro via `register_toolchains("@<name>//:all")`, where
+    `<name>` is the value of the `name` parameter.
 
     Toolchain resolution is determined with target_compatible_with
     parameter and constrained with --java_runtime_version flag either having value
