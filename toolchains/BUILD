@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load(
-    "//toolchains:default_java_toolchain.bzl",
+    ":default_java_toolchain.bzl",
     "DEFAULT_TOOLCHAIN_CONFIGURATION",
     "PREBUILT_TOOLCHAIN_CONFIGURATION",
     "bootclasspath",
@@ -8,7 +8,7 @@ load(
     "java_runtime_files",
 )
 load(
-    "//toolchains:java_toolchain_alias.bzl",
+    ":java_toolchain_alias.bzl",
     "java_host_runtime_alias",
     "java_runtime_alias",
     "java_runtime_version_alias",
@@ -22,7 +22,11 @@ licenses(["notice"])
 filegroup(
     name = "srcs",
     srcs = glob(["**"]),
-    visibility = ["//:__pkg__"],
+)
+
+filegroup(
+    name = "bzl_srcs",
+    srcs = glob(["*.bzl"]),
 )
 
 # Used to distinguish toolchains used for Java development, ie the JavaToolchainProvider.
@@ -109,6 +113,7 @@ cc_library(
         "@bazel_tools//src/conditions:windows": ["include/win32"],
         "//conditions:default": [],
     }),
+    tags = ["nobuilder"],
 )
 
 [
@@ -196,8 +201,8 @@ alias(
 bootclasspath(
     name = "platformclasspath",
     src = "DumpPlatformClassPath.java",
-    host_javabase = "current_java_runtime",
-    target_javabase = "current_java_runtime",
+    host_javabase = ":current_java_runtime",
+    target_javabase = ":current_java_runtime",
 )
 
 default_java_toolchain(
@@ -222,6 +227,15 @@ RELEASES = (8, 9, 10, 11)
     )
     for release in RELEASES
 ]
+
+# A toolchain that targets java 14.
+default_java_toolchain(
+    name = "toolchain_jdk_14",
+    configuration = dict(),
+    java_runtime = "//toolchains:remotejdk_14",
+    source_version = "14",
+    target_version = "14",
+)
 
 # A toolchain that targets java 15.
 default_java_toolchain(
@@ -248,6 +262,15 @@ default_java_toolchain(
     java_runtime = "//toolchains:remotejdk_17",
     source_version = "17",
     target_version = "17",
+)
+
+# A toolchain that targets java 20.
+default_java_toolchain(
+    name = "toolchain_jdk_20",
+    configuration = dict(),
+    java_runtime = "//toolchains:remotejdk_20",
+    source_version = "20",
+    target_version = "20",
 )
 
 default_java_toolchain(
@@ -278,5 +301,17 @@ java_runtime_version_alias(
 java_runtime_version_alias(
     name = "remotejdk_17",
     runtime_version = "remotejdk_17",
+    visibility = ["//visibility:public"],
+)
+
+java_runtime_version_alias(
+    name = "remotejdk_20",
+    runtime_version = "remotejdk_20",
+    visibility = ["//visibility:public"],
+)
+
+java_runtime_version_alias(
+    name = "jdk_8",
+    runtime_version = "8",
     visibility = ["//visibility:public"],
 )

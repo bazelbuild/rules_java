@@ -1,6 +1,6 @@
 module(
     name = "rules_java",
-    version = "5.5.0",
+    version = "6.1.0",
     compatibility_level = 1,
 )
 
@@ -8,8 +8,9 @@ bazel_dep(name = "platforms", version = "0.0.4")
 bazel_dep(name = "rules_cc", version = "0.0.2")
 bazel_dep(name = "bazel_skylib", version = "1.2.0")
 
-# rules_proto is required by @remote_java_tools, which is loaded via module extension.
+# Required by @remote_java_tools, which is loaded via module extension.
 bazel_dep(name = "rules_proto", version = "4.0.0")
+bazel_dep(name = "rules_license", version = "0.0.3")
 
 register_toolchains("//toolchains:all")
 
@@ -31,7 +32,7 @@ register_toolchains("@local_jdk//:runtime_toolchain_definition")
 JDK_VERSIONS = [
     "11",
     "17",
-    "19",
+    "20",
 ]
 
 PLATFORMS = [

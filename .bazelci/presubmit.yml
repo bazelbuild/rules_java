@@ -1,11 +1,13 @@
 ---
 build_targets: &build_targets
   - "//..."
+  - "@remote_java_tools//java_tools/..."
   # TODO: Look into broken targets in //toolchains
   - "-//toolchains/..."
 
 build_targets_bzlmod: &build_targets_bzlmod
   - "//..."
+  - "@remote_java_tools//java_tools/..."
   - "-//toolchains/..."
   # TODO(pcloudy): pkg_tar doesn't work with Bzlmod due to https://github.com/bazelbuild/bazel/issues/14259
   # Enable once the issue is fixed.

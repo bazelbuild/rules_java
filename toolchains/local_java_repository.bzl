@@ -14,7 +14,7 @@
 
 """Rules for importing and registering a local JDK."""
 
-load("@rules_java//java:defs.bzl", "java_runtime")
+load("//java:defs.bzl", "java_runtime")
 load(":default_java_toolchain.bzl", "default_java_toolchain")
 
 def _detect_java_version(repository_ctx, java_bin):
@@ -39,7 +39,7 @@ def _detect_java_version(repository_ctx, java_bin):
         return minor
     return major
 
-def local_java_runtime(name, java_home, version, runtime_name = None, visibility = ["//visibility:public"]):
+def local_java_runtime(name, java_home, version, runtime_name = None, visibility = ["//visibility:public"], exec_compatible_with = [], target_compatible_with = []):
     """Defines a java_runtime target together with Java runtime and compile toolchain definitions.
 
     Java runtime toolchain is constrained by flag --java_runtime_version having
@@ -56,6 +56,10 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
       version: Version of the JDK.
       runtime_name: name of java_runtime target if it already exists.
       visibility: Visibility that will be applied to the java runtime target
+      exec_compatible_with: A list of constraint values that must be
+                            satisfied for the exec platform.
+      target_compatible_with: A list of constraint values that must be
+                              satisfied for the target platform.
     """
 
     if runtime_name == None:
@@ -64,6 +68,7 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
             name = runtime_name,
             java_home = java_home,
             visibility = visibility,
+            version = int(version) if version.isdigit() else 0,
         )
 
     native.config_setting(
@@ -84,9 +89,9 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
     native.alias(
         name = name + "_settings_alias",
         actual = select({
-            ":" + name + "_name_setting": ":" + name + "_name_setting",
-            ":" + name + "_version_setting": ":" + name + "_version_setting",
-            "//conditions:default": ":" + name + "_name_version_setting",
+            name + "_name_setting": name + "_name_setting",
+            name + "_version_setting": name + "_version_setting",
+            "//conditions:default": name + "_name_version_setting",
         }),
         visibility = ["//visibility:private"],
     )
@@ -104,6 +109,8 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
                 source_version = str(version),
                 target_version = str(version),
                 java_runtime = runtime_name,
+                exec_compatible_with = exec_compatible_with,
+                target_compatible_with = target_compatible_with,
             )
 
     # else version is not recognized and no compilation toolchains are predefined
@@ -130,8 +137,7 @@ def _determine_java_home(repository_ctx):
     if java_home:
         java_home_path = repository_ctx.path(java_home)
         if not java_home_path.exists:
-            fail('The path indicated by the "java_home" attribute "%s" (absolute: "%s") ' +
-                 "does not exist." % (java_home, str(java_home_path)))
+            fail('The path indicated by the "java_home" attribute "%s" (absolute: "%s") does not exist.' % (java_home, str(java_home_path)))
         return java_home_path
     if "JAVA_HOME" in repository_ctx.os.environ:
         return repository_ctx.path(repository_ctx.os.environ["JAVA_HOME"])
@@ -160,10 +166,13 @@ def _local_java_repository_impl(repository_ctx):
 
     java_home = _determine_java_home(repository_ctx)
 
+    # When Bzlmod is enabled, the Java runtime name should be the last segment of the repository name.
+    local_java_runtime_name = repository_ctx.name.split("~")[-1]
+
     repository_ctx.file(
         "WORKSPACE",
         "# DO NOT EDIT: automatically generated WORKSPACE file for local_java_repository\n" +
-        "workspace(name = \"{name}\")\n".format(name = repository_ctx.name),
+        "workspace(name = \"{name}\")\n".format(name = local_java_runtime_name),
     )
 
     java_bin = java_home.get_child("bin").get_child(_with_os_extension(repository_ctx, "java"))
@@ -173,7 +182,7 @@ def _local_java_repository_impl(repository_ctx):
         repository_ctx.file(
             "BUILD.bazel",
             _NOJDK_BUILD_TPL.format(
-                local_jdk = repository_ctx.name,
+                local_jdk = local_java_runtime_name,
                 java_binary = _with_os_extension(repository_ctx, "bin/java"),
                 java_home = java_home,
             ),
@@ -185,11 +194,17 @@ def _local_java_repository_impl(repository_ctx):
     version = repository_ctx.attr.version if repository_ctx.attr.version != "" else _detect_java_version(repository_ctx, java_bin)
 
     # Prepare BUILD file using "local_java_runtime" macro
-    build_file = ""
-    if repository_ctx.attr.build_file != None:
+    if repository_ctx.attr.build_file_content and repository_ctx.attr.build_file:
+        fail("build_file and build_file_content are exclusive")
+    if repository_ctx.attr.build_file_content:
+        build_file = repository_ctx.attr.build_file_content
+    elif repository_ctx.attr.build_file:
         build_file = repository_ctx.read(repository_ctx.path(repository_ctx.attr.build_file))
+    else:
+        build_file = ""
+    build_file = build_file.format(RUNTIME_VERSION = version if version.isdigit() else "0")
 
-    runtime_name = '"jdk"' if repository_ctx.attr.build_file else None
+    runtime_name = '"jdk"' if build_file else None
     local_java_runtime_macro = """
 local_java_runtime(
     name = "%s",
@@ -197,7 +212,7 @@ local_java_runtime(
     java_home = "%s",
     version = "%s",
 )
-""" % (repository_ctx.attr.target_name, runtime_name, java_home, version)
+""" % (local_java_runtime_name, runtime_name, java_home, version)
 
     repository_ctx.file(
         "BUILD.bazel",
@@ -207,7 +222,7 @@ local_java_runtime(
     )
 
     # Symlink all files
-    for file in java_home.readdir():
+    for file in repository_ctx.path(java_home).readdir():
         repository_ctx.symlink(file, file.basename)
 
 # Build file template, when JDK does not exist
@@ -217,7 +232,7 @@ fail_rule(
    header = "Auto-Configuration Error:",
    message = ("Cannot find Java binary {java_binary} in {java_home}; either correct your JAVA_HOME, " +
           "PATH or specify Java from remote repository (e.g. " +
-          "--java_runtime_version=remotejdk_11")
+          "--java_runtime_version=remotejdk_11)")
 )
 config_setting(
    name = "localjdk_setting",
@@ -239,13 +254,13 @@ _local_java_repository_rule = repository_rule(
     environ = ["JAVA_HOME"],
     attrs = {
         "build_file": attr.label(),
+        "build_file_content": attr.string(),
         "java_home": attr.string(),
-        "target_name": attr.string(),
         "version": attr.string(),
     },
 )
 
-def local_java_repository(name, java_home = "", version = "", build_file = None):
+def local_java_repository(name, java_home = "", version = "", build_file = None, build_file_content = None, **kwargs):
     """Registers a runtime toolchain for local JDK and creates an unregistered compile toolchain.
 
     Toolchain resolution is constrained with --java_runtime_version flag
@@ -261,12 +276,8 @@ def local_java_repository(name, java_home = "", version = "", build_file = None)
       name: A unique name for this rule.
       java_home: Location of the JDK imported.
       build_file: optionally BUILD file template
+      build_file_content: optional BUILD file template as a string
       version: optionally java version
+      **kwargs: additional arguments for repository rule
     """
-    _local_java_repository_rule(
-        name = name,
-        target_name = name,
-        java_home = java_home,
-        version = version,
-        build_file = build_file,
-    )
+    _local_java_repository_rule(name = name, java_home = java_home, version = version, build_file = build_file, build_file_content = build_file_content, **kwargs)
