@@ -82,6 +82,16 @@ toolchain(
     toolchain_type = "@bazel_tools//tools/jdk:runtime_toolchain_type",
     toolchain = "{toolchain}",
 )
+toolchain(
+    name = "bootstrap_runtime_toolchain",
+    # These constraints are not required for correctness, but prevent fetches of remote JDK for
+    # different architectures. As every Java compilation toolchain depends on a bootstrap runtime in
+    # the same configuration, this constraint will not result in toolchain resolution failures.
+    exec_compatible_with = {target_compatible_with},
+    target_settings = [":version_or_prefix_version_setting"],
+    toolchain_type = "@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type",
+    toolchain = "{toolchain}",
+)
 """.format(
             prefix = prefix,
             version = version,
