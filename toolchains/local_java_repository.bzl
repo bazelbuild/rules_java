@@ -57,9 +57,13 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
       runtime_name: name of java_runtime target if it already exists.
       visibility: Visibility that will be applied to the java runtime target
       exec_compatible_with: A list of constraint values that must be
-                            satisfied for the exec platform.
+                            satisfied by the exec platform for the Java compile
+                            toolchain to be selected. They must be satisfied by
+                            the target platform for the Java runtime toolchain
+                            to be selected.
       target_compatible_with: A list of constraint values that must be
-                              satisfied for the target platform.
+                              satisfied by the target platform for the Java
+                              compile toolchain to be selected.
     """
 
     if runtime_name == None:
@@ -97,6 +101,8 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
     )
     native.toolchain(
         name = "runtime_toolchain_definition",
+        # A JDK can be used as a runtime *for* the platforms it can be used to compile *on*.
+        target_compatible_with = exec_compatible_with,
         target_settings = [":%s_settings_alias" % name],
         toolchain_type = Label("@bazel_tools//tools/jdk:runtime_toolchain_type"),
         toolchain = runtime_name,
@@ -211,12 +217,14 @@ local_java_runtime(
     runtime_name = %s,
     java_home = "%s",
     version = "%s",
+    exec_compatible_with = HOST_CONSTRAINTS,
 )
 """ % (local_java_runtime_name, runtime_name, java_home, version)
 
     repository_ctx.file(
         "BUILD.bazel",
         'load("@rules_java//toolchains:local_java_repository.bzl", "local_java_runtime")\n' +
+        'load("@local_config_platform//:constraints.bzl", "HOST_CONSTRAINTS")\n' +
         build_file +
         local_java_runtime_macro,
     )
