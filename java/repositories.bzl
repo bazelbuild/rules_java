@@ -107,10 +107,10 @@ def remote_jdk8_repos(name = ""):
             "@platforms//os:linux",
             "@platforms//cpu:s390x",
         ],
-        sha256 = "b137500de20ff1a733e9c4ff28cb4ee585cd01f8cd9a50636fe0d22b86ba502e",
-        strip_prefix = "jdk8u362-b09",
+        sha256 = "276a431c79b7e94bc1b1b4fd88523383ae2d635ea67114dfc8a6174267f8fb2c",
+        strip_prefix = "jdk8u292-b10",
         urls = [
-            "https://github.com/ibmruntimes/semeru8-binaries/releases/download/jdk8u362-b09_openj9-0.36.0/ibm-semeru-open-jdk_s390x_linux_8u362b09_openj9-0.36.0.tar.gz",
+            "https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jdk_s390x_linux_hotspot_8u292b10.tar.gz",
         ],
         version = "8",
     )
@@ -543,14 +543,18 @@ def rules_java_toolchains(name = "toolchains"):
     JDK_VERSIONS = ["11", "17", "20"]
     PLATFORMS = ["linux", "macos", "macos_aarch64", "win"]
 
-    # Remote JDK repos for those Linux platforms are only defined for JDK 11.
+    # Remote JDK repos for those Linux platforms are only defined for JDK 11 and JDK 17.
     EXTRA_REMOTE_JDK11_REPOS = [
         "remotejdk11_linux_aarch64",
         "remotejdk11_linux_ppc64le",
         "remotejdk11_linux_s390x",
     ]
 
-    REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDK_VERSIONS for platform in PLATFORMS] + EXTRA_REMOTE_JDK11_REPOS
+    EXTRA_REMOTE_JDK17_REPOS = [
+        "remotejdk17_linux_s390x",
+    ]
+
+    REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDK_VERSIONS for platform in PLATFORMS] + EXTRA_REMOTE_JDK11_REPOS + EXTRA_REMOTE_JDK17_REPOS
 
     native.register_toolchains("//toolchains:all")
     native.register_toolchains("@local_jdk//:runtime_toolchain_definition")
