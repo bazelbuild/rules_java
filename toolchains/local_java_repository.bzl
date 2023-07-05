@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rules for importing and registering a local JDK."""
+"""Rules for importing a local JDK."""
 
 load("//java:defs.bzl", "java_runtime")
 load(":default_java_toolchain.bzl", "default_java_toolchain")
