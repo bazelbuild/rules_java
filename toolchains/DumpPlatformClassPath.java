@@ -47,7 +47,7 @@ import javax.tools.StandardLocation;
 /**
  * Output a jar file containing all classes on the platform classpath of the given JDK release.
  *
- * <p>usage: DumpPlatformClassPath <release version> <output jar> <path to target JDK>?
+ * <p>usage: {@code DumpPlatformClassPath <output jar> <path to target JDK>}
  */
 public class DumpPlatformClassPath {
 
@@ -90,7 +90,7 @@ public class DumpPlatformClassPath {
     // * --release takes a language level (e.g. '9') and uses the API information baked in to
     //     the host JDK (in lib/ct.sym).
 
-    // Since --system only supports JDK >= 9, first check of the target JDK defines a JDK 8
+    // Since --system only supports JDK >= 9, first check if the target JDK defines a JDK 8
     // bootclasspath.
     List<Path> bootClassPathJars = getBootClassPathJars(targetJavabase);
     if (!bootClassPathJars.isEmpty()) {
