@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rules for importing and registering a local JDK."""
+"""Rules for importing a local JDK."""
 
 load("//java:defs.bzl", "java_runtime")
 load(":default_java_toolchain.bzl", "default_java_toolchain")
@@ -261,7 +261,10 @@ _local_java_repository_rule = repository_rule(
 )
 
 def local_java_repository(name, java_home = "", version = "", build_file = None, build_file_content = None, **kwargs):
-    """Registers a runtime toolchain for local JDK and creates an unregistered compile toolchain.
+    """Defines runtime and compile toolchains for a local JDK.
+
+    Register the toolchains defined by this macro via `register_toolchains("@<name>//:all")`, where
+    `<name>` is the value of the `name` parameter.
 
     Toolchain resolution is constrained with --java_runtime_version flag
     having value of the "name" or "version" parameter.
