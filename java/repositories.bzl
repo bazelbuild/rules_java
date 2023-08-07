@@ -551,7 +551,13 @@ def rules_java_toolchains(name = "toolchains"):
 
     REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDKS for platform in JDKS[version]]
 
-    native.register_toolchains("//toolchains:all")
-    native.register_toolchains("@local_jdk//:runtime_toolchain_definition")
+    native.register_toolchains(
+        "//toolchains:all",
+        "@local_jdk//:runtime_toolchain_definition",
+        "@local_jdk//:bootstrap_runtime_toolchain_definition",
+    )
     for name in REMOTE_JDK_REPOS:
-        native.register_toolchains("@" + name + "_toolchain_config_repo//:toolchain")
+        native.register_toolchains(
+            "@" + name + "_toolchain_config_repo//:toolchain",
+            "@" + name + "_toolchain_config_repo//:bootstrap_runtime_toolchain",
+        )

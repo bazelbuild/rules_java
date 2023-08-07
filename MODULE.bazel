@@ -27,7 +27,10 @@ use_repo(toolchains, "remote_java_tools_darwin_arm64")
 # Declare local jdk repo
 use_repo(toolchains, "local_jdk")
 
-register_toolchains("@local_jdk//:runtime_toolchain_definition")
+register_toolchains(
+    "@local_jdk//:runtime_toolchain_definition",
+    "@local_jdk//:bootstrap_runtime_toolchain_definition",
+)
 
 # Declare all remote jdk toolchain config repos
 JDKS = {
@@ -70,7 +73,7 @@ REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDKS
     repo + "_toolchain_config_repo",
 ) for repo in REMOTE_JDK_REPOS]
 
-[register_toolchains("@" + name + "_toolchain_config_repo//:toolchain") for name in REMOTE_JDK_REPOS]
+[register_toolchains("@" + name + "_toolchain_config_repo//:all") for name in REMOTE_JDK_REPOS]
 
 # Dev dependencies
 bazel_dep(name = "rules_pkg", version = "0.5.1", dev_dependency = True)
