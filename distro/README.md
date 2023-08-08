@@ -10,7 +10,7 @@
 
 ------
 
-**Note:** Steps 2-6 have been automated. Trigger a new build of the [rules_java release pipeline](https://buildkite.com/bazel-trusted/rules-java-release/). Set the message to "rules_java [version]" (or anything else), and leave the commit and branch fields as is. 
+**Note:** Steps 2-6 have been automated. Trigger a new build of the [rules_java release pipeline](https://buildkite.com/bazel-trusted/rules-java-release/). Set the message to "rules_java [version]" (or anything else), and leave the commit and branch fields as is.
 
 A new release will be created [here](https://github.com/bazelbuild/rules_java/releases) -- edit the description as needed. A PR will be submitted against the [bazel-central-registry](https://github.com/bazelbuild/bazel-central-registry) repo.
 
