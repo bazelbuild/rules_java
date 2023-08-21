@@ -86,7 +86,7 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
     singlejar = [Label("//toolchains:singlejar")],
     # Code to enumerate target JVM boot classpath uses host JVM. Because
     # java_runtime-s are involved, its implementation is in @bazel_tools.
-    bootclasspath = [Label("//toolchains:platformclasspath")],
+    bootclasspath = [Label("@bazel_tools//tools/jdk:platformclasspath")],
     source_version = "8",
     target_version = "8",
     reduced_classpath_incompatible_processors = [
