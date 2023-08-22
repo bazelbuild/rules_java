@@ -283,8 +283,17 @@ _local_java_repository_rule = repository_rule(
 def local_java_repository(name, java_home = "", version = "", build_file = None, build_file_content = None, **kwargs):
     """Defines runtime and compile toolchains for a local JDK.
 
-    Register the toolchains defined by this macro via `register_toolchains("@<name>//:all")`, where
-    `<name>` is the value of the `name` parameter.
+    Register the toolchains defined by this macro as follows (where `<name>` is the value of the
+    `name` parameter):
+    * Runtime toolchains only (recommended)
+      ```
+      register_toolchains("@<name>//:runtime_toolchain_definition")
+      register_toolchains("@<name>//:bootstrap_runtime_toolchain_definition")
+      ```
+    * Runtime and compilation toolchains:
+      ```
+      register_toolchains("@<name>//:all")
+      ```
 
     Toolchain resolution is constrained with --java_runtime_version flag
     having value of the "name" or "version" parameter.
