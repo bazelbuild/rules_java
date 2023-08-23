@@ -1,13 +1,19 @@
 licenses(["notice"])
 
-exports_files(["LICENSE"])
+exports_files([
+    "LICENSE",
+    "WORKSPACE",
+])
 
 filegroup(
     name = "distribution",
-    srcs = glob([
+    srcs = [
+        "AUTHORS",
         "BUILD",
         "LICENSE",
-        "*.bzl",
-    ]),
-    visibility = ["@//distro:__pkg__"],
+        "MODULE.bazel",
+        "//java:srcs",
+        "//toolchains:srcs",
+    ],
+    visibility = ["//distro:__pkg__"],
 )

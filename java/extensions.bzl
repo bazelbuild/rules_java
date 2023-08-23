@@ -1,4 +1,4 @@
-# Copyright 2019 The Bazel Authors. All rights reserved.
+# Copyright 2021 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,11 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Module extensions for rules_java."""
 
-"""Dependencies that are needed for rules_java tests and tools."""
+load("//java:repositories.bzl", "java_tools_repos", "local_jdk_repo", "remote_jdk11_repos", "remote_jdk17_repos", "remote_jdk20_repos")
 
-load("@bazel_federation//:repositories.bzl", "rules_pkg")
+def _toolchains_impl(_ctx):
+    java_tools_repos()
+    local_jdk_repo()
+    remote_jdk11_repos()
+    remote_jdk17_repos()
+    remote_jdk20_repos()
 
-def rules_java_internal_deps():
-    """Fetches all required dependencies for rules_java tests and tools."""
-    rules_pkg()
+toolchains = module_extension(implementation = _toolchains_impl)

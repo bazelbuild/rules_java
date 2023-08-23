@@ -1,0 +1,1 @@
+build:bzlmod --experimental_enable_bzlmod

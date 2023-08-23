@@ -1,11 +1,9 @@
-# Package rules_java
+# Releasing rules_java
 
-```
-bazel build :relnotes
-cat ../bazel-bin/distro/relnotes.txt
-tar tzf ../bazel-bin/distro/rules_java-*.tar.gz
-```
-
-- Create a new release
-- Copy/paste relnotes.txt into the notes. Adjust as needed.
-- Upload the tar.gz file as an artifact.
+1. Update version in [java/defs.bzl](/java/defs.bzl),
+   [MODULE.bazel](/MODULE.bazel) and merge it
+2. Build the release running `bazel build //distro:rules_java-{version}`
+3. Prepare release notes running `bazel build //distro:relnotes`
+4. Create a new release on GitHub
+5. Copy/paste the produced `relnotes.txt` into the notes. Adjust as needed.
+6. Upload the produced tar.gz file as an artifact.
