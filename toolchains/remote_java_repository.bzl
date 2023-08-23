@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rules for importing and registering JDKs from http archive.
+"""Rules for importing JDKs from http archive.
 
-Rule remote_java_repository imports and registers JDK with the toolchain resolution.
+Rule remote_java_repository imports a JDK and creates toolchain definitions for it.
 """
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
@@ -33,7 +33,10 @@ _toolchain_config = repository_rule(
 )
 
 def remote_java_repository(name, version, target_compatible_with = None, prefix = "remotejdk", **kwargs):
-    """Imports and registers a JDK from a http archive.
+    """Imports a JDK from a http archive and creates runtime toolchain definitions for it.
+
+    Register the toolchains defined by this macro via `register_toolchains("@<name>//:all")`, where
+    `<name>` is the value of the `name` parameter.
 
     Toolchain resolution is determined with target_compatible_with
     parameter and constrained with --java_runtime_version flag either having value
@@ -77,6 +80,16 @@ toolchain(
     target_compatible_with = {target_compatible_with},
     target_settings = [":version_or_prefix_version_setting"],
     toolchain_type = "@bazel_tools//tools/jdk:runtime_toolchain_type",
+    toolchain = "{toolchain}",
+)
+toolchain(
+    name = "bootstrap_runtime_toolchain",
+    # These constraints are not required for correctness, but prevent fetches of remote JDK for
+    # different architectures. As every Java compilation toolchain depends on a bootstrap runtime in
+    # the same configuration, this constraint will not result in toolchain resolution failures.
+    exec_compatible_with = {target_compatible_with},
+    target_settings = [":version_or_prefix_version_setting"],
+    toolchain_type = "@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type",
     toolchain = "{toolchain}",
 )
 """.format(

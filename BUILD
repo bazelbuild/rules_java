@@ -12,8 +12,9 @@ filegroup(
         "BUILD",
         "LICENSE",
         "MODULE.bazel",
+        "WORKSPACE",
         "//java:srcs",
         "//toolchains:srcs",
     ],
-    visibility = ["//distro:__pkg__"],
+    visibility = ["//visibility:public"],
 )

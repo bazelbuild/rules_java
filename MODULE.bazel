@@ -1,6 +1,6 @@
 module(
     name = "rules_java",
-    version = "6.1.0",
+    version = "6.5.1",
     compatibility_level = 1,
 )
 
@@ -26,37 +26,53 @@ use_repo(toolchains, "remote_java_tools_darwin_arm64")
 # Declare local jdk repo
 use_repo(toolchains, "local_jdk")
 
-register_toolchains("@local_jdk//:runtime_toolchain_definition")
+register_toolchains(
+    "@local_jdk//:runtime_toolchain_definition",
+    "@local_jdk//:bootstrap_runtime_toolchain_definition",
+)
 
 # Declare all remote jdk toolchain config repos
-JDK_VERSIONS = [
-    "11",
-    "17",
-    "20",
-]
+JDKS = {
+    # Must match JDK repos defined in remote_jdk11_repos()
+    "11": [
+        "linux",
+        "linux_aarch64",
+        "linux_ppc64le",
+        "linux_s390x",
+        "macos",
+        "macos_aarch64",
+        "win",
+        "win_arm64",
+    ],
+    # Must match JDK repos defined in remote_jdk17_repos()
+    "17": [
+        "linux",
+        "linux_aarch64",
+        "linux_ppc64le",
+        "linux_s390x",
+        "macos",
+        "macos_aarch64",
+        "win",
+        "win_arm64",
+    ],
+    # Must match JDK repos defined in remote_jdk20_repos()
+    "20": [
+        "linux",
+        "linux_aarch64",
+        "macos",
+        "macos_aarch64",
+        "win",
+    ],
+}
 
-PLATFORMS = [
-    "linux",
-    "macos",
-    "macos_aarch64",
-    "win",
-]
-
-# Remote JDK repos for those Linux platforms are only defined for JDK 11.
-EXTRA_REMOTE_JDK11_REPOS = [
-    "remotejdk11_linux_aarch64",
-    "remotejdk11_linux_ppc64le",
-    "remotejdk11_linux_s390x",
-]
-
-REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDK_VERSIONS for platform in PLATFORMS] + EXTRA_REMOTE_JDK11_REPOS
+REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDKS for platform in JDKS[version]]
 
 [use_repo(
     toolchains,
     repo + "_toolchain_config_repo",
 ) for repo in REMOTE_JDK_REPOS]
 
-[register_toolchains("@" + name + "_toolchain_config_repo//:toolchain") for name in REMOTE_JDK_REPOS]
+[register_toolchains("@" + name + "_toolchain_config_repo//:all") for name in REMOTE_JDK_REPOS]
 
 # Dev dependencies
 bazel_dep(name = "rules_pkg", version = "0.5.1", dev_dependency = True)

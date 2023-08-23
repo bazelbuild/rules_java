@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rules for importing and registering a local JDK."""
+"""Rules for importing a local JDK."""
 
 load("//java:defs.bzl", "java_runtime")
 load(":default_java_toolchain.bzl", "default_java_toolchain")
@@ -57,9 +57,13 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
       runtime_name: name of java_runtime target if it already exists.
       visibility: Visibility that will be applied to the java runtime target
       exec_compatible_with: A list of constraint values that must be
-                            satisfied for the exec platform.
+                            satisfied by the exec platform for the Java compile
+                            toolchain to be selected. They must be satisfied by
+                            the target platform for the Java runtime toolchain
+                            to be selected.
       target_compatible_with: A list of constraint values that must be
-                              satisfied for the target platform.
+                              satisfied by the target platform for the Java
+                              compile toolchain to be selected.
     """
 
     if runtime_name == None:
@@ -97,8 +101,16 @@ def local_java_runtime(name, java_home, version, runtime_name = None, visibility
     )
     native.toolchain(
         name = "runtime_toolchain_definition",
+        # A JDK can be used as a runtime *for* the platforms it can be used to compile *on*.
+        target_compatible_with = exec_compatible_with,
         target_settings = [":%s_settings_alias" % name],
         toolchain_type = Label("@bazel_tools//tools/jdk:runtime_toolchain_type"),
+        toolchain = runtime_name,
+    )
+    native.toolchain(
+        name = "bootstrap_runtime_toolchain_definition",
+        target_settings = [":%s_settings_alias" % name],
+        toolchain_type = Label("@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type"),
         toolchain = runtime_name,
     )
 
@@ -211,12 +223,14 @@ local_java_runtime(
     runtime_name = %s,
     java_home = "%s",
     version = "%s",
+    exec_compatible_with = HOST_CONSTRAINTS,
 )
 """ % (local_java_runtime_name, runtime_name, java_home, version)
 
     repository_ctx.file(
         "BUILD.bazel",
         'load("@rules_java//toolchains:local_java_repository.bzl", "local_java_runtime")\n' +
+        'load("@local_config_platform//:constraints.bzl", "HOST_CONSTRAINTS")\n' +
         build_file +
         local_java_runtime_macro,
     )
@@ -245,6 +259,12 @@ toolchain(
    toolchain_type = "@bazel_tools//tools/jdk:runtime_toolchain_type",
    toolchain = ":jdk",
 )
+toolchain(
+   name = "bootstrap_runtime_toolchain_definition",
+   target_settings = [":localjdk_setting"],
+   toolchain_type = "@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type",
+   toolchain = ":jdk",
+)
 '''
 
 _local_java_repository_rule = repository_rule(
@@ -261,7 +281,19 @@ _local_java_repository_rule = repository_rule(
 )
 
 def local_java_repository(name, java_home = "", version = "", build_file = None, build_file_content = None, **kwargs):
-    """Registers a runtime toolchain for local JDK and creates an unregistered compile toolchain.
+    """Defines runtime and compile toolchains for a local JDK.
+
+    Register the toolchains defined by this macro as follows (where `<name>` is the value of the
+    `name` parameter):
+    * Runtime toolchains only (recommended)
+      ```
+      register_toolchains("@<name>//:runtime_toolchain_definition")
+      register_toolchains("@<name>//:bootstrap_runtime_toolchain_definition")
+      ```
+    * Runtime and compilation toolchains:
+      ```
+      register_toolchains("@<name>//:all")
+      ```
 
     Toolchain resolution is constrained with --java_runtime_version flag
     having value of the "name" or "version" parameter.
