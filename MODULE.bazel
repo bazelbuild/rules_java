@@ -75,4 +75,4 @@ REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDKS
 [register_toolchains("@" + name + "_toolchain_config_repo//:all") for name in REMOTE_JDK_REPOS]
 
 # Dev dependencies
-bazel_dep(name = "rules_pkg", version = "0.5.1", dev_dependency = True)
+bazel_dep(name = "rules_pkg", version = "0.9.1", dev_dependency = True)
