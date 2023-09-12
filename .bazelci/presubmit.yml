@@ -13,9 +13,8 @@ build_targets_bzlmod: &build_targets_bzlmod
   # Enable once the issue is fixed.
   - "-//distro/..."
 
-buildifier:
-  version: latest
-  warnings: "all"
+buildifier: latest
+
 tasks:
   ubuntu2004:
     build_targets: *build_targets
