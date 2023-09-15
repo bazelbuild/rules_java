@@ -16,3 +16,9 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = ["//java/private"],
 )
+
+bzl_library(
+    name = "java_single_jar",
+    srcs = ["java_single_jar.bzl"],
+    visibility = ["//visibility:public"],
+)
