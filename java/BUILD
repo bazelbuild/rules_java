@@ -22,3 +22,12 @@ bzl_library(
     srcs = ["java_single_jar.bzl"],
     visibility = ["//visibility:public"],
 )
+
+filegroup(
+    name = "for_bazel_tests",
+    srcs = [
+        "BUILD",
+        ":java_single_jar",
+    ],
+    visibility = ["//visibility:public"],
+)
