@@ -305,13 +305,13 @@ default_java_toolchain(
     target_version = "17",
 )
 
-# A toolchain that targets java 20.
+# A toolchain that targets java 21.
 default_java_toolchain(
-    name = "toolchain_jdk_20",
+    name = "toolchain_jdk_21",
     configuration = dict(),
-    java_runtime = "//toolchains:remotejdk_20",
-    source_version = "20",
-    target_version = "20",
+    java_runtime = "//toolchains:remotejdk_21",
+    source_version = "21",
+    target_version = "21",
 )
 
 default_java_toolchain(
@@ -346,8 +346,8 @@ java_runtime_version_alias(
 )
 
 java_runtime_version_alias(
-    name = "remotejdk_20",
-    runtime_version = "remotejdk_20",
+    name = "remotejdk_21",
+    runtime_version = "remotejdk_21",
     visibility = ["//visibility:public"],
 )
 

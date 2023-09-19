@@ -55,8 +55,8 @@ JDKS = {
         "win",
         "win_arm64",
     ],
-    # Must match JDK repos defined in remote_jdk20_repos()
-    "20": [
+    # Must match JDK repos defined in remote_jdk21_repos()
+    "21": [
         "linux",
         "linux_aarch64",
         "macos",
