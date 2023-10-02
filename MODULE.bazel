@@ -1,6 +1,6 @@
 module(
     name = "rules_java",
-    version = "6.3.1",
+    version = "6.3.2",
     compatibility_level = 1,
 )
 
