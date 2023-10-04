@@ -92,7 +92,7 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
     reduced_classpath_incompatible_processors = [
         "dagger.hilt.processor.internal.root.RootProcessor",  # see b/21307381
     ],
-    java_runtime = Label("//toolchains:remotejdk_17"),
+    java_runtime = Label("//toolchains:remotejdk_21"),
 )
 
 DEFAULT_TOOLCHAIN_CONFIGURATION = _BASE_TOOLCHAIN_CONFIGURATION
