@@ -23,6 +23,7 @@ def _java_single_jar(ctx):
     args.add_all("--sources", inputs)
     args.use_param_file("@%s")
     args.set_param_file_format("multiline")
+    args.add_all("--deploy_manifest_lines", ctx.attr.deploy_manifest_lines)
     args.add("--output", ctx.outputs.jar)
     args.add("--normalize")
 
@@ -71,6 +72,8 @@ java_single_jar = rule(
                 deps, exports, and runtime_deps. Resources are also collected.
                 Native cc_library or java_wrap_cc dependencies are not.""",
         ),
+        "deploy_manifest_lines": attr.string_list(doc = """
+          A list of lines to add to the <code>META-INF/manifest.mf</code> file."""),
         "compress": attr.string(default = "preserve", doc = """
             Whether to always deflate ("yes"), always store ("no"), or pass
             through unmodified ("preserve"). The default is "preserve", and is the
