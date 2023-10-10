@@ -19,6 +19,15 @@ def _java_single_jar(ctx):
             transitive_inputs.append(depset(files))
     inputs = depset(transitive = transitive_inputs)
 
+    if hasattr(java_common, "JavaRuntimeClasspathInfo"):
+        deploy_env_jars = depset(transitive = [
+            dep[java_common.JavaRuntimeClasspathInfo].runtime_classpath
+            for dep in ctx.attr.deploy_env
+        ])
+        excluded_jars = {jar: None for jar in deploy_env_jars.to_list()}
+        if excluded_jars:
+            inputs = depset([jar for jar in inputs.to_list() if jar not in excluded_jars])
+
     args = ctx.actions.args()
     args.add_all("--sources", inputs)
     args.use_param_file("@%s")
@@ -74,6 +83,18 @@ java_single_jar = rule(
         ),
         "deploy_manifest_lines": attr.string_list(doc = """
           A list of lines to add to the <code>META-INF/manifest.mf</code> file."""),
+        "deploy_env": attr.label_list(
+            providers = [java_common.JavaRuntimeClasspathInfo] if hasattr(java_common, "JavaRuntimeClasspathInfo") else [],
+            allow_files = False,
+            doc = """
+            A list of `java_binary` or `java_single_jar` targets which represent
+            the deployment environment for this binary.
+
+            Set this attribute when building a plugin which will be loaded by another
+            `java_binary`.
+
+            `deploy_env` dependencies are excluded from the jar built by this rule.""",
+        ),
         "compress": attr.string(default = "preserve", doc = """
             Whether to always deflate ("yes"), always store ("no"), or pass
             through unmodified ("preserve"). The default is "preserve", and is the
