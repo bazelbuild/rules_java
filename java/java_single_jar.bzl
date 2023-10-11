@@ -104,7 +104,7 @@ java_single_jar = rule(
             by default."""),
         "multi_release": attr.bool(default = True, doc = """Whether to enable Multi-Release output jars."""),
         "_singlejar": attr.label(
-            default = Label("//tools/jdk:singlejar"),
+            default = Label("//toolchains:singlejar"),
             cfg = "exec",
             allow_single_file = True,
             executable = True,
