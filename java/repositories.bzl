@@ -27,7 +27,8 @@ def java_tools_repos():
         name = "remote_java_tools",
         sha256 = "6c615009b93dc87113626e923232687f2f7a1afaa8000663915f11028a961680",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v12.8/java_tools-v12.8-rc1.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v12.8/java_tools-v12.8.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v12.8/java_tools-v12.8.zip",
         ],
     )
 
@@ -36,7 +37,8 @@ def java_tools_repos():
         name = "remote_java_tools_linux",
         sha256 = "30cb605ec438c83527ded1a67850cadb3d70332f1d8d92204f00ad8fad316245",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v12.8/java_tools_linux-v12.8-rc1.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v12.8/java_tools_linux-v12.8.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v12.8/java_tools_linux-v12.8.zip",
         ],
     )
 
@@ -45,7 +47,8 @@ def java_tools_repos():
         name = "remote_java_tools_windows",
         sha256 = "eb1b15e753efda0e3f7b7a506431ab72cbe6844bd7252cc54fbdb3ba12bdd9ef",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v12.8/java_tools_windows-v12.8-rc1.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v12.8/java_tools_windows-v12.8.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v12.8/java_tools_windows-v12.8.zip",
         ],
     )
 
@@ -54,7 +57,8 @@ def java_tools_repos():
         name = "remote_java_tools_darwin_x86_64",
         sha256 = "cae556a2b28611b74f4b21e87d36c64d76fef76dddf0341e6642744797d7369b",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v12.8/java_tools_darwin_x86_64-v12.8-rc1.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v12.8/java_tools_darwin_x86_64-v12.8.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v12.8/java_tools_darwin_x86_64-v12.8.zip",
         ],
     )
 
@@ -63,7 +67,8 @@ def java_tools_repos():
         name = "remote_java_tools_darwin_arm64",
         sha256 = "58494c9380f14c63f9f7b37f2c82e524cc4381fd3aae25c09a8bcd14891f606e",
         urls = [
-            "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v12.8/java_tools_darwin_arm64-v12.8-rc1.zip",
+            "https://mirror.bazel.build/bazel_java_tools/releases/java/v12.8/java_tools_darwin_arm64-v12.8.zip",
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v12.8/java_tools_darwin_arm64-v12.8.zip",
         ],
     )
 
