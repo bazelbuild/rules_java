@@ -28,7 +28,7 @@ def java_tools_repos():
         sha256 = "610e40b1a89c9941638e33c56cf1be58f2d9d24cf9ac5a34b63270e08bb7000a",
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.0/java_tools-v13.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools-v13.0.zip"
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools-v13.0.zip",
         ],
     )
 
@@ -38,7 +38,7 @@ def java_tools_repos():
         sha256 = "f950ecc09cbc2ca110016095fe2a46e661925115975c84039f4370db1e70fe27",
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.0/java_tools_linux-v13.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_linux-v13.0.zip"
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_linux-v13.0.zip",
         ],
     )
 
@@ -48,7 +48,7 @@ def java_tools_repos():
         sha256 = "0224bb368b98f14d97afb749f3f956a177b60f753213b6c57db16deb2706c5dc",
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.0/java_tools_windows-v13.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_windows-v13.0.zip"
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_windows-v13.0.zip",
         ],
     )
 
@@ -58,7 +58,7 @@ def java_tools_repos():
         sha256 = "3edf102f683bfece8651f206aee864628825b4f6e614d183154e6bdf98b8c494",
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.0/java_tools_darwin_x86_64-v13.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_darwin_x86_64-v13.0.zip"
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_darwin_x86_64-v13.0.zip",
         ],
     )
 
@@ -68,7 +68,7 @@ def java_tools_repos():
         sha256 = "1ecd91bf870b4f246960c11445218798113b766762e26a3de09cfcf3e9b4c646",
         urls = [
             "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.0/java_tools_darwin_arm64-v13.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_darwin_arm64-v13.0.zip"
+            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_darwin_arm64-v13.0.zip",
         ],
     )
 
