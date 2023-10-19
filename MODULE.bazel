@@ -2,8 +2,8 @@ module(
     name = "rules_java",
     version = "7.0.6",
     # Requires @bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type.
-    compatibility_level = 1,
     bazel_compatibility = [">=6.4.0"],
+    compatibility_level = 1,
 )
 
 bazel_dep(name = "platforms", version = "0.0.4")
