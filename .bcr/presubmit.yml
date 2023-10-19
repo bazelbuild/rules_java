@@ -4,6 +4,6 @@ tasks:
   verify_build_targets:
     name: "Verify build targets"
     platform: ${{ platform }}
-    bazel_version: 6.4.0rc5
+    bazel: 6.4.0rc5
     build_targets:
       - "@rules_java//java/..."
