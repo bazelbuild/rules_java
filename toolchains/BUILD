@@ -257,62 +257,17 @@ alias(
     actual = ":toolchain",
 )
 
-RELEASES = (8, 9, 10, 11)
+RELEASES = (8, 9, 10, 11, 17, 21)
 
 [
     default_java_toolchain(
-        name = "toolchain_java%d" % release,
+        name = ("toolchain_java%d" if release <= 11 else "toolchain_jdk_%d") % release,
         configuration = DEFAULT_TOOLCHAIN_CONFIGURATION,
         source_version = "%s" % release,
         target_version = "%s" % release,
     )
     for release in RELEASES
 ]
-
-# A toolchain that targets java 14.
-default_java_toolchain(
-    name = "toolchain_jdk_14",
-    configuration = dict(),
-    java_runtime = "//toolchains:remotejdk_14",
-    source_version = "14",
-    target_version = "14",
-)
-
-# A toolchain that targets java 15.
-default_java_toolchain(
-    name = "toolchain_jdk_15",
-    configuration = dict(),
-    java_runtime = "//toolchains:remotejdk_15",
-    source_version = "15",
-    target_version = "15",
-)
-
-# A toolchain that targets java 16.
-default_java_toolchain(
-    name = "toolchain_jdk_16",
-    configuration = dict(),
-    java_runtime = "//toolchains:remotejdk_16",
-    source_version = "16",
-    target_version = "16",
-)
-
-# A toolchain that targets java 17.
-default_java_toolchain(
-    name = "toolchain_jdk_17",
-    configuration = dict(),
-    java_runtime = "//toolchains:remotejdk_17",
-    source_version = "17",
-    target_version = "17",
-)
-
-# A toolchain that targets java 21.
-default_java_toolchain(
-    name = "toolchain_jdk_21",
-    configuration = dict(),
-    java_runtime = "//toolchains:remotejdk_21",
-    source_version = "21",
-    target_version = "21",
-)
 
 default_java_toolchain(
     name = "prebuilt_toolchain",
