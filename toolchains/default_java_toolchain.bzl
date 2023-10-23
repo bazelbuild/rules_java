@@ -206,6 +206,10 @@ def java_runtime_files(name, srcs):
 
 _JAVA_BOOTSTRAP_RUNTIME_TOOLCHAIN_TYPE = Label("@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type")
 
+# Opt the Java bootstrap actions into path mapping:
+# https://github.com/bazelbuild/bazel/commit/a239ea84832f18ee8706682145e9595e71b39680
+_SUPPORTS_PATH_MAPPING = {"supports-path-mapping": "1"}
+
 def _bootclasspath_impl(ctx):
     exec_javabase = ctx.attr.java_runtime_alias[java_common.JavaRuntimeInfo]
 
@@ -227,6 +231,7 @@ def _bootclasspath_impl(ctx):
         inputs = [ctx.file.src] + ctx.files.java_runtime_alias,
         outputs = [class_dir],
         arguments = [args],
+        execution_requirements = _SUPPORTS_PATH_MAPPING,
     )
 
     bootclasspath = ctx.outputs.output_jar
@@ -255,6 +260,7 @@ def _bootclasspath_impl(ctx):
         inputs = inputs,
         outputs = [bootclasspath],
         arguments = [args],
+        execution_requirements = _SUPPORTS_PATH_MAPPING,
     )
     return [
         DefaultInfo(files = depset([bootclasspath])),
