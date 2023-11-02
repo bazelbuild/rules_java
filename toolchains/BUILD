@@ -170,6 +170,10 @@ cc_library(
             actual = "@remote_java_tools_%s//:prebuilt_singlejar" % OS,
             visibility = ["//visibility:private"],
         ),
+        alias(
+            name = "turbine_direct_graal_%s" % OS,
+            actual = "@remote_java_tools_%s//:turbine_direct_graal" % OS,
+        ),
     )
     for OS in [
         "linux",
@@ -237,6 +241,32 @@ alias(
         "@bazel_tools//src/conditions:darwin_x86_64": ":prebuilt_singlejar_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
         "@bazel_tools//src/conditions:windows": ":prebuilt_singlejar_windows",
+    }),
+)
+
+alias(
+    name = "turbine_direct",
+    actual = ":turbine_direct_graal_or_java",
+)
+
+alias(
+    name = "turbine_direct_graal_or_java",
+    actual = select({
+        "@bazel_tools//src/conditions:darwin_arm64": ":turbine_direct_graal_darwin_arm64",
+        "@bazel_tools//src/conditions:darwin_x86_64": ":turbine_direct_graal_darwin_x86_64",
+        "@bazel_tools//src/conditions:linux_x86_64": ":turbine_direct_graal_linux",
+        "@bazel_tools//src/conditions:windows": ":turbine_direct_graal_windows",
+        "//conditions:default": "@remote_java_tools//:TurbineDirect",
+    }),
+)
+
+alias(
+    name = "turbine_direct_graal",
+    actual = select({
+        "@bazel_tools//src/conditions:darwin_arm64": ":turbine_direct_graal_darwin_arm64",
+        "@bazel_tools//src/conditions:darwin_x86_64": ":turbine_direct_graal_darwin_x86_64",
+        "@bazel_tools//src/conditions:linux_x86_64": ":turbine_direct_graal_linux",
+        "@bazel_tools//src/conditions:windows": ":turbine_direct_graal_windows",
     }),
 )
 
