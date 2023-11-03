@@ -20,57 +20,50 @@ load("//toolchains:jdk_build_file.bzl", "JDK_BUILD_TEMPLATE")
 load("//toolchains:local_java_repository.bzl", "local_java_repository")
 load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
+_JAVA_TOOLS_CONFIG = {
+    "version": "v13.1",
+    "release": "true",
+    "artifacts": {
+        "java_tools_linux": {
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.1/java_tools_linux-v13.1.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.1/java_tools_linux-v13.1.zip",
+            "sha": "d134da9b04c9023fb6e56a5d4bffccee73f7bc9572ddc4e747778dacccd7a5a7",
+        },
+        "java_tools_windows": {
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.1/java_tools_windows-v13.1.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.1/java_tools_windows-v13.1.zip",
+            "sha": "c5c70c214a350f12cbf52da8270fa43ba629b795f3dd328028a38f8f0d39c2a1",
+        },
+        "java_tools_darwin_x86_64": {
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.1/java_tools_darwin_x86_64-v13.1.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.1/java_tools_darwin_x86_64-v13.1.zip",
+            "sha": "0db40d8505a2b65ef0ed46e4256757807db8162f7acff16225be57c1d5726dbc",
+        },
+        "java_tools_darwin_arm64": {
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.1/java_tools_darwin_arm64-v13.1.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.1/java_tools_darwin_arm64-v13.1.zip",
+            "sha": "dab5bb87ec43e980faea6e1cec14bafb217b8e2f5346f53aa784fd715929a930",
+        },
+        "java_tools": {
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.1/java_tools-v13.1.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.1/java_tools-v13.1.zip",
+            "sha": "286bdbbd66e616fc4ed3f90101418729a73baa7e8c23a98ffbef558f74c0ad14",
+        },
+    },
+}
+
 def java_tools_repos():
     """ Declares the remote java_tools repositories """
-    maybe(
-        http_archive,
-        name = "remote_java_tools",
-        sha256 = "610e40b1a89c9941638e33c56cf1be58f2d9d24cf9ac5a34b63270e08bb7000a",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.0/java_tools-v13.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools-v13.0.zip",
-        ],
-    )
-
-    maybe(
-        http_archive,
-        name = "remote_java_tools_linux",
-        sha256 = "f950ecc09cbc2ca110016095fe2a46e661925115975c84039f4370db1e70fe27",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.0/java_tools_linux-v13.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_linux-v13.0.zip",
-        ],
-    )
-
-    maybe(
-        http_archive,
-        name = "remote_java_tools_windows",
-        sha256 = "0224bb368b98f14d97afb749f3f956a177b60f753213b6c57db16deb2706c5dc",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.0/java_tools_windows-v13.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_windows-v13.0.zip",
-        ],
-    )
-
-    maybe(
-        http_archive,
-        name = "remote_java_tools_darwin_x86_64",
-        sha256 = "3edf102f683bfece8651f206aee864628825b4f6e614d183154e6bdf98b8c494",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.0/java_tools_darwin_x86_64-v13.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_darwin_x86_64-v13.0.zip",
-        ],
-    )
-
-    maybe(
-        http_archive,
-        name = "remote_java_tools_darwin_arm64",
-        sha256 = "1ecd91bf870b4f246960c11445218798113b766762e26a3de09cfcf3e9b4c646",
-        urls = [
-            "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.0/java_tools_darwin_arm64-v13.0.zip",
-            "https://github.com/bazelbuild/java_tools/releases/download/java_v13.0/java_tools_darwin_arm64-v13.0.zip",
-        ],
-    )
+    for name, config in _JAVA_TOOLS_CONFIG["artifacts"].items():
+        maybe(
+            http_archive,
+            name = "remote_" + name,
+            sha256 = config["sha"],
+            urls = [
+                config["mirror_url"],
+                config["github_url"],
+            ],
+        )
 
 def local_jdk_repo():
     maybe(
