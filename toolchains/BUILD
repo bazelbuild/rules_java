@@ -68,17 +68,6 @@ filegroup(
 # TODO: migrate away from using @bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type ?
 # toolchain_type(name = "bootstrap_runtime_toolchain_type")
 
-# The Java runtime to extract the bootclasspath from that is then used to compile Java sources.
-#
-# As the bootclasspath is platform independent, toolchains of this type may have no constraints.
-# Purely as an optimization to prevent unnecessary fetches of remote runtimes for other
-# architectures, toolchains of this type may have constraints on the execution platform that match
-# those on the corresponding compilation toolchain.
-#
-# Toolchains of this type are only consumed internally by the bootclasspath rule and should not be
-# accessed from Starlark.
-# toolchain_type(name = "bootstrap_runtime_toolchain_type")
-
 # Points to toolchain[":runtime_toolchain_type"] (was :legacy_current_java_runtime)
 java_runtime_alias(name = "current_java_runtime")
 
@@ -179,9 +168,6 @@ cc_library(
     ]
 ]
 
-# On Windows, executables end in ".exe", but the label we reach it through
-# must be platform-independent. Thus, we create a little filegroup that
-# contains the appropriate platform-dependent file.
 alias(
     name = "ijar",
     actual = ":ijar_prebuilt_binary_or_cc_binary",
@@ -208,12 +194,6 @@ alias(
     }),
 )
 
-# On Windows, Java implementation of singlejar is used. We create a little
-# filegroup that contains the appropriate platform-dependent file.
-# Once https://github.com/bazelbuild/bazel/issues/2241 is fixed (that is,
-# the native singlejar is used on windows), this file group can be reused since
-# on Windows, executables end in ".exe", but the label we reach it through
-# must be platform-independent.
 alias(
     name = "singlejar",
     actual = ":singlejar_prebuilt_or_cc_binary",
