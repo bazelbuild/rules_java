@@ -18,6 +18,12 @@ bzl_library(
 )
 
 bzl_library(
+    name = "utils",
+    srcs = ["java_utils.bzl"],
+    visibility = ["//visibility:public"],
+)
+
+bzl_library(
     name = "java_single_jar",
     srcs = ["java_single_jar.bzl"],
     visibility = ["//visibility:public"],
