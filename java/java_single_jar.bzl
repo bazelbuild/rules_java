@@ -73,7 +73,6 @@ def _java_single_jar(ctx):
 java_single_jar = rule(
     attrs = {
         "deps": attr.label_list(
-            providers = [JavaInfo],
             allow_files = True,
             doc = """
                 The Java targets (including java_import and java_library) to collect
