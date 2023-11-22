@@ -6,7 +6,10 @@ licenses(["notice"])
 
 filegroup(
     name = "srcs",
-    srcs = glob(["**"]) + ["//java/private:srcs"],
+    srcs = glob(["**"]) + [
+        "//java/private:srcs",
+        "//java/proto:srcs",
+    ],
     visibility = ["//:__pkg__"],
 )
 
