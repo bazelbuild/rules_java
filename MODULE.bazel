@@ -78,3 +78,9 @@ REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDKS
 
 # Dev dependencies
 bazel_dep(name = "rules_pkg", version = "0.9.1", dev_dependency = True)
+
+# Override rules_python version to deal with #161 and https://github.com/bazelbuild/bazel/issues/20458
+single_version_override(
+    module_name = "rules_python",
+    version = "0.24.0",
+)
