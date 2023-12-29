@@ -35,19 +35,16 @@ tasks:
     platform: windows
     build_targets: *build_targets
   ubuntu2004_bzlmod:
-    bazel: last_green
     platform: ubuntu2004
     build_flags:
       - "--config=bzlmod"
     build_targets: *build_targets_bzlmod
   macos_bzlmod:
-    bazel: last_green
     platform: macos
     build_flags:
       - "--config=bzlmod"
     build_targets: *build_targets_bzlmod
   windows_bzlmod:
-    bazel: last_green
     platform: windows
     build_flags:
       - "--config=bzlmod"
