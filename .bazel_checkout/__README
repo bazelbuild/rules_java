@@ -1,0 +1,4 @@
+This directory exists just so we can clone Bazel sources and run tests on presubmit
+
+At some point, we should migrate the tests we care about, out of Bazel and into
+rules_java.

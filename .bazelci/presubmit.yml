@@ -49,3 +49,30 @@ tasks:
     build_flags:
       - "--config=bzlmod"
     build_targets: *build_targets_bzlmod
+  ubuntu2004_bazel_tests:
+    environment:
+      USE_BAZEL_DIFF: ""
+    platform: ubuntu2004
+    working_directory: .bazel_checkout
+    shell_commands:
+      - sh setup.sh
+    build_flags:
+      - "--config=ci-linux"
+    test_flags:
+      - "--config=ci-linux"
+    build_targets:
+      - "//:bazel-distfile.zip"
+      - "//scripts/packages/debian:bazel-debian.deb"
+      - "//scripts/packages:with-jdk/install.sh"
+      - "//src:bazel"
+      - "//src:bazel_jdk_minimal"
+      - "//src:test_repos"
+      - "//src/main/java/..."
+    test_targets:
+      - "//src/java_tools/..."
+      - "//src/test/java/com/google/devtools/build/lib/rules/java/..."
+      - "//src/test/java/com/google/devtools/build/lib/view/java/..."
+      - "//src/test/shell/bazel:bazel_java_test"
+      - "//src/test/shell/bazel:bazel_coverage_java_test"
+      # Re-enable once fixed: https://github.com/bazelbuild/bazel/issues/8162
+      - "-//src/java_tools/import_deps_checker/..."
