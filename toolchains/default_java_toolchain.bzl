@@ -130,6 +130,7 @@ PREBUILT_TOOLCHAIN_CONFIGURATION = dict(
 NONPREBUILT_TOOLCHAIN_CONFIGURATION = dict(
     ijar = [Label("@remote_java_tools//:ijar_cc_binary")],
     singlejar = [Label("@remote_java_tools//:singlejar_cc_bin")],
+    header_compiler_direct = [Label("@remote_java_tools//:TurbineDirect")],
 )
 
 _DEFAULT_SOURCE_VERSION = "8"
