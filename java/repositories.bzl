@@ -48,8 +48,8 @@ _JAVA_TOOLS_CONFIG = {
             "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.4/java_tools-v13.4.zip",
             "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.4/java_tools-v13.4.zip",
             "sha": "e025fd260ac39b47c111f5212d64ec0d00d85dec16e49368aae82fc626a940cf"
-        }
-    }
+        },
+    },
 }
 
 def java_tools_repos():
