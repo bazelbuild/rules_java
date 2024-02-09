@@ -7,8 +7,10 @@ licenses(["notice"])
 filegroup(
     name = "srcs",
     srcs = glob(["**"]) + [
+        "//java/modules:srcs",
         "//java/private:srcs",
         "//java/proto:srcs",
+        "//java/toolchains:srcs",
     ],
     visibility = ["//:__pkg__"],
 )
@@ -16,6 +18,25 @@ filegroup(
 bzl_library(
     name = "rules",
     srcs = ["defs.bzl"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":core_rules",
+        "//java/modules",
+        "//java/proto:proto_rules",
+        "//java/toolchains:toolchain_rules",
+    ],
+)
+
+bzl_library(
+    name = "core_rules",
+    srcs = [
+        "java_binary.bzl",
+        "java_import.bzl",
+        "java_library.bzl",
+        "java_plugin.bzl",
+        "java_single_jar.bzl",
+        "java_test.bzl",
+    ],
     visibility = ["//visibility:public"],
     deps = ["//java/private"],
 )

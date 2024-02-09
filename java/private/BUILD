@@ -4,8 +4,11 @@ licenses(["notice"])
 
 bzl_library(
     name = "private",
-    srcs = ["native.bzl"],
-    visibility = ["//java:__pkg__"],
+    srcs = [
+        "add_tags.bzl",
+        "native.bzl",
+    ],
+    visibility = ["//java:__subpackages__"],
 )
 
 filegroup(
