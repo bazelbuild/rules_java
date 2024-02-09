@@ -13,142 +13,45 @@
 # limitations under the License.
 """Starlark rules for building Java projects."""
 
-load("//java/private:native.bzl", "NativeJavaInfo", "NativeJavaPluginInfo", "native_java_common")
+load("//java:java_binary.bzl", _java_binary = "java_binary")
+load("//java:java_import.bzl", _java_import = "java_import")
+load("//java:java_library.bzl", _java_library = "java_library")
+load("//java:java_plugin.bzl", _java_plugin = "java_plugin")
+load("//java:java_test.bzl", _java_test = "java_test")
+load("//java/modules:java_common.bzl", _java_common = "java_common")
+load("//java/modules:java_info.bzl", _JavaInfo = "JavaInfo")
+load("//java/modules:java_plugin_info.bzl", _JavaPluginInfo = "JavaPluginInfo")
+load("//java/proto:java_lite_proto_library.bzl", _java_lite_proto_library = "java_lite_proto_library")
+load("//java/proto:java_proto_library.bzl", _java_proto_library = "java_proto_library")
+load("//java/toolchains:java_package_configuration.bzl", _java_package_configuration = "java_package_configuration")
+load("//java/toolchains:java_runtime.bzl", _java_runtime = "java_runtime")
+load("//java/toolchains:java_toolchain.bzl", _java_toolchain = "java_toolchain")
 
 # Do not touch: This line marks the end of loads; needed for PR importing.
 
-_MIGRATION_TAG = "__JAVA_RULES_MIGRATION_DO_NOT_USE_WILL_BREAK__"
 version = "6.5.2"
 
-def _add_tags(attrs):
-    if "tags" in attrs and attrs["tags"] != None:
-        attrs["tags"] = attrs["tags"] + [_MIGRATION_TAG]
-    else:
-        attrs["tags"] = [_MIGRATION_TAG]
-    return attrs
+# Language rules
 
-def java_binary(**attrs):
-    """Bazel java_binary rule.
+java_binary = _java_binary
+java_test = _java_test
+java_library = _java_library
+java_plugin = _java_plugin
+java_import = _java_import
 
-    https://docs.bazel.build/versions/master/be/java.html#java_binary
+# Toolchain rules
 
-    Args:
-      **attrs: Rule attributes
-    """
+java_runtime = _java_runtime
+java_toolchain = _java_toolchain
+java_package_configuration = _java_package_configuration
 
-    # buildifier: disable=native-java
-    native.java_binary(**_add_tags(attrs))
+# Proto rules
 
-def java_import(**attrs):
-    """Bazel java_import rule.
+java_proto_library = _java_proto_library
+java_lite_proto_library = _java_lite_proto_library
 
-    https://docs.bazel.build/versions/master/be/java.html#java_import
+# Modules and providers
 
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_import(**_add_tags(attrs))
-
-def java_library(**attrs):
-    """Bazel java_library rule.
-
-    https://docs.bazel.build/versions/master/be/java.html#java_library
-
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_library(**_add_tags(attrs))
-
-def java_lite_proto_library(**attrs):
-    """Bazel java_lite_proto_library rule.
-
-    https://docs.bazel.build/versions/master/be/java.html#java_lite_proto_library
-
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_lite_proto_library(**_add_tags(attrs))
-
-def java_proto_library(**attrs):
-    """Bazel java_proto_library rule.
-
-    https://docs.bazel.build/versions/master/be/java.html#java_proto_library
-
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_proto_library(**_add_tags(attrs))
-
-def java_test(**attrs):
-    """Bazel java_test rule.
-
-    https://docs.bazel.build/versions/master/be/java.html#java_test
-
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_test(**_add_tags(attrs))
-
-def java_package_configuration(**attrs):
-    """Bazel java_package_configuration rule.
-
-    https://docs.bazel.build/versions/master/be/java.html#java_package_configuration
-
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_package_configuration(**_add_tags(attrs))
-
-def java_plugin(**attrs):
-    """Bazel java_plugin rule.
-
-    https://docs.bazel.build/versions/master/be/java.html#java_plugin
-
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_plugin(**_add_tags(attrs))
-
-def java_runtime(**attrs):
-    """Bazel java_runtime rule.
-
-    https://docs.bazel.build/versions/master/be/java.html#java_runtime
-
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_runtime(**_add_tags(attrs))
-
-def java_toolchain(**attrs):
-    """Bazel java_toolchain rule.
-
-    https://docs.bazel.build/versions/master/be/java.html#java_toolchain
-
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_toolchain(**_add_tags(attrs))
-
-java_common = native_java_common
-
-JavaInfo = NativeJavaInfo
-
-JavaPluginInfo = NativeJavaPluginInfo
+JavaInfo = _JavaInfo
+JavaPluginInfo = _JavaPluginInfo
+java_common = _java_common
