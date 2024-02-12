@@ -1,6 +1,12 @@
 {
   "homepage": "https://github.com/bazelbuild/rules_java",
-  "maintainers": [],
+  "maintainers": [
+    {
+      "email": "hvd@google.com",
+      "github": "hvadehra",
+      "name": "Hemanshu Vadehra"
+    }
+  ],
   "versions": [],
   "yanked_versions": {},
   "repository": [
