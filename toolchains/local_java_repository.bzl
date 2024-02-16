@@ -191,19 +191,13 @@ def _local_java_repository_impl(repository_ctx):
 
     if not java_bin.exists:
         # Java binary does not exist
-        message = ("Cannot find Java binary {java_binary} in {java_home}; either correct your JAVA_HOME, " +
-                   "PATH or specify Java from remote repository (e.g. " +
-                   "--java_runtime_version=remotejdk_11)")
-        repository_ctx.file(
-            "BUILD.bazel",
-            _AUTO_CONFIG_ERROR_BUILD_TPL.format(
-                local_jdk = local_java_runtime_name,
-                message = repr(message.format(
-                    java_binary = _with_os_extension(repository_ctx, "bin/java"),
-                    java_home = java_home,
-                )),
-            ),
-            False,
+        _create_auto_config_error_build_file(
+            repository_ctx,
+            local_java_runtime_name = local_java_runtime_name,
+            java_home = java_home,
+            message = "Cannot find Java binary {java_binary} in {java_home}; " +
+                      "either correct your JAVA_HOME, PATH or specify Java from " +
+                      "remote repository (e.g. --java_runtime_version=remotejdk_11)",
         )
         return
 
@@ -211,17 +205,12 @@ def _local_java_repository_impl(repository_ctx):
     version = repository_ctx.attr.version if repository_ctx.attr.version != "" else _detect_java_version(repository_ctx, java_bin)
     if version == None:
         # Java version could not be detected
-        message = "Cannot detect Java version of {java_binary} in {java_home}; make sure it points to a valid Java executable"
-        repository_ctx.file(
-            "BUILD.bazel",
-            _AUTO_CONFIG_ERROR_BUILD_TPL.format(
-                local_jdk = local_java_runtime_name,
-                message = repr(message.format(
-                    java_binary = _with_os_extension(repository_ctx, "bin/java"),
-                    java_home = java_home,
-                )),
-            ),
-            False,
+        _create_auto_config_error_build_file(
+            repository_ctx,
+            local_java_runtime_name = local_java_runtime_name,
+            java_home = java_home,
+            message = "Cannot detect Java version of {java_binary} in {java_home}; " +
+                      "make sure it points to a valid Java executable",
         )
         return
 
@@ -284,6 +273,19 @@ toolchain(
    toolchain = ":jdk",
 )
 '''
+
+def _create_auto_config_error_build_file(repository_ctx, *, local_java_runtime_name, java_home, message):
+    repository_ctx.file(
+        "BUILD.bazel",
+        _AUTO_CONFIG_ERROR_BUILD_TPL.format(
+            local_jdk = local_java_runtime_name,
+            message = repr(message.format(
+                java_binary = _with_os_extension(repository_ctx, "bin/java"),
+                java_home = java_home,
+            )),
+        ),
+        False,
+    )
 
 _local_java_repository_rule = repository_rule(
     implementation = _local_java_repository_impl,
