@@ -191,12 +191,17 @@ def _local_java_repository_impl(repository_ctx):
 
     if not java_bin.exists:
         # Java binary does not exist
+        message = ("Cannot find Java binary {java_binary} in {java_home}; either correct your JAVA_HOME, " +
+                   "PATH or specify Java from remote repository (e.g. " +
+                   "--java_runtime_version=remotejdk_11)")
         repository_ctx.file(
             "BUILD.bazel",
-            _NOJDK_BUILD_TPL.format(
+            _AUTO_CONFIG_ERROR_BUILD_TPL.format(
                 local_jdk = local_java_runtime_name,
-                java_binary = _with_os_extension(repository_ctx, "bin/java"),
-                java_home = java_home,
+                message = repr(message.format(
+                    java_binary = _with_os_extension(repository_ctx, "bin/java"),
+                    java_home = java_home,
+                )),
             ),
             False,
         )
@@ -204,6 +209,21 @@ def _local_java_repository_impl(repository_ctx):
 
     # Detect version
     version = repository_ctx.attr.version if repository_ctx.attr.version != "" else _detect_java_version(repository_ctx, java_bin)
+    if version == None:
+        # Java version could not be detected
+        message = "Cannot detect Java version of {java_binary} in {java_home}; make sure it points to a valid Java executable"
+        repository_ctx.file(
+            "BUILD.bazel",
+            _AUTO_CONFIG_ERROR_BUILD_TPL.format(
+                local_jdk = local_java_runtime_name,
+                message = repr(message.format(
+                    java_binary = _with_os_extension(repository_ctx, "bin/java"),
+                    java_home = java_home,
+                )),
+            ),
+            False,
+        )
+        return
 
     # Prepare BUILD file using "local_java_runtime" macro
     if repository_ctx.attr.build_file_content and repository_ctx.attr.build_file:
@@ -239,14 +259,12 @@ local_java_runtime(
     for file in repository_ctx.path(java_home).readdir():
         repository_ctx.symlink(file, file.basename)
 
-# Build file template, when JDK does not exist
-_NOJDK_BUILD_TPL = '''load("@rules_java//toolchains:fail_rule.bzl", "fail_rule")
+# Build file template, when JDK could not be detected
+_AUTO_CONFIG_ERROR_BUILD_TPL = '''load("@rules_java//toolchains:fail_rule.bzl", "fail_rule")
 fail_rule(
    name = "jdk",
    header = "Auto-Configuration Error:",
-   message = ("Cannot find Java binary {java_binary} in {java_home}; either correct your JAVA_HOME, " +
-          "PATH or specify Java from remote repository (e.g. " +
-          "--java_runtime_version=remotejdk_11)")
+   message = {message},
 )
 config_setting(
    name = "localjdk_setting",
