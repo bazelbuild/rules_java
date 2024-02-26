@@ -13,8 +13,6 @@
 # limitations under the License.
 """java_toolchain rule"""
 
-load("//java/private:add_tags.bzl", "add_tags")
-
 def java_toolchain(**attrs):
     """Bazel java_toolchain rule.
 
@@ -25,4 +23,4 @@ def java_toolchain(**attrs):
     """
 
     # buildifier: disable=native-java
-    native.java_toolchain(**add_tags(attrs))
+    native.java_toolchain(**attrs)

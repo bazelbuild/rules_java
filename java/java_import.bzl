@@ -13,8 +13,6 @@
 # limitations under the License.
 """java_import rule"""
 
-load("//java/private:add_tags.bzl", "add_tags")
-
 def java_import(**attrs):
     """Bazel java_import rule.
 
@@ -25,4 +23,4 @@ def java_import(**attrs):
     """
 
     # buildifier: disable=native-java
-    native.java_import(**add_tags(attrs))
+    native.java_import(**attrs)

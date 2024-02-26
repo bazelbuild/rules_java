@@ -13,8 +13,6 @@
 # limitations under the License.
 """java_plugin rule"""
 
-load("//java/private:add_tags.bzl", "add_tags")
-
 def java_plugin(**attrs):
     """Bazel java_plugin rule.
 
@@ -25,4 +23,4 @@ def java_plugin(**attrs):
     """
 
     # buildifier: disable=native-java
-    native.java_plugin(**add_tags(attrs))
+    native.java_plugin(**attrs)

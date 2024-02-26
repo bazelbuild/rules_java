@@ -13,8 +13,6 @@
 # limitations under the License.
 """java_runtime rule"""
 
-load("//java/private:add_tags.bzl", "add_tags")
-
 def java_runtime(**attrs):
     """Bazel java_runtime rule.
 
@@ -25,4 +23,4 @@ def java_runtime(**attrs):
     """
 
     # buildifier: disable=native-java
-    native.java_runtime(**add_tags(attrs))
+    native.java_runtime(**attrs)

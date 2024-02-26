@@ -5,7 +5,6 @@ licenses(["notice"])
 bzl_library(
     name = "private",
     srcs = [
-        "add_tags.bzl",
         "native.bzl",
     ],
     visibility = ["//java:__subpackages__"],

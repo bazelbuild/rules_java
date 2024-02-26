@@ -13,8 +13,6 @@
 # limitations under the License.
 """java_test rule"""
 
-load("//java/private:add_tags.bzl", "add_tags")
-
 # Do not touch: This line marks the end of loads; needed for PR importing.
 
 def java_test(**attrs):
@@ -27,4 +25,4 @@ def java_test(**attrs):
     """
 
     # buildifier: disable=native-java
-    native.java_test(**add_tags(attrs))
+    native.java_test(**attrs)
