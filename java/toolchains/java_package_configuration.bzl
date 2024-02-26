@@ -13,8 +13,6 @@
 # limitations under the License.
 """java_package_configuration rule"""
 
-load("//java/private:add_tags.bzl", "add_tags")
-
 def java_package_configuration(**attrs):
     """Bazel java_package_configuration rule.
 
@@ -25,4 +23,4 @@ def java_package_configuration(**attrs):
     """
 
     # buildifier: disable=native-java
-    native.java_package_configuration(**add_tags(attrs))
+    native.java_package_configuration(**attrs)
