@@ -133,6 +133,8 @@ NONPREBUILT_TOOLCHAIN_CONFIGURATION = dict(
     header_compiler_direct = [Label("@remote_java_tools//:TurbineDirect")],
 )
 
+# If this is changed, the docs for "{,tool_}java_language_version" also
+# need to be updated in the Bazel user manual
 _DEFAULT_SOURCE_VERSION = "8"
 
 def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION, toolchain_definition = True, exec_compatible_with = [], target_compatible_with = [], **kwargs):
