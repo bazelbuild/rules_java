@@ -57,6 +57,7 @@ filegroup(
     name = "for_bazel_tests",
     srcs = [
         "BUILD",
+        ":core_rules",
         ":java_single_jar",
     ],
     visibility = ["//visibility:public"],
