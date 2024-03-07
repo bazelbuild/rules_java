@@ -21,8 +21,6 @@ load("//java:java_test.bzl", _java_test = "java_test")
 load("//java/modules:java_common.bzl", _java_common = "java_common")
 load("//java/modules:java_info.bzl", _JavaInfo = "JavaInfo")
 load("//java/modules:java_plugin_info.bzl", _JavaPluginInfo = "JavaPluginInfo")
-load("//java/proto:java_lite_proto_library.bzl", _java_lite_proto_library = "java_lite_proto_library")
-load("//java/proto:java_proto_library.bzl", _java_proto_library = "java_proto_library")
 load("//java/toolchains:java_package_configuration.bzl", _java_package_configuration = "java_package_configuration")
 load("//java/toolchains:java_runtime.bzl", _java_runtime = "java_runtime")
 load("//java/toolchains:java_toolchain.bzl", _java_toolchain = "java_toolchain")
@@ -46,9 +44,9 @@ java_toolchain = _java_toolchain
 java_package_configuration = _java_package_configuration
 
 # Proto rules
-
-java_proto_library = _java_proto_library
-java_lite_proto_library = _java_lite_proto_library
+# Deprecated: don't use java proto libraries from here
+java_proto_library = native.java_proto_library
+java_lite_proto_library = native.java_lite_proto_library
 
 # Modules and providers
 
