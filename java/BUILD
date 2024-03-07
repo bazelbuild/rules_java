@@ -22,7 +22,6 @@ bzl_library(
     deps = [
         ":core_rules",
         "//java/modules",
-        "//java/proto:proto_rules",
         "//java/toolchains:toolchain_rules",
     ],
 )
