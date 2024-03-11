@@ -224,6 +224,7 @@ def _bootclasspath_impl(ctx):
     args.add("-target")
     args.add("8")
     args.add("-Xlint:-options")
+    args.add("-J-XX:-UsePerfData")
     args.add("-d")
     args.add_all([class_dir], expand_directories = False)
     args.add(ctx.file.src)
@@ -241,6 +242,7 @@ def _bootclasspath_impl(ctx):
 
     args = ctx.actions.args()
     args.add("-XX:+IgnoreUnrecognizedVMOptions")
+    args.add("-XX:-UsePerfData")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.platform=ALL-UNNAMED")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
