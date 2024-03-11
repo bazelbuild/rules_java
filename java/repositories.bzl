@@ -471,6 +471,22 @@ def remote_jdk21_repos():
 
     maybe(
         remote_java_repository,
+        name = "remotejdk21_linux_s390x",
+        target_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:s390x",
+        ],
+	sha256 = "0d5676c50821e0d0b951bf3ffd717e7a13be2a89d8848a5c13b4aedc6f982c78",
+        strip_prefix = "jdk-21.0.2+13",
+        urls = [
+	    "https://mirror.bazel.build/github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.2%2B13/OpenJDK21U-jdk_s390x_linux_hotspot_21.0.2_13.tar.gz",
+            "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.2%2B13/OpenJDK21U-jdk_s390x_linux_hotspot_21.0.2_13.tar.gz"
+	],
+        version = "21",
+    )
+
+    maybe(
+        remote_java_repository,
         name = "remotejdk21_macos",
         target_compatible_with = [
             "@platforms//os:macos",
@@ -540,7 +556,7 @@ def rules_java_toolchains(name = "toolchains"):
         # Must match JDK repos defined in remote_jdk17_repos()
         "17": ["linux", "linux_aarch64", "linux_ppc64le", "linux_s390x", "macos", "macos_aarch64", "win", "win_arm64"],
         # Must match JDK repos defined in remote_jdk21_repos()
-        "21": ["linux", "linux_aarch64", "macos", "macos_aarch64", "win"],
+	"21": ["linux", "linux_aarch64", "linux_s390x", "macos", "macos_aarch64", "win"],
     }
 
     REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDKS for platform in JDKS[version]]
