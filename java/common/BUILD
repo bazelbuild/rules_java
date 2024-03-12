@@ -11,7 +11,7 @@ filegroup(
 )
 
 bzl_library(
-    name = "modules",
+    name = "common",
     srcs = glob(["*.bzl"]),
     visibility = ["//visibility:public"],
     deps = ["//java/private"],
