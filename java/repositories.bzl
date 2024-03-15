@@ -556,7 +556,7 @@ def rules_java_toolchains(name = "toolchains"):
         # Must match JDK repos defined in remote_jdk17_repos()
         "17": ["linux", "linux_aarch64", "linux_ppc64le", "linux_s390x", "macos", "macos_aarch64", "win", "win_arm64"],
         # Must match JDK repos defined in remote_jdk21_repos()
-	"21": ["linux", "linux_aarch64", "linux_s390x", "macos", "macos_aarch64", "win"],
+	    "21": ["linux", "linux_aarch64", "linux_s390x", "macos", "macos_aarch64", "win"],
     }
 
     REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDKS for platform in JDKS[version]]
