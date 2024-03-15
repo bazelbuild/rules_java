@@ -452,7 +452,6 @@ def remote_jdk21_repos():
         ],
         version = "21",
     )
-
     maybe(
         remote_java_repository,
         name = "remotejdk21_linux_aarch64",
@@ -468,7 +467,36 @@ def remote_jdk21_repos():
         ],
         version = "21",
     )
-
+    maybe(
+        remote_java_repository,
+        name = "remotejdk21_linux_ppc64le",
+        target_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:ppc",
+        ],
+        sha256 = "d08de863499d8851811c893e8915828f2cd8eb67ed9e29432a6b4e222d80a12f",
+        strip_prefix = "jdk-21.0.2+13",
+        urls = [
+            "https://mirror.bazel.build/github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.2%2B13/OpenJDK21U-jdk_ppc64le_linux_hotspot_21.0.2_13.tar.gz",
+            "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.2%2B13/OpenJDK21U-jdk_ppc64le_linux_hotspot_21.0.2_13.tar.gz",
+        ],
+        version = "21",
+    )
+    maybe(
+        remote_java_repository,
+        name = "remotejdk21_linux_s390x",
+        target_compatible_with = [
+            "@platforms//os:linux",
+            "@platforms//cpu:s390x",
+        ],
+        sha256 = "0d5676c50821e0d0b951bf3ffd717e7a13be2a89d8848a5c13b4aedc6f982c78",
+        strip_prefix = "jdk-21.0.2+13",
+        urls = [
+            "https://mirror.bazel.build/github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.2%2B13/OpenJDK21U-jdk_s390x_linux_hotspot_21.0.2_13.tar.gz",
+            "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.2%2B13/OpenJDK21U-jdk_s390x_linux_hotspot_21.0.2_13.tar.gz",
+        ],
+        version = "21",
+    )
     maybe(
         remote_java_repository,
         name = "remotejdk21_macos",
@@ -512,6 +540,21 @@ def remote_jdk21_repos():
         urls = [
             "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu21.32.17-ca-jdk21.0.2-win_x64.zip",
             "https://cdn.azul.com/zulu/bin/zulu21.32.17-ca-jdk21.0.2-win_x64.zip",
+        ],
+        version = "21",
+    )
+    maybe(
+        remote_java_repository,
+        name = "remotejdk21_win_arm64",
+        target_compatible_with = [
+            "@platforms//os:windows",
+            "@platforms//cpu:arm64",
+        ],
+        sha256 = "975603e684f2ec5a525b3b5336d6aa0b09b5b7d2d0d9e271bd6a9892ad550181",
+        strip_prefix = "jdk-21+35",
+        urls = [
+            "https://mirror.bazel.build/aka.ms/download-jdk/microsoft-jdk-21.0.0-windows-aarch64.zip",
+            "https://aka.ms/download-jdk/microsoft-jdk-21.0.0-windows-aarch64.zip",
         ],
         version = "21",
     )

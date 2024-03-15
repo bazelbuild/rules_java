@@ -61,9 +61,12 @@ JDKS = {
     "21": [
         "linux",
         "linux_aarch64",
+        "linux_ppc64le",
+        "linux_s390x",
         "macos",
         "macos_aarch64",
         "win",
+        "win_arm64",
     ],
 }
 
