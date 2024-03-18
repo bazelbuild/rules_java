@@ -21,7 +21,7 @@ load("//toolchains:local_java_repository.bzl", "local_java_repository")
 load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
 _JAVA_TOOLS_CONFIG = {
-    "version": "v13.4",
+    "version": "v13.5",
     "release": "true",
     "artifacts": {
         "java_tools_linux": {
