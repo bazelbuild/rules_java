@@ -26,23 +26,23 @@ _JAVA_TOOLS_CONFIG = {
     "artifacts": {
         "java_tools_linux": {
             "mirror_url": "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v13.5/java_tools_linux-v13.5-rc1.zip",
-            "sha": "d7308c073d6f85a65289e2623cbf78709c904928e72e4f98956cb01c87499a1c"
+            "sha": "d7308c073d6f85a65289e2623cbf78709c904928e72e4f98956cb01c87499a1c",
         },
         "java_tools_windows": {
             "mirror_url": "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v13.5/java_tools_windows-v13.5-rc1.zip",
-            "sha": "4e25c1e9915da2c46bf3f1185693a9731aa62ad89c9384de6adad12425eefff9"
+            "sha": "4e25c1e9915da2c46bf3f1185693a9731aa62ad89c9384de6adad12425eefff9",
         },
         "java_tools_darwin_x86_64": {
             "mirror_url": "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v13.5/java_tools_darwin_x86_64-v13.5-rc1.zip",
-            "sha": "702d9b8a759979423df3a385e10253fe2b7ad080654fc112bd1643d826aa058c"
+            "sha": "702d9b8a759979423df3a385e10253fe2b7ad080654fc112bd1643d826aa058c",
         },
         "java_tools_darwin_arm64": {
             "mirror_url": "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v13.5/java_tools_darwin_arm64-v13.5-rc1.zip",
-            "sha": "6e300ffdce897807a7af835b0cf64f4ba5caec10914508bd0add96d7d76368d7"
+            "sha": "6e300ffdce897807a7af835b0cf64f4ba5caec10914508bd0add96d7d76368d7",
         },
         "java_tools": {
             "mirror_url": "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v13.5/java_tools-v13.5-rc1.zip",
-            "sha": "c1e1045ed067777fe2be3b0369ee186bef42885f4ec59e500c2c92d03e71e28f"
+            "sha": "c1e1045ed067777fe2be3b0369ee186bef42885f4ec59e500c2c92d03e71e28f",
         }
     },
 }
