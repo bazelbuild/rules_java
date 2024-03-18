@@ -56,7 +56,6 @@ def java_tools_repos():
             sha256 = config["sha"],
             urls = [
                 config["mirror_url"],
-                config["github_url"],
             ],
         )
 
