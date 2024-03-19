@@ -176,7 +176,10 @@ def remote_jdk8_repos(name = ""):
         "remote_jdk8_windows",
     ]
     for name in REMOTE_JDK8_REPOS:
-        native.register_toolchains("@" + name + "_toolchain_config_repo//:toolchain")
+        native.register_toolchains(
+            "@" + name + "_toolchain_config_repo//:toolchain",
+            "@" + name + "_toolchain_config_repo//:bootstrap_runtime_toolchain",
+        )
 
 def remote_jdk11_repos():
     """Imports OpenJDK 11 repositories."""
