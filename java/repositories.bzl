@@ -48,7 +48,7 @@ _JAVA_TOOLS_CONFIG = {
             "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.5/java_tools-v13.5.zip",
             "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.5/java_tools-v13.5.zip",
             "sha": "c1e1045ed067777fe2be3b0369ee186bef42885f4ec59e500c2c92d03e71e28f",
-        }
+        },
     },
 }
 
