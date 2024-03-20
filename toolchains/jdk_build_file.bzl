@@ -63,6 +63,14 @@ filegroup(
 )
 
 filegroup(
+    name = "jdk-jmods",
+    srcs = glob(
+        ["jmods/**"],
+        allow_empty = True,
+    ),
+)
+
+filegroup(
     name = "jdk-lib",
     srcs = glob(
         ["lib/**", "release"],
@@ -79,6 +87,7 @@ java_runtime(
     srcs = [
         ":jdk-bin",
         ":jdk-conf",
+        ":jdk-jmods",
         ":jdk-include",
         ":jdk-lib",
         ":jre",
