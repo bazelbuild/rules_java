@@ -35,6 +35,15 @@ register_toolchains(
 
 # Declare all remote jdk toolchain config repos
 JDKS = {
+    # Must match JDK repos defined in remote_jdk8_repos()
+    "8": [
+        "linux",
+        "linux_aarch64",
+        "linux_s390x",
+        "macos",
+        "macos_aarch64",
+        "windows",
+    ],
     # Must match JDK repos defined in remote_jdk11_repos()
     "11": [
         "linux",
@@ -70,7 +79,7 @@ JDKS = {
     ],
 }
 
-REMOTE_JDK_REPOS = [("remotejdk" + version + "_" + platform) for version in JDKS for platform in JDKS[version]]
+REMOTE_JDK_REPOS = [(("remote_jdk" if version == "8" else "remotejdk") + version + "_" + platform) for version in JDKS for platform in JDKS[version]]
 
 [use_repo(
     toolchains,
