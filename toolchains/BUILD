@@ -1,3 +1,7 @@
+load(
+    "@bazel_skylib//rules:common_settings.bzl",
+    "string_setting",
+)
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load(
     ":default_java_toolchain.bzl",
@@ -6,6 +10,7 @@ load(
     "bootclasspath",
     "default_java_toolchain",
     "java_runtime_files",
+    "language_version_bootstrap_runtime",
 )
 load(
     ":java_toolchain_alias.bzl",
@@ -250,10 +255,41 @@ alias(
     }),
 )
 
+config_setting(
+    name = "incompatible_language_version_bootclasspath",
+    flag_values = {
+        "//java:incompatible_language_version_bootclasspath": "True",
+    },
+    visibility = ["//visibility:private"],
+)
+
+string_setting(
+    name = "java_language_version",
+    build_setting_default = "",
+    visibility = ["//visibility:private"],
+)
+
+string_setting(
+    name = "java_runtime_version",
+    build_setting_default = "",
+    visibility = ["//visibility:private"],
+)
+
+language_version_bootstrap_runtime(
+    name = "language_version_bootstrap_runtime",
+    java_language_version = ":java_language_version",
+    java_runtime_version = ":java_runtime_version",
+    visibility = ["//visibility:private"],
+)
+
 bootclasspath(
     name = "platformclasspath",
     src = "DumpPlatformClassPath.java",
     java_runtime_alias = ":current_java_runtime",
+    language_version_bootstrap_runtime = select({
+        ":incompatible_language_version_bootclasspath": ":language_version_bootstrap_runtime",
+        "//conditions:default": None,
+    }),
 )
 
 default_java_toolchain(
