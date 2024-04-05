@@ -92,15 +92,10 @@ def _java_toolchain_alias(ctx):
     toolchain_info = ctx.toolchains["@bazel_tools//tools/jdk:toolchain_type"]
     toolchain = toolchain_info.java
 
-    # buildifier: disable=rule-impl-return
-    return struct(
-        providers = [
-            toolchain_info,
-            toolchain,
-        ],
-        # Use the legacy provider syntax for compatibility with the native rules.
-        java_toolchain = toolchain,
-    )
+    return [
+        toolchain_info,
+        toolchain,
+    ]
 
 java_toolchain_alias = rule(
     implementation = _java_toolchain_alias,
