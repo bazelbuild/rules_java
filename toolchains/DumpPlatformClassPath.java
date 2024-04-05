@@ -187,6 +187,10 @@ public class DumpPlatformClassPath {
         jars.add(path);
       }
     }
+    Path toolsJar = javaHome.resolve("lib/tools.jar");
+    if (Files.exists(toolsJar)) {
+      jars.add(toolsJar);
+    }
     return jars;
   }
 
