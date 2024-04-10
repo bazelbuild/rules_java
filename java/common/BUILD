@@ -16,3 +16,12 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = ["//java/private"],
 )
+
+filegroup(
+    name = "for_bazel_tests",
+    srcs = [
+        "BUILD",
+        ":common",
+    ],
+    visibility = ["//java:__pkg__"],
+)

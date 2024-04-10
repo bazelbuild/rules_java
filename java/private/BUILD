@@ -15,3 +15,12 @@ filegroup(
     srcs = glob(["**"]),
     visibility = ["//java:__pkg__"],
 )
+
+filegroup(
+    name = "for_bazel_tests",
+    srcs = [
+        "BUILD",
+        ":private",
+    ],
+    visibility = ["//java:__pkg__"],
+)
