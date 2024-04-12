@@ -14,6 +14,8 @@
 
 """Experimental re-implementations of Java toolchain aliases using toolchain resolution."""
 
+load("//java/common:java_common.bzl", "java_common")
+
 def _java_runtime_alias(ctx):
     """An experimental implementation of java_runtime_alias using toolchain resolution."""
     toolchain_info = ctx.toolchains["@bazel_tools//tools/jdk:runtime_toolchain_type"]

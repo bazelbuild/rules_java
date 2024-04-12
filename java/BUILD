@@ -37,7 +37,10 @@ bzl_library(
         "java_test.bzl",
     ],
     visibility = ["//visibility:public"],
-    deps = ["//java/private"],
+    deps = [
+        "//java/common",
+        "//java/private",
+    ],
 )
 
 bzl_library(
@@ -50,6 +53,7 @@ bzl_library(
     name = "java_single_jar",
     srcs = ["java_single_jar.bzl"],
     visibility = ["//visibility:public"],
+    deps = ["//java/common"],
 )
 
 filegroup(

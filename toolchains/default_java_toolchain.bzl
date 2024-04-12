@@ -15,6 +15,7 @@
 """Rules for defining default_java_toolchain"""
 
 load("//java:defs.bzl", "java_toolchain")
+load("//java/common:java_common.bzl", "java_common")
 
 # JVM options, without patching java.compiler and jdk.compiler modules.
 BASE_JDK9_JVM_OPTS = [

@@ -1,5 +1,8 @@
 """ Definition of _java_single_jar. """
 
+load("//java/common:java_common.bzl", "java_common")
+load("//java/common:java_info.bzl", "JavaInfo")
+
 def _java_single_jar(ctx):
     transitive_inputs = []
     for dep in ctx.attr.deps:

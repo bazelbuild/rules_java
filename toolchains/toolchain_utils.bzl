@@ -19,6 +19,8 @@ Returns the toolchain if enabled, and falls back to a toolchain constructed from
 legacy toolchain selection.
 """
 
+load("//java/common:java_common.bzl", "java_common")
+
 def find_java_toolchain(ctx, target):
     """
     Finds the Java toolchain.
