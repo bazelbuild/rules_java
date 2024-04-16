@@ -18,6 +18,7 @@ filegroup(
 
 filegroup(
     name = "for_bazel_tests",
+    testonly = 1,
     srcs = [
         "BUILD",
         ":private",
