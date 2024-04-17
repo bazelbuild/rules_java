@@ -63,6 +63,7 @@ filegroup(
         "BUILD",
         ":core_rules",
         ":java_single_jar",
+        ":rules",
         "//java/common:for_bazel_tests",
         "//java/private:for_bazel_tests",
     ],
