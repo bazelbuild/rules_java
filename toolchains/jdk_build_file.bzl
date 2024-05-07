@@ -92,4 +92,26 @@ java_runtime(
     java = glob(["bin/java.exe", "bin/java"], allow_empty = True)[0],
     version = {RUNTIME_VERSION},
 )
+
+filegroup(
+    name = "jdk-jmods",
+    srcs = glob(
+        ["jmods/**"],
+        allow_empty = True,
+    ),
+)
+
+java_runtime(
+    name = "jdk-with-jmods",
+    srcs = [
+        ":jdk-bin",
+        ":jdk-conf",
+        ":jdk-include",
+        ":jdk-lib",
+        ":jdk-jmods",
+        ":jre",
+    ],
+    java = glob(["bin/java.exe", "bin/java"], allow_empty = True)[0],
+    version = {RUNTIME_VERSION},
+)
 """
