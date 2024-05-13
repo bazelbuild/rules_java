@@ -556,6 +556,7 @@ def rules_java_dependencies():
     """
 
     local_jdk_repo()
+    remote_jdk8_repos()
     remote_jdk11_repos()
     remote_jdk17_repos()
     remote_jdk21_repos()
