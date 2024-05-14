@@ -13,6 +13,7 @@
 # limitations under the License.
 """Module extensions for rules_java."""
 
+load("@bazel_skylib//lib:modules.bzl", "modules")
 load(
     "//java:repositories.bzl",
     "java_tools_repos",
@@ -23,7 +24,7 @@ load(
     "remote_jdk8_repos",
 )
 
-def _toolchains_impl(_ctx):
+def _toolchains_impl():
     java_tools_repos()
     local_jdk_repo()
     remote_jdk8_repos()
@@ -31,4 +32,4 @@ def _toolchains_impl(_ctx):
     remote_jdk17_repos()
     remote_jdk21_repos()
 
-toolchains = module_extension(implementation = _toolchains_impl)
+toolchains = modules.as_extension(_toolchains_impl)
