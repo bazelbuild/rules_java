@@ -1,3 +1,4 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load(
     ":default_java_toolchain.bzl",
@@ -320,4 +321,11 @@ java_runtime_version_alias(
     name = "jdk_8",
     runtime_version = "8",
     visibility = ["//visibility:public"],
+)
+
+bzl_library(
+    name = "toolchain_utils",
+    srcs = ["toolchain_utils.bzl"],
+    visibility = ["//visibility:public"],
+    deps = ["//java/common"],
 )
