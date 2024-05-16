@@ -5,11 +5,9 @@ package(
     default_visibility = ["//visibility:private"],
 )
 
-_VERSION = "7.6.0"
-
 # Build the artifact to put on the github release page.
 pkg_tar(
-    name = "rules_java-%s" % _VERSION,
+    name = "rules_java-%s" % module_version(),
     srcs = ["//:distribution"],
     extension = "tar.gz",
     # It is all source code, so make it read-only.
@@ -27,5 +25,5 @@ print_rel_notes(
     repo = "rules_java",
     setup_file = "java:repositories.bzl",
     toolchains_method = "rules_java_toolchains",
-    version = _VERSION,
+    version = module_version(),
 )
