@@ -383,8 +383,9 @@ def rules_java_toolchains(name = "toolchains"):
         "@local_jdk//:runtime_toolchain_definition",
         "@local_jdk//:bootstrap_runtime_toolchain_definition",
     )
-    for __, item in REMOTE_JDK_CONFIGS:
-        native.register_toolchains(
-            "@" + item.name + "_toolchain_config_repo//:toolchain",
-            "@" + item.name + "_toolchain_config_repo//:bootstrap_runtime_toolchain",
-        )
+    for items in REMOTE_JDK_CONFIGS.values():
+        for item in items:
+            native.register_toolchains(
+                "@" + item.name + "_toolchain_config_repo//:toolchain",
+                "@" + item.name + "_toolchain_config_repo//:bootstrap_runtime_toolchain",
+            )
