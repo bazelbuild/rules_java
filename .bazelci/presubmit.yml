@@ -4,6 +4,7 @@ build_targets: &build_targets
   - "@remote_java_tools//java_tools/..."
   # TODO: Look into broken targets in //toolchains
   - "-//toolchains/..."
+  - "-//test/repo/..."
 
 build_targets_bzlmod: &build_targets_bzlmod
   - "//..."
@@ -12,6 +13,7 @@ build_targets_bzlmod: &build_targets_bzlmod
   # TODO(pcloudy): pkg_tar doesn't work with Bzlmod due to https://github.com/bazelbuild/bazel/issues/14259
   # Enable once the issue is fixed.
   - "-//distro/..."
+  - "-//test/repo/..."
 
 test_targets: &test_targets
   - "//test/..."
@@ -22,33 +24,46 @@ tasks:
   ubuntu2004:
     build_targets: *build_targets
     test_targets: *test_targets
+  ubuntu2004_integration:
+    name: "Integration Tests"
+    platform: ubuntu2004
+    working_directory: "test/repo"
+    build_targets:
+      - "//..."
+      - "//:bin_deploy.jar"
   macos:
     build_targets: *build_targets
   windows:
     build_targets: *build_targets
   ubuntu2004_head:
+    name: "Bazel@HEAD"
     bazel: last_green
     platform: ubuntu2004
     build_targets: *build_targets
   macos_head:
+    name: "Bazel@HEAD"
     bazel: last_green
     platform: macos
     build_targets: *build_targets
   windows_head:
+    name: "Bazel@HEAD"
     bazel: last_green
     platform: windows
     build_targets: *build_targets
   ubuntu2004_bzlmod:
+    name: "bzlmod"
     platform: ubuntu2004
     build_flags:
       - "--config=bzlmod"
     build_targets: *build_targets_bzlmod
   macos_bzlmod:
+    name: "bzlmod"
     platform: macos
     build_flags:
       - "--config=bzlmod"
     build_targets: *build_targets_bzlmod
   windows_bzlmod:
+    name: "bzlmod"
     platform: windows
     build_flags:
       - "--config=bzlmod"

@@ -1,0 +1,13 @@
+load("@rules_java//java:java_binary.bzl", "java_binary")
+load("@rules_java//java:java_library.bzl", "java_library")
+
+java_library(
+    name = "lib",
+    srcs = glob(["src/*.java"]),
+)
+
+java_binary(
+    name = "bin",
+    main_class = "Main",
+    runtime_deps = [":lib"],
+)

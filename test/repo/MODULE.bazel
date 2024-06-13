@@ -1,0 +1,7 @@
+module(name = "fake_repo_for_testing")
+
+bazel_dep(name = "rules_java", version = "7.5.0")
+local_path_override(
+    module_name = "rules_java",
+    path = "../../",
+)
