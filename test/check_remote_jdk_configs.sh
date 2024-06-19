@@ -15,9 +15,10 @@
 
 echo "Checking hashes and strip_prefix for $# configs"
 
+_MISSING_MIRRORS=()
 for config in "$@"; do
     TMP_FILE=$(mktemp -q /tmp/remotejdk.XXXXXX)
-    IFS=, read -r name url hash strip_prefix <<< "${config}"
+    IFS=, read -r name url mirror_url hash strip_prefix <<< "${config}"
     echo "fetching $name from $url to ${TMP_FILE}"
     curl --silent -o ${TMP_FILE} -L "$url"
     actual_hash=`sha256sum ${TMP_FILE} | cut -d' ' -f1`
@@ -37,4 +38,16 @@ for config in "$@"; do
       echo "ERROR: bad strip_prefix for ${name}, wanted: ${strip_prefix}/, got: ${root_dir}"
       exit 1
     fi
+    if [[ -n "${mirror_url}" ]]; then
+      echo "checking mirror: ${mirror_url}"
+      curl --silent --fail -I -L ${mirror_url} > /dev/null || { _MISSING_MIRRORS+="${mirror_url}"; }
+    fi
 done
+
+if [[ ${#_MISSING_MIRRORS[@]} -gt 0 ]]; then
+  echo "Missing mirror URLs:"
+  for m in "${_MISSING_MIRRORS[@]}"; do
+    echo "  ${m}"
+  done
+  exit 1
+fi

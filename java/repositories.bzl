@@ -80,7 +80,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:aarch64"],
         sha256 = "82c46c65d57e187ef68fdd125ef760eaeb52ebfe1be1a6a251cf5b43cbebc78a",
         strip_prefix = "zulu8.78.0.19-ca-jdk8.0.412-linux_aarch64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-linux_aarch64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-8.78.0.19-ca-jdk8.0.412/zulu8.78.0.19-ca-jdk8.0.412-linux_aarch64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-linux_aarch64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-linux_aarch64.tar.gz"],
         version = "8",
     ),
     struct(
@@ -88,7 +88,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:x86_64"],
         sha256 = "9c0ac5ebffa61520fee78ead52add0f4edd3b1b54b01b6a17429b719515caf90",
         strip_prefix = "zulu8.78.0.19-ca-jdk8.0.412-linux_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-linux_x64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-8.78.0.19-ca-jdk8.0.412/zulu8.78.0.19-ca-jdk8.0.412-linux_x64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-linux_x64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-linux_x64.tar.gz"],
         version = "8",
     ),
     struct(
@@ -96,7 +96,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:aarch64"],
         sha256 = "35bc35808379400e4a70e1f7ee379778881799b93c2cc9fe1ae515c03c2fb057",
         strip_prefix = "zulu8.78.0.19-ca-jdk8.0.412-macosx_aarch64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-macosx_aarch64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-8.78.0.19-ca-jdk8.0.412/zulu8.78.0.19-ca-jdk8.0.412-macosx_aarch64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-macosx_aarch64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-macosx_aarch64.tar.gz"],
         version = "8",
     ),
     struct(
@@ -104,7 +104,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:x86_64"],
         sha256 = "2bfa0506196962bddb21a604eaa2b0b39eaf3383d0bdad08bdbe7f42f25d8928",
         strip_prefix = "zulu8.78.0.19-ca-jdk8.0.412-macosx_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-macosx_x64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-8.78.0.19-ca-jdk8.0.412/zulu8.78.0.19-ca-jdk8.0.412-macosx_x64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-macosx_x64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-macosx_x64.tar.gz"],
         version = "8",
     ),
     struct(
@@ -112,7 +112,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:x86_64"],
         sha256 = "ca5499c301d5b42604d8535b8c40a7f928a796247b8c66a600333dd799798ff7",
         strip_prefix = "zulu8.78.0.19-ca-jdk8.0.412-win_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-win_x64.zip", "https://mirror.bazel.build/openjdk/azul-zulu-8.78.0.19-ca-jdk8.0.412/zulu8.78.0.19-ca-jdk8.0.412-win_x64.zip"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-win_x64.zip", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu8.78.0.19-ca-jdk8.0.412-win_x64.zip"],
         version = "8",
     ),
     struct(
@@ -120,7 +120,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:s390x"],
         sha256 = "276a431c79b7e94bc1b1b4fd88523383ae2d635ea67114dfc8a6174267f8fb2c",
         strip_prefix = "jdk8u292-b10",
-        urls = ["https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jdk_s390x_linux_hotspot_8u292b10.tar.gz"],
+        urls = ["https://github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jdk_s390x_linux_hotspot_8u292b10.tar.gz", "https://mirror.bazel.build/github.com/AdoptOpenJDK/openjdk8-binaries/releases/download/jdk8u292-b10/OpenJDK8U-jdk_s390x_linux_hotspot_8u292b10.tar.gz"],
         version = "8",
     ),
     struct(
@@ -128,7 +128,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:aarch64"],
         sha256 = "be7d7574253c893eb58f66e985c75adf48558c41885827d1f02f827e109530e0",
         strip_prefix = "zulu11.72.19-ca-jdk11.0.23-linux_aarch64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-linux_aarch64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-11.72.19-ca-jdk11.0.23/zulu11.72.19-ca-jdk11.0.23-linux_aarch64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-linux_aarch64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-linux_aarch64.tar.gz"],
         version = "11",
     ),
     struct(
@@ -136,7 +136,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:x86_64"],
         sha256 = "0a4d1bfc7a96a7f9f5329b72b9801b3c53366417b4753f1b658fa240204c7347",
         strip_prefix = "zulu11.72.19-ca-jdk11.0.23-linux_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-linux_x64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-11.72.19-ca-jdk11.0.23/zulu11.72.19-ca-jdk11.0.23-linux_x64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-linux_x64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-linux_x64.tar.gz"],
         version = "11",
     ),
     struct(
@@ -144,7 +144,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:aarch64"],
         sha256 = "40fb1918385e03814b67b7608c908c7f945ccbeddbbf5ed062cdfb2602e21c83",
         strip_prefix = "zulu11.72.19-ca-jdk11.0.23-macosx_aarch64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-macosx_aarch64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-11.72.19-ca-jdk11.0.23/zulu11.72.19-ca-jdk11.0.23-macosx_aarch64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-macosx_aarch64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-macosx_aarch64.tar.gz"],
         version = "11",
     ),
     struct(
@@ -152,7 +152,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:x86_64"],
         sha256 = "e5b19b82045826ae09c9d17742691bc9e40312c44be7bd7598ae418a3d4edb1c",
         strip_prefix = "zulu11.72.19-ca-jdk11.0.23-macosx_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-macosx_x64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-11.72.19-ca-jdk11.0.23/zulu11.72.19-ca-jdk11.0.23-macosx_x64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-macosx_x64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-macosx_x64.tar.gz"],
         version = "11",
     ),
     struct(
@@ -160,7 +160,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:x86_64"],
         sha256 = "1295b2affe498018c45f6f15187b58c4456d51dce5eb608ee73ef7665d4566d2",
         strip_prefix = "zulu11.72.19-ca-jdk11.0.23-win_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-win_x64.zip", "https://mirror.bazel.build/openjdk/azul-zulu-11.72.19-ca-jdk11.0.23/zulu11.72.19-ca-jdk11.0.23-win_x64.zip"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-win_x64.zip", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu11.72.19-ca-jdk11.0.23-win_x64.zip"],
         version = "11",
     ),
     struct(
@@ -192,7 +192,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:aarch64"],
         sha256 = "518cc455c0c7b49c0ae7d809c0bb87ab371bb850d46abb8efad5010c6a06faec",
         strip_prefix = "zulu17.50.19-ca-jdk17.0.11-linux_aarch64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-linux_aarch64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-17.50.19-ca-jdk17.0.11/zulu17.50.19-ca-jdk17.0.11-linux_aarch64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-linux_aarch64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-linux_aarch64.tar.gz"],
         version = "17",
     ),
     struct(
@@ -200,7 +200,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:x86_64"],
         sha256 = "a1e8ac9ae5804b84dc07cf9d8ebe1b18247d70c92c1e0de97ea10109563f4379",
         strip_prefix = "zulu17.50.19-ca-jdk17.0.11-linux_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-linux_x64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-17.50.19-ca-jdk17.0.11/zulu17.50.19-ca-jdk17.0.11-linux_x64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-linux_x64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-linux_x64.tar.gz"],
         version = "17",
     ),
     struct(
@@ -208,7 +208,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:aarch64"],
         sha256 = "dd1a82d57e80cdefb045066e5c28b5bd41e57eea9c57303ec7e012b57230bb9c",
         strip_prefix = "zulu17.50.19-ca-jdk17.0.11-macosx_aarch64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-macosx_aarch64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-17.50.19-ca-jdk17.0.11/zulu17.50.19-ca-jdk17.0.11-macosx_aarch64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-macosx_aarch64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-macosx_aarch64.tar.gz"],
         version = "17",
     ),
     struct(
@@ -216,7 +216,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:x86_64"],
         sha256 = "b384991e93af39abe5229c7f5efbe912a7c5a6480674a6e773f3a9128f96a764",
         strip_prefix = "zulu17.50.19-ca-jdk17.0.11-macosx_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-macosx_x64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-17.50.19-ca-jdk17.0.11/zulu17.50.19-ca-jdk17.0.11-macosx_x64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-macosx_x64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-macosx_x64.tar.gz"],
         version = "17",
     ),
     struct(
@@ -224,7 +224,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:arm64"],
         sha256 = "b8833d272eb31f54f8c881139807a28a74de9deae07d2cc37688ff72043e32c9",
         strip_prefix = "zulu17.50.19-ca-jdk17.0.11-win_aarch64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-win_aarch64.zip", "https://mirror.bazel.build/openjdk/azul-zulu-17.50.19-ca-jdk17.0.11/zulu17.50.19-ca-jdk17.0.11-win_aarch64.zip"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-win_aarch64.zip", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-win_aarch64.zip"],
         version = "17",
     ),
     struct(
@@ -232,7 +232,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:x86_64"],
         sha256 = "43f0f1bdecf48ba9763d46ee7784554c95b442ffdd39ebd62dc8b297cc82e116",
         strip_prefix = "zulu17.50.19-ca-jdk17.0.11-win_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-win_x64.zip", "https://mirror.bazel.build/openjdk/azul-zulu-17.50.19-ca-jdk17.0.11/zulu17.50.19-ca-jdk17.0.11-win_x64.zip"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-win_x64.zip", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu17.50.19-ca-jdk17.0.11-win_x64.zip"],
         version = "17",
     ),
     struct(
@@ -256,7 +256,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:aarch64"],
         sha256 = "c898d4ce365c8926e22859c06be4a81bafb9fd0126088867e15a528fe99b1599",
         strip_prefix = "zulu21.34.19-ca-jdk21.0.3-linux_aarch64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-linux_aarch64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-21.34.19-ca-jdk21.0.3/zulu21.34.19-ca-jdk21.0.3-linux_aarch64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-linux_aarch64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-linux_aarch64.tar.gz"],
         version = "21",
     ),
     struct(
@@ -264,7 +264,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:x86_64"],
         sha256 = "ca763d1308a6bcc768382f160733a08e591d5f595a7dd9e51b60d27d54828dcc",
         strip_prefix = "zulu21.34.19-ca-jdk21.0.3-linux_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-linux_x64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-21.34.19-ca-jdk21.0.3/zulu21.34.19-ca-jdk21.0.3-linux_x64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-linux_x64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-linux_x64.tar.gz"],
         version = "21",
     ),
     struct(
@@ -272,7 +272,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:aarch64"],
         sha256 = "4f42a561909d71868a700cf2efa1390e1b9e04863f3fa75ea30c4965e5a702f0",
         strip_prefix = "zulu21.34.19-ca-jdk21.0.3-macosx_aarch64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-macosx_aarch64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-21.34.19-ca-jdk21.0.3/zulu21.34.19-ca-jdk21.0.3-macosx_aarch64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-macosx_aarch64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-macosx_aarch64.tar.gz"],
         version = "21",
     ),
     struct(
@@ -280,7 +280,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:x86_64"],
         sha256 = "148006a220a18922d7a9c52ac0bad099c5b4e60334a8d02b11f8c945e9ec9a34",
         strip_prefix = "zulu21.34.19-ca-jdk21.0.3-macosx_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-macosx_x64.tar.gz", "https://mirror.bazel.build/openjdk/azul-zulu-21.34.19-ca-jdk21.0.3/zulu21.34.19-ca-jdk21.0.3-macosx_x64.tar.gz"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-macosx_x64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-macosx_x64.tar.gz"],
         version = "21",
     ),
     struct(
@@ -288,7 +288,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:x86_64"],
         sha256 = "fb9f0dc6a484b0b169b3b3a3c2425d5f62bebfd15cb06c1597e33f77959c72af",
         strip_prefix = "zulu21.34.19-ca-jdk21.0.3-win_x64",
-        urls = ["https://cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-win_x64.zip", "https://mirror.bazel.build/openjdk/azul-zulu-21.34.19-ca-jdk21.0.3/zulu21.34.19-ca-jdk21.0.3-win_x64.zip"],
+        urls = ["https://cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-win_x64.zip", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu21.34.19-ca-jdk21.0.3-win_x64.zip"],
         version = "21",
     ),
     struct(

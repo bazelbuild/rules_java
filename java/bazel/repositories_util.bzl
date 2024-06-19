@@ -123,9 +123,10 @@ def _zulu_remote_jdk_repo(os, cpu, release):
         platform = "win"
         arch = "aarch64" if arch == "arm64" else arch
     archive_name = "zulu" + release + "-" + platform + "_" + arch
+    primary_url = "cdn.azul.com/zulu/bin/" + archive_name + ext
     urls = [
-        "https://cdn.azul.com/zulu/bin/" + archive_name + ext,
-        "https://mirror.bazel.build/openjdk/azul-zulu-" + release + "/" + archive_name + ext,
+        "https://" + primary_url,
+        "https://mirror.bazel.build/" + primary_url,
     ]
     return urls, archive_name
 
@@ -135,23 +136,27 @@ def _adoptium_linux_remote_jdk_repo(version, cpu, release):
     if cpu == "ppc":
         arch = "ppc64le"
     archive_name = "OpenJDK" + version + "U-jdk_" + arch + "_" + os + "_hotspot_" + release.replace("+", "_") + ".tar.gz"
+    primary_url = "github.com/adoptium/temurin" + version + "-binaries/releases/download/jdk-" + release + "/" + archive_name
     urls = [
-        "https://github.com/adoptium/temurin" + version + "-binaries/releases/download/jdk-" + release + "/" + archive_name,
-        "https://mirror.bazel.build/github.com/adoptium/temurin" + version + "-binaries/releases/download/jdk-" + release + "/" + archive_name,
+        "https://" + primary_url,
+        "https://mirror.bazel.build/" + primary_url,
     ]
     return urls, "jdk-" + release
 
 def _microsoft_windows_arm64_remote_jdk_repo(release):
+    primary_url = "aka.ms/download-jdk/microsoft-jdk-" + release + "-windows-aarch64.zip"
     urls = [
-        "https://aka.ms/download-jdk/microsoft-jdk-" + release + "-windows-aarch64.zip",
-        "https://mirror.bazel.build/aka.ms/download-jdk/microsoft-jdk-" + release + "-windows-aarch64.zip",
+        "https://" + primary_url,
+        "https://mirror.bazel.build/" + primary_url,
     ]
     return urls, ""
 
 def _adoptopenjdk_remote_jdk_repo(version, os, cpu, release):
     archive = "OpenJDK" + version + "U-jdk_" + cpu + "_" + os + "_hotspot_" + release.replace("-", "") + ".tar.gz"
+    primary_url = "github.com/AdoptOpenJDK/openjdk" + version + "-binaries/releases/download/jdk" + release + "/" + archive
     urls = [
-        "https://github.com/AdoptOpenJDK/openjdk" + version + "-binaries/releases/download/jdk" + release + "/" + archive,
+        "https://" + primary_url,
+        "https://mirror.bazel.build/" + primary_url,
     ]
     return urls, "jdk" + release
 

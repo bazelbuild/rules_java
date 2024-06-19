@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 load("//java:repositories.bzl", "REMOTE_JDK_CONFIGS")
+load(":check_remotejdk_configs_match.bzl", "validate_configs")
 
 sh_test(
     name = "check_remote_jdk_configs_test",
@@ -20,6 +21,7 @@ sh_test(
         ",".join([
             config.name,
             config.urls[0],
+            config.urls[1] if len(config.urls) > 1 else "",
             config.sha256,
             config.strip_prefix,
         ])
@@ -27,3 +29,5 @@ sh_test(
         for config in configs
     ],
 )
+
+validate_configs()
