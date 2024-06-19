@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-load("//java:repositories.bzl", "REMOTE_JDK_CONFIGS")
+load("//java:repositories.bzl", "JAVA_TOOLS_CONFIG", "REMOTE_JDK_CONFIGS")
 load(":check_remotejdk_configs_match.bzl", "validate_configs")
 
 sh_test(
@@ -27,6 +27,20 @@ sh_test(
         ])
         for configs in REMOTE_JDK_CONFIGS.values()
         for config in configs
+    ],
+)
+
+sh_test(
+    name = "check_remote_java_tools_configs_test",
+    srcs = ["check_remote_java_tools_configs.sh"],
+    args = [
+        ",".join([
+            name,
+            config["mirror_url"],
+            config["github_url"],
+            config["sha"],
+        ])
+        for name, config in JAVA_TOOLS_CONFIG["artifacts"].items()
     ],
 )
 

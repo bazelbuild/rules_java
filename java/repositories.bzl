@@ -20,7 +20,8 @@ load("//toolchains:jdk_build_file.bzl", "JDK_BUILD_TEMPLATE")
 load("//toolchains:local_java_repository.bzl", "local_java_repository")
 load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
-_JAVA_TOOLS_CONFIG = {
+# visible for tests
+JAVA_TOOLS_CONFIG = {
     "version": "v13.6.1",
     "release": "true",
     "artifacts": {
@@ -54,7 +55,7 @@ _JAVA_TOOLS_CONFIG = {
 
 def java_tools_repos():
     """ Declares the remote java_tools repositories """
-    for name, config in _JAVA_TOOLS_CONFIG["artifacts"].items():
+    for name, config in JAVA_TOOLS_CONFIG["artifacts"].items():
         maybe(
             http_archive,
             name = "remote_" + name,
