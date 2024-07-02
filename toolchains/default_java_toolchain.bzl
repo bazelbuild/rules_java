@@ -214,6 +214,9 @@ _JAVA_BOOTSTRAP_RUNTIME_TOOLCHAIN_TYPE = Label("@bazel_tools//tools/jdk:bootstra
 # https://github.com/bazelbuild/bazel/commit/a239ea84832f18ee8706682145e9595e71b39680
 _SUPPORTS_PATH_MAPPING = {"supports-path-mapping": "1"}
 
+def _java_home(java_executable):
+    return java_executable.dirname[:-len("/bin")]
+
 def _bootclasspath_impl(ctx):
     exec_javabase = ctx.attr.java_runtime_alias[java_common.JavaRuntimeInfo]
 
@@ -252,10 +255,18 @@ def _bootclasspath_impl(ctx):
     args.add(bootclasspath)
 
     any_javabase = ctx.toolchains[_JAVA_BOOTSTRAP_RUNTIME_TOOLCHAIN_TYPE].java_runtime
-    args.add(any_javabase.java_home)
+    any_javabase_files = any_javabase.files.to_list()
+
+    # If possible, add the Java executable to the command line as a File so that it can be path
+    # mapped.
+    java_executable = [f for f in any_javabase_files if f.path == any_javabase.java_executable_exec_path]
+    if len(java_executable) == 1:
+        args.add_all(java_executable, map_each = _java_home)
+    else:
+        args.add(any_javabase.java_home)
 
     system_files = ("release", "modules", "jrt-fs.jar")
-    system = [f for f in any_javabase.files.to_list() if f.basename in system_files]
+    system = [f for f in any_javabase_files if f.basename in system_files]
     if len(system) != len(system_files):
         system = None
 
