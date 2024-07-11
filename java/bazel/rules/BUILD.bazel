@@ -11,16 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""java_test rule"""
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
-def java_test(**attrs):
-    """Bazel java_test rule.
+bzl_library(
+    name = "rules",
+    srcs = glob(["*.bzl"]),
+    visibility = ["//java:__pkg__"],
+)
 
-    https://docs.bazel.build/versions/master/be/java.html#java_test
-
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_test(**attrs)
+filegroup(
+    name = "for_bazel_tests",
+    testonly = 1,
+    srcs = [
+        "BUILD.bazel",
+        ":rules",
+    ],
+    visibility = ["//java:__pkg__"],
+)

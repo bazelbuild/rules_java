@@ -11,16 +11,4 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""java_test rule"""
-
-def java_test(**attrs):
-    """Bazel java_test rule.
-
-    https://docs.bazel.build/versions/master/be/java.html#java_test
-
-    Args:
-      **attrs: Rule attributes
-    """
-
-    # buildifier: disable=native-java
-    native.java_test(**attrs)
+"""Empty file as a placeholder for migration"""

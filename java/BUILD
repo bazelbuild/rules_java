@@ -38,6 +38,7 @@ bzl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//java/bazel/rules",
         "//java/common",
         "//java/private",
     ],
@@ -64,6 +65,7 @@ filegroup(
         ":core_rules",
         ":java_single_jar",
         ":rules",
+        "//java/bazel/rules:for_bazel_tests",
         "//java/common:for_bazel_tests",
         "//java/private:for_bazel_tests",
     ],
