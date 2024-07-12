@@ -178,8 +178,7 @@ def _local_java_repository_impl(repository_ctx):
 
     java_home = _determine_java_home(repository_ctx)
 
-    # When Bzlmod is enabled, the Java runtime name should be the last segment of the repository name.
-    local_java_runtime_name = repository_ctx.name.split("~")[-1]
+    local_java_runtime_name = repository_ctx.attr.runtime_name
 
     repository_ctx.file(
         "WORKSPACE",
@@ -293,6 +292,7 @@ _local_java_repository_rule = repository_rule(
     configure = True,
     environ = ["JAVA_HOME"],
     attrs = {
+        "runtime_name": attr.string(),
         "build_file": attr.label(),
         "build_file_content": attr.string(),
         "java_home": attr.string(),
@@ -332,4 +332,4 @@ def local_java_repository(name, java_home = "", version = "", build_file = None,
       version: optionally java version
       **kwargs: additional arguments for repository rule
     """
-    _local_java_repository_rule(name = name, java_home = java_home, version = version, build_file = build_file, build_file_content = build_file_content, **kwargs)
+    _local_java_repository_rule(name = name, runtime_name = name, java_home = java_home, version = version, build_file = build_file, build_file_content = build_file_content, **kwargs)
