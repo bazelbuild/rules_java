@@ -38,7 +38,7 @@ bzl_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//java/bazel/rules",
+        "//java/bazel/rules",  # copybara-use-repo-external-label
         "//java/common",
         "//java/private",
     ],
@@ -65,7 +65,7 @@ filegroup(
         ":core_rules",
         ":java_single_jar",
         ":rules",
-        "//java/bazel/rules:for_bazel_tests",
+        "//java/bazel/rules:for_bazel_tests",  # copybara-use-repo-external-label
         "//java/common:for_bazel_tests",
         "//java/private:for_bazel_tests",
     ],

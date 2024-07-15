@@ -1,5 +1,5 @@
-load("@rules_java//java:java_binary.bzl", "java_binary")
-load("@rules_java//java:java_library.bzl", "java_library")
+load("@rules_java//java:java_binary.bzl", "java_binary")  # copybara-use-repo-external-label
+load("@rules_java//java:java_library.bzl", "java_library")  # copybara-use-repo-external-label
 
 java_library(
     name = "lib",
