@@ -68,6 +68,7 @@ filegroup(
         "//java/bazel/rules:for_bazel_tests",  # copybara-use-repo-external-label
         "//java/common:for_bazel_tests",
         "//java/private:for_bazel_tests",
+        "//java/toolchains:for_bazel_tests",
     ],
     visibility = ["//visibility:public"],
 )
