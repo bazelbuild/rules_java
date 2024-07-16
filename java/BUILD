@@ -7,6 +7,7 @@ licenses(["notice"])
 filegroup(
     name = "srcs",
     srcs = glob(["**"]) + [
+        "//java/bazel/rules:srcs",
         "//java/common:srcs",
         "//java/private:srcs",
         "//java/proto:srcs",
