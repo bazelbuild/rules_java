@@ -28,9 +28,12 @@ tasks:
     name: "Integration Tests"
     platform: ubuntu2004
     working_directory: "test/repo"
+    shell_commands:
+      - sh setup.sh
     build_targets:
       - "//..."
       - "//:bin_deploy.jar"
+      - "@rules_java//java/..."
   macos:
     build_targets: *build_targets
   windows:
