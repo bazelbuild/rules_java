@@ -13,9 +13,13 @@
 # limitations under the License.
 """Support for Java compilation of protocol buffer generated code."""
 
-_legacy_api = _legacy_api_DO_NOT_USE_OR_ELSE()
+load("//java/private:native.bzl", "native_java_common")
 
-visibility(["//third_party/protobuf/..."])
+# Partial support, because internal symbols are not available in older Bazel version
+# TODO: Once Java rules are moved into the rules_java, this should become a full support.
 
-compile = _legacy_api.java_compile_for_protos
-merge = _legacy_api.java_info_merge_for_protos
+def compile(*, injecting_rule_kind, enable_jspecify, include_compilation_info, **kwargs):  # buildifier: disable=unused-variable
+    return native_java_common.compile(**kwargs)
+
+def merge(providers, *, merge_java_outputs = True, merge_source_jars = True):  # buildifier: disable=unused-variable
+    return native_java_common.merge(providers)
