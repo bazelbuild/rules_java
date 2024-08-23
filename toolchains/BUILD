@@ -161,6 +161,11 @@ cc_library(
             visibility = ["//visibility:private"],
         ),
         alias(
+            name = "prebuilt_one_version_%s" % OS,
+            actual = "@remote_java_tools_%s//:prebuilt_one_version" % OS,
+            visibility = ["//visibility:private"],
+        ),
+        alias(
             name = "turbine_direct_graal_%s" % OS,
             actual = "@remote_java_tools_%s//:turbine_direct_graal" % OS,
         ),
@@ -222,6 +227,32 @@ alias(
         "@bazel_tools//src/conditions:darwin_x86_64": ":prebuilt_singlejar_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
         "@bazel_tools//src/conditions:windows": ":prebuilt_singlejar_windows",
+    }),
+)
+
+alias(
+    name = "one_version",
+    actual = ":one_version_prebuilt_or_cc_binary",
+)
+
+alias(
+    name = "one_version_prebuilt_or_cc_binary",
+    actual = select({
+        "@bazel_tools//src/conditions:darwin_arm64": ":prebuilt_one_version_darwin_arm64",
+        "@bazel_tools//src/conditions:darwin_x86_64": ":prebuilt_one_version_darwin_x86_64",
+        "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_one_version_linux",
+        "@bazel_tools//src/conditions:windows": ":prebuilt_one_version_windows",
+        "//conditions:default": "@remote_java_tools//:one_version_cc_bin",
+    }),
+)
+
+alias(
+    name = "prebuilt_one_version",
+    actual = select({
+        "@bazel_tools//src/conditions:darwin_arm64": ":prebuilt_one_version_darwin_arm64",
+        "@bazel_tools//src/conditions:darwin_x86_64": ":prebuilt_one_version_darwin_x86_64",
+        "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_one_version_linux",
+        "@bazel_tools//src/conditions:windows": ":prebuilt_one_version_windows",
     }),
 )
 
