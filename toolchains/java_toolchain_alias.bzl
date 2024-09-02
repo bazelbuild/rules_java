@@ -85,6 +85,9 @@ java_runtime_version_alias = rule(
     toolchains = ["@bazel_tools//tools/jdk:runtime_toolchain_type"],
     attrs = {
         "runtime_version": attr.string(mandatory = True),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
     },
     cfg = _java_runtime_transition,
 )
