@@ -72,17 +72,17 @@ tasks:
       - "--config=bzlmod"
     build_targets: *build_targets_bzlmod
   ubuntu2004_bazel630:
-    name: "Bazel@HEAD"
+    name: "Bazel 6.3.0"
     bazel: 6.3.0
     platform: ubuntu2004
     build_targets: *build_targets
   macos_bazel630:
-    name: "Bazel@HEAD"
+    name: "Bazel 6.3.0"
     bazel: 6.3.0
     platform: macos
     build_targets: *build_targets
   windows_bazel630:
-    name: "Bazel@HEAD"
+    name: "Bazel 6.3.0"
     bazel: 6.3.0
     platform: windows
     build_targets: *build_targets
