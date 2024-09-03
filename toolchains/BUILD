@@ -66,8 +66,8 @@ filegroup(
 #
 # Toolchains of this type are only consumed internally by the bootclasspath rule and should not be
 # accessed from Starlark.
-# TODO: migrate away from using @bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type ?
-# toolchain_type(name = "bootstrap_runtime_toolchain_type")
+
+toolchain_type(name = "bootstrap_runtime_toolchain_type")
 
 # Points to toolchain[":runtime_toolchain_type"] (was :legacy_current_java_runtime)
 java_runtime_alias(name = "current_java_runtime")
@@ -290,18 +290,6 @@ default_java_toolchain(
 java_runtime_version_alias(
     name = "remote_jdk11",
     runtime_version = "remotejdk_11",
-    visibility = ["//visibility:public"],
-)
-
-java_runtime_version_alias(
-    name = "remotejdk_15",
-    runtime_version = "remotejdk_15",
-    visibility = ["//visibility:public"],
-)
-
-java_runtime_version_alias(
-    name = "remotejdk_16",
-    runtime_version = "remotejdk_16",
     visibility = ["//visibility:public"],
 )
 
