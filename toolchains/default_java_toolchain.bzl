@@ -94,6 +94,7 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
         "dagger.hilt.processor.internal.root.RootProcessor",  # see b/21307381
     ],
     java_runtime = Label("//toolchains:remotejdk_21"),
+    oneversion = Label("//toolchains:one_version"),
 )
 
 DEFAULT_TOOLCHAIN_CONFIGURATION = _BASE_TOOLCHAIN_CONFIGURATION
@@ -125,6 +126,7 @@ VANILLA_TOOLCHAIN_CONFIGURATION = dict(
 PREBUILT_TOOLCHAIN_CONFIGURATION = dict(
     ijar = [Label("//toolchains:ijar_prebuilt_binary")],
     singlejar = [Label("//toolchains:prebuilt_singlejar")],
+    oneversion = Label("//toolchains:prebuilt_one_version"),
 )
 
 # The new toolchain is using all the tools from sources.
@@ -132,6 +134,7 @@ NONPREBUILT_TOOLCHAIN_CONFIGURATION = dict(
     ijar = [Label("@remote_java_tools//:ijar_cc_binary")],
     singlejar = [Label("@remote_java_tools//:singlejar_cc_bin")],
     header_compiler_direct = [Label("@remote_java_tools//:TurbineDirect")],
+    oneversion = Label("@remote_java_tools//:one_version_cc_bin"),
 )
 
 # If this is changed, the docs for "{,tool_}java_language_version" also
