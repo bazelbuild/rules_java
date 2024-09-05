@@ -9,7 +9,6 @@ filegroup(
     srcs = glob(["**"]) + [
         "//java/common:srcs",
         "//java/private:srcs",
-        "//java/proto:srcs",
         "//java/toolchains:srcs",
     ],
     visibility = ["//:__pkg__"],
@@ -33,7 +32,6 @@ bzl_library(
         "java_import.bzl",
         "java_library.bzl",
         "java_plugin.bzl",
-        "java_single_jar.bzl",
         "java_test.bzl",
     ],
     visibility = ["//visibility:public"],
