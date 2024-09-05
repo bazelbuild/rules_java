@@ -1,5 +1,5 @@
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
-load("@rules_pkg//releasing:defs.bzl", "print_rel_notes")
+load("@rules_pkg//pkg/releasing:defs.bzl", "print_rel_notes")
 load("//java:defs.bzl", "version")
 
 package(
