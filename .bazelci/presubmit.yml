@@ -23,33 +23,13 @@ tasks:
     build_targets: *build_targets
   windows:
     build_targets: *build_targets
-  ubuntu2004_head:
-    bazel: last_green
-    platform: ubuntu2004
+  ubuntu2004_650:
+    bazel: 6.5.0
     build_targets: *build_targets
-  macos_head:
-    bazel: last_green
-    platform: macos
+  macos_650:
+    bazel: 6.5.0
     build_targets: *build_targets
-  windows_head:
-    bazel: last_green
-    platform: windows
+  windows_650:
+    bazel: 6.5.0
     build_targets: *build_targets
-  ubuntu2004_bzlmod:
-    bazel: last_green
-    platform: ubuntu2004
-    build_flags:
-      - "--config=bzlmod"
-    build_targets: *build_targets_bzlmod
-  macos_bzlmod:
-    bazel: last_green
-    platform: macos
-    build_flags:
-      - "--config=bzlmod"
-    build_targets: *build_targets_bzlmod
-  windows_bzlmod:
-    bazel: last_green
-    platform: windows
-    build_flags:
-      - "--config=bzlmod"
-    build_targets: *build_targets_bzlmod
+
