@@ -13,6 +13,7 @@
 # limitations under the License.
 """Bazel java_binary rule"""
 
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "use_cc_toolchain")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
@@ -24,7 +25,6 @@ load("//java/common/rules:java_binary.bzl", "BASE_TEST_ATTRIBUTES", "BASIC_JAVA_
 load("//java/common/rules:java_binary_deploy_jar.bzl", "create_deploy_archives")
 load("//java/common/rules:java_helper.bzl", "helper")
 load("//java/common/rules:rule_util.bzl", "merge_attrs")
-load("//third_party/bazel_skylib/lib:paths.bzl", "paths")
 
 visibility("private")
 

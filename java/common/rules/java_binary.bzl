@@ -14,13 +14,13 @@
 
 """ Implementation of java_binary for bazel """
 
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/common:java_semantics.bzl", "PLATFORMS_ROOT", "semantics")
-load("//third_party/bazel_skylib/lib:paths.bzl", "paths")
 load("//third_party/protobuf/bazel/common:proto_info.bzl", "ProtoInfo")
 load(":basic_java_library.bzl", "BASIC_JAVA_LIBRARY_IMPLICIT_ATTRS", "basic_java_library", "collect_deps")
 load(":java_binary_deploy_jar.bzl", "create_deploy_archive")

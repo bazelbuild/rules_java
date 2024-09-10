@@ -16,9 +16,9 @@
 Definition of java_runtime rule and JavaRuntimeInfo provider.
 """
 
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common:java_semantics.bzl", "PLATFORMS_ROOT")
-load("//third_party/bazel_skylib/lib:paths.bzl", "paths")
 load(":java_helper.bzl", "helper")
 
 visibility(["//java/..."])
