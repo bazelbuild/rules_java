@@ -15,7 +15,7 @@
 """Implementation for the java_package_configuration rule"""
 
 load("//java/common:java_common.bzl", "java_common")
-load(":java_helper.bzl", "helper")
+load("//java/common/rules/impl:java_helper.bzl", "helper")
 
 visibility(["//java/..."])
 

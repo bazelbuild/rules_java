@@ -21,20 +21,27 @@ load(
     "//java/common/rules:android_lint.bzl",
     "android_lint_subrule",
 )
-load("//java/common/rules:java_binary.bzl", "BASE_TEST_ATTRIBUTES", "BASIC_JAVA_BINARY_ATTRIBUTES", "basic_java_binary")
-load("//java/common/rules:java_binary_deploy_jar.bzl", "create_deploy_archives")
-load("//java/common/rules:java_helper.bzl", "helper")
+load("//java/common/rules:java_binary.bzl", "BASIC_JAVA_BINARY_ATTRIBUTES")
 load("//java/common/rules:rule_util.bzl", "merge_attrs")
+load("//java/common/rules/impl:java_binary_deploy_jar.bzl", "create_deploy_archives")
+load("//java/common/rules/impl:java_binary_impl.bzl", "basic_java_binary")
+load("//java/common/rules/impl:java_helper.bzl", "helper")
 
 visibility("private")
 
 def _bazel_java_binary_impl(ctx):
-    return _bazel_base_binary_impl(ctx, is_test_rule_class = False) + helper.executable_providers(ctx)
+    return bazel_base_binary_impl(ctx, is_test_rule_class = False) + helper.executable_providers(ctx)
 
-def _bazel_java_test_impl(ctx):
-    return _bazel_base_binary_impl(ctx, is_test_rule_class = True) + helper.test_providers(ctx)
+def bazel_base_binary_impl(ctx, is_test_rule_class):
+    """Common implementation for binaries and tests
 
-def _bazel_base_binary_impl(ctx, is_test_rule_class):
+    Args:
+        ctx: (RuleContext)
+        is_test_rule_class: (bool)
+
+    Returns:
+        [Provider]
+    """
     deps = _collect_all_targets_as_deps(ctx, classpath_type = "compile_only")
     runtime_deps = _collect_all_targets_as_deps(ctx)
 
@@ -288,7 +295,7 @@ def _short_path(file):
 def _compute_test_support(use_testrunner):
     return Label(semantics.JAVA_TEST_RUNNER_LABEL) if use_testrunner else None
 
-def _make_binary_rule(implementation, *, doc, attrs, executable = False, test = False, initializer = None):
+def make_binary_rule(implementation, *, doc, attrs, executable = False, test = False, initializer = None):
     return rule(
         implementation = implementation,
         initializer = initializer,
@@ -315,7 +322,7 @@ def _make_binary_rule(implementation, *, doc, attrs, executable = False, test = 
         subrules = [android_lint_subrule],
     )
 
-_BASE_BINARY_ATTRS = merge_attrs(
+BASE_BINARY_ATTRS = merge_attrs(
     BASIC_JAVA_BINARY_ATTRIBUTES,
     {
         "resource_strip_prefix": attr.string(
@@ -345,7 +352,7 @@ logic as the Java package of source files. For example, a source file at
 )
 
 def make_java_binary(executable):
-    return _make_binary_rule(
+    return make_binary_rule(
         _bazel_java_binary_impl,
         doc = """
 <p>
@@ -439,7 +446,7 @@ java_binary(
 </pre>
         """,
         attrs = merge_attrs(
-            _BASE_BINARY_ATTRS,
+            BASE_BINARY_ATTRS,
             ({} if executable else {
                 "args": attr.string_list(),
                 "output_licenses": attr.string_list(),
@@ -449,128 +456,3 @@ java_binary(
     )
 
 java_binary = make_java_binary(executable = True)
-
-def _java_test_initializer(**kwargs):
-    if "stamp" in kwargs and type(kwargs["stamp"]) == type(True):
-        kwargs["stamp"] = 1 if kwargs["stamp"] else 0
-    if "use_launcher" in kwargs and not kwargs["use_launcher"]:
-        kwargs["launcher"] = None
-    else:
-        # If launcher is not set or None, set it to config flag
-        if "launcher" not in kwargs or not kwargs["launcher"]:
-            kwargs["launcher"] = semantics.LAUNCHER_FLAG_LABEL
-    return kwargs
-
-java_test = _make_binary_rule(
-    _bazel_java_test_impl,
-    doc = """
-<p>
-A <code>java_test()</code> rule compiles a Java test. A test is a binary wrapper around your
-test code. The test runner's main method is invoked instead of the main class being compiled.
-</p>
-
-<h4 id="java_test_implicit_outputs">Implicit output targets</h4>
-<ul>
-  <li><code><var>name</var>.jar</code>: A Java archive.</li>
-  <li><code><var>name</var>_deploy.jar</code>: A Java archive suitable
-    for deployment. (Only built if explicitly requested.) See the description of the
-    <code><var>name</var>_deploy.jar</code> output from
-    <a href="#java_binary">java_binary</a> for more details.</li>
-</ul>
-
-<p>
-See the section on <code>java_binary()</code> arguments. This rule also
-supports all <a href="${link common-definitions#common-attributes-tests}">attributes common
-to all test rules (*_test)</a>.
-</p>
-
-<h4 id="java_test_examples">Examples</h4>
-
-<pre class="code">
-<code class="lang-starlark">
-
-java_library(
-    name = "tests",
-    srcs = glob(["*.java"]),
-    deps = [
-        "//java/com/foo/base:testResources",
-        "//java/com/foo/testing/util",
-    ],
-)
-
-java_test(
-    name = "AllTests",
-    size = "small",
-    runtime_deps = [
-        ":tests",
-        "//util/mysql",
-    ],
-)
-</code>
-</pre>
-    """,
-    attrs = merge_attrs(
-        BASE_TEST_ATTRIBUTES,
-        _BASE_BINARY_ATTRS,
-        {
-            "_lcov_merger": attr.label(
-                cfg = "exec",
-                default = configuration_field(
-                    fragment = "coverage",
-                    name = "output_generator",
-                ),
-            ),
-            "_collect_cc_coverage": attr.label(
-                cfg = "exec",
-                allow_single_file = True,
-                default = "@bazel_tools//tools/test:collect_cc_coverage",
-            ),
-        },
-        override_attrs = {
-            "use_testrunner": attr.bool(
-                default = True,
-                doc = semantics.DOCS.for_attribute("use_testrunner") + """
-<br/>
-You can use this to override the default
-behavior, which is to use test runner for
-<code>java_test</code> rules,
-and not use it for <code>java_binary</code> rules.  It is unlikely
-you will want to do this.  One use is for <code>AllTest</code>
-rules that are invoked by another rule (to set up a database
-before running the tests, for example).  The <code>AllTest</code>
-rule must be declared as a <code>java_binary</code>, but should
-still use the test runner as its main entry point.
-
-The name of a test runner class can be overridden with <code>main_class</code> attribute.
-                """,
-            ),
-            "stamp": attr.int(
-                default = 0,
-                values = [-1, 0, 1],
-                doc = """
-Whether to encode build information into the binary. Possible values:
-<ul>
-<li>
-  <code>stamp = 1</code>: Always stamp the build information into the binary, even in
-  <a href="${link user-manual#flag--stamp}"><code>--nostamp</code></a> builds. <b>This
-  setting should be avoided</b>, since it potentially kills remote caching for the
-  binary and any downstream actions that depend on it.
-</li>
-<li>
-  <code>stamp = 0</code>: Always replace build information by constant values. This
-  gives good build result caching.
-</li>
-<li>
-  <code>stamp = -1</code>: Embedding of build information is controlled by the
-  <a href="${link user-manual#flag--stamp}"><code>--[no]stamp</code></a> flag.
-</li>
-</ul>
-<p>Stamped binaries are <em>not</em> rebuilt unless their dependencies change.</p>
-                """,
-            ),
-        },
-        remove_attrs = ["deploy_env"],
-    ),
-    test = True,
-    initializer = _java_test_initializer,
-)

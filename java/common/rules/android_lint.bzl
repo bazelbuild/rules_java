@@ -14,13 +14,17 @@
 
 """Creates the android lint action for java rules"""
 
-load("//java/common:java_semantics.bzl", "semantics")
-load("//java/common/rules:java_helper.bzl", "helper")
+load(
+    "//java/common:java_semantics.bzl",
+    "semantics",
+    _semantics_tokenize_javacopts = "tokenize_javacopts",
+)
 
 visibility(["//java/..."])
 
 def _tokenize_opts(opts_depset):
-    return helper.tokenize_javacopts(ctx = None, opts = opts_depset)
+    opts = reversed(opts_depset.to_list())
+    return _semantics_tokenize_javacopts(opts)
 
 def _android_lint_action(ctx, source_files, source_jars, compilation_info):
     """

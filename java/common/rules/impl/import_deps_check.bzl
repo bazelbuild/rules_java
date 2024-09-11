@@ -16,7 +16,7 @@
 
 load("//java/common:java_semantics.bzl", "semantics")
 
-visibility("private")
+visibility(["//java/common/rules/..."])
 
 def import_deps_check(
         ctx,

@@ -18,11 +18,7 @@ load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_helper.bzl", "cc_helper")
-load(
-    "//java/common:java_semantics.bzl",
-    "semantics",
-    _semantics_tokenize_javacopts = "tokenize_javacopts",
-)
+load("//java/common:java_semantics.bzl", "semantics")
 
 visibility(["//java/..."])
 
@@ -397,34 +393,6 @@ def _shell_escape(s):
             return "'" + s.replace("'", "'\\''") + "'"
     return s
 
-def _tokenize_javacopts(ctx = None, opts = []):
-    """Tokenizes a list or depset of options to a list.
-
-    Iff opts is a depset, we reverse the flattened list to ensure right-most
-    duplicates are preserved in their correct position.
-
-    If the ctx parameter is omitted, a slow, but pure Starlark, implementation
-    of shell tokenization is used. Otherwise, tokenization is performed using
-    ctx.tokenize() which has significantly better performance (up to 100x for
-    large options lists).
-
-    Args:
-        ctx: (RuleContext|None) the rule context
-        opts: (depset[str]|[str]) the javac options to tokenize
-    Returns:
-        [str] list of tokenized options
-    """
-    if hasattr(opts, "to_list"):
-        opts = reversed(opts.to_list())
-    if ctx:
-        return [
-            token
-            for opt in opts
-            for token in ctx.tokenize(opt)
-        ]
-    else:
-        return _semantics_tokenize_javacopts(opts)
-
 def _detokenize_javacopts(opts):
     """Detokenizes a list of options to a depset.
 
@@ -500,7 +468,6 @@ helper = struct(
     executable_providers = _executable_providers,
     create_single_jar = _create_single_jar,
     shell_escape = _shell_escape,
-    tokenize_javacopts = _tokenize_javacopts,
     detokenize_javacopts = _detokenize_javacopts,
     derive_output_file = _derive_output_file,
     is_stamping_enabled = _is_stamping_enabled,
