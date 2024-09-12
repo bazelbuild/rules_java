@@ -53,3 +53,9 @@ done <<< '{configs}' >> $@
     ],
     visibility = ["//visibility:private"],
 )
+
+filegroup(
+    name = "for_bazel_tests",
+    testonly = 1,
+    visibility = ["//java:__pkg__"],
+)

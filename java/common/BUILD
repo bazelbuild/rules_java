@@ -25,6 +25,7 @@ filegroup(
     srcs = [
         "BUILD",
         ":common",
+        "//java/common/rules:for_bazel_tests",
     ],
     visibility = ["//java:__pkg__"],
 )
