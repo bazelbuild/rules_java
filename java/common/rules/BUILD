@@ -34,7 +34,7 @@ bzl_library(
         "java_toolchain.bzl",
     ],
     visibility = [
-        "//java:__pkg__",
+        "//java:__subpackages__",
     ],
     deps = [
         ":android_lint_bzl",
