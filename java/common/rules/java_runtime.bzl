@@ -60,7 +60,7 @@ def _default_java_home(label):
     if _is_main_repo(label):
         return label.package
     else:
-        return paths.get_relative(label.workspace_root, label.package)
+        return helper.get_relative(label.workspace_root, label.package)
 
 def _get_bin_java(ctx):
     is_windows = helper.is_target_platform_windows(ctx)
@@ -68,10 +68,10 @@ def _get_bin_java(ctx):
 
 def _get_runfiles_java_executable(ctx, java_home, label):
     if paths.is_absolute(java_home) or _is_main_repo(label):
-        return paths.get_relative(java_home, _get_bin_java(ctx))
+        return helper.get_relative(java_home, _get_bin_java(ctx))
     else:
-        repo_runfiles_path = "" if _is_main_repo(label) else paths.get_relative("..", label.workspace_name)
-        return paths.get_relative(repo_runfiles_path, _get_bin_java(ctx))
+        repo_runfiles_path = "" if _is_main_repo(label) else helper.get_relative("..", label.workspace_name)
+        return helper.get_relative(repo_runfiles_path, _get_bin_java(ctx))
 
 def _is_java_binary(path):
     return path.endswith("bin/java") or path.endswith("bin/java.exe")
@@ -94,9 +94,9 @@ def _java_runtime_rule_impl(ctx):
         java_home_attr = ctx.expand_make_variables("java_home", ctx.attr.java_home, {})
         if ctx.files.srcs and paths.is_absolute(java_home_attr):
             fail("'java_home' with an absolute path requires 'srcs' to be empty.")
-        java_home = paths.get_relative(java_home, java_home_attr)
+        java_home = helper.get_relative(java_home, java_home_attr)
 
-    java_binary_exec_path = paths.get_relative(java_home, _get_bin_java(ctx))
+    java_binary_exec_path = helper.get_relative(java_home, _get_bin_java(ctx))
     java_binary_runfiles_path = _get_runfiles_java_executable(ctx, java_home, ctx.label)
 
     java = ctx.file.java
