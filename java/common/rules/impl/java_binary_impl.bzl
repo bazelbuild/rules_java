@@ -16,11 +16,11 @@
 
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
+load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules/impl:basic_java_library_impl.bzl", "basic_java_library", "collect_deps")
-load("//third_party/protobuf/bazel/common:proto_info.bzl", "ProtoInfo")
 load(":java_binary_deploy_jar.bzl", "create_deploy_archive")
 load(":java_helper.bzl", "helper")
 

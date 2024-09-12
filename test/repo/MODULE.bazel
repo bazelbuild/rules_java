@@ -5,3 +5,42 @@ archive_override(
     module_name = "rules_java",
     urls = ["file:///tmp/rules_java-HEAD.tar.gz"],
 )
+
+java_toolchains = use_extension("@rules_java//java:extensions.bzl", "toolchains")
+use_repo(
+    java_toolchains,
+    "local_jdk",
+    "remote_java_tools",
+    "remote_java_tools_darwin_arm64",
+    "remote_java_tools_darwin_x86_64",
+    "remote_java_tools_linux",
+    "remote_java_tools_windows",
+    "remotejdk11_linux",
+    "remotejdk11_linux_aarch64",
+    "remotejdk11_linux_ppc64le",
+    "remotejdk11_linux_s390x",
+    "remotejdk11_macos",
+    "remotejdk11_macos_aarch64",
+    "remotejdk11_win",
+    "remotejdk11_win_arm64",
+    "remotejdk17_linux",
+    "remotejdk17_linux_s390x",
+    "remotejdk17_macos",
+    "remotejdk17_macos_aarch64",
+    "remotejdk17_win",
+    "remotejdk17_win_arm64",
+    "remotejdk21_linux",
+    "remotejdk21_macos",
+    "remotejdk21_macos_aarch64",
+    "remotejdk21_win",
+)
+
+# TODO: drop this & update version from BCR above
+archive_override(
+    module_name = "rules_cc",
+    integrity = "sha256-ZvxtrlaB2jZk56tUDasvs4b1ThcPMaEa64u+MZSwf1E=",
+    strip_prefix = "rules_cc-0.0.10-rc2",
+    urls = ["https://github.com/bazelbuild/rules_cc/releases/download/0.0.10-rc2/rules_cc-0.0.10-rc2.tar.gz"],
+)
+
+register_toolchains("//:all")

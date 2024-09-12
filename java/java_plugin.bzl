@@ -13,6 +13,8 @@
 # limitations under the License.
 """java_plugin rule"""
 
+load("//java/bazel/rules:bazel_java_plugin.bzl", _java_plugin = "java_plugin")
+
 def java_plugin(**attrs):
     """Bazel java_plugin rule.
 
@@ -22,5 +24,4 @@ def java_plugin(**attrs):
       **attrs: Rule attributes
     """
 
-    # buildifier: disable=native-java
-    native.java_plugin(**attrs)
+    _java_plugin(**attrs)

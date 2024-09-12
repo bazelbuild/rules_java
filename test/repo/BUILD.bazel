@@ -1,5 +1,5 @@
-load("@rules_java//java:java_binary.bzl", "java_binary")  # copybara-use-repo-external-label
-load("@rules_java//java:java_library.bzl", "java_library")  # copybara-use-repo-external-label
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")  # copybara-use-repo-external-label
+load("@rules_java//toolchains:default_java_toolchain.bzl", "default_java_toolchain")  # copybara-use-repo-external-label
 
 java_library(
     name = "lib",
@@ -10,4 +10,8 @@ java_binary(
     name = "bin",
     main_class = "Main",
     runtime_deps = [":lib"],
+)
+
+default_java_toolchain(
+    name = "my_funky_toolchain",
 )

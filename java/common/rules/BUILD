@@ -39,10 +39,9 @@ bzl_library(
     deps = [
         ":android_lint_bzl",
         ":rule_util_bzl",
-        # TODO: re-enable after rules_cc release
-        #        "@rules_cc//cc/common",
         "//java/common",
         "@bazel_skylib//lib:paths",
+        "@rules_cc//cc/common",
     ],
 )
 
@@ -52,6 +51,7 @@ filegroup(
     srcs = [
         "BUILD",
         ":core_rules",
+        "//java/common/rules/impl:for_bazel_tests",
     ],
     visibility = ["//java/common:__pkg__"],
 )
