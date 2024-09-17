@@ -52,6 +52,7 @@ filegroup(
         "BUILD",
         ":core_rules",
         "//java/common/rules/impl:for_bazel_tests",
+        "@rules_cc//cc/private/rules_impl:srcs",
     ],
     visibility = ["//java/common:__pkg__"],
 )

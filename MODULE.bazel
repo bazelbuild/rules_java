@@ -6,7 +6,7 @@ module(
 )
 
 bazel_dep(name = "platforms", version = "0.0.4")
-bazel_dep(name = "rules_cc", version = "0.0.2")
+bazel_dep(name = "rules_cc", version = "0.0.10")
 bazel_dep(name = "bazel_features", version = "1.11.0")
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
 
@@ -96,12 +96,4 @@ bazel_dep(name = "rules_pkg", version = "0.9.1", dev_dependency = True)
 single_version_override(
     module_name = "rules_python",
     version = "0.24.0",
-)
-
-# TODO: drop this & update version from BCR above
-archive_override(
-    module_name = "rules_cc",
-    integrity = "sha256-ZvxtrlaB2jZk56tUDasvs4b1ThcPMaEa64u+MZSwf1E=",
-    strip_prefix = "rules_cc-0.0.10-rc2",
-    urls = ["https://github.com/bazelbuild/rules_cc/releases/download/0.0.10-rc2/rules_cc-0.0.10-rc2.tar.gz"],
 )

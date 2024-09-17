@@ -35,12 +35,4 @@ use_repo(
     "remotejdk21_win",
 )
 
-# TODO: drop this & update version from BCR above
-archive_override(
-    module_name = "rules_cc",
-    integrity = "sha256-ZvxtrlaB2jZk56tUDasvs4b1ThcPMaEa64u+MZSwf1E=",
-    strip_prefix = "rules_cc-0.0.10-rc2",
-    urls = ["https://github.com/bazelbuild/rules_cc/releases/download/0.0.10-rc2/rules_cc-0.0.10-rc2.tar.gz"],
-)
-
 register_toolchains("//:all")
