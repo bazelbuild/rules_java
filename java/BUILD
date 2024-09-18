@@ -75,6 +75,7 @@ filegroup(
         "//java/common:for_bazel_tests",
         "//java/private:for_bazel_tests",
         "//java/toolchains:for_bazel_tests",
+        "@bazel_skylib//lib:test_deps",
     ],
     visibility = ["//visibility:public"],
 )

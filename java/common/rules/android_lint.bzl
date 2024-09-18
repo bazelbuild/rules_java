@@ -14,11 +14,7 @@
 
 """Creates the android lint action for java rules"""
 
-load(
-    "//java/common:java_semantics.bzl",
-    "semantics",
-    _semantics_tokenize_javacopts = "tokenize_javacopts",
-)
+load("//java/common:java_semantics.bzl", "semantics", _semantics_tokenize_javacopts = "tokenize_javacopts")
 
 visibility(["//java/..."])
 

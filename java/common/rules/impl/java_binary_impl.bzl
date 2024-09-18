@@ -53,7 +53,7 @@ def basic_java_binary(
         launcher_info,
         executable,
         strip_as_default,
-        extension_registry_provider = None,
+        extra_java_info = None,
         is_test_rule_class = False):
     """Creates actions for compiling and linting java sources, coverage support, and sources jar (_deploy-src.jar).
 
@@ -68,7 +68,7 @@ def basic_java_binary(
         launcher_info: (Struct) Structure with fields (launcher, unstripped_launcher, runfiles, runtime_jars, jvm_flags, classpath_resources)
         executable: (File) The executable output of the rule
         strip_as_default: (bool) Whether this target outputs a stripped launcher and deploy jar
-        extension_registry_provider: (GeneratedExtensionRegistryProvider) internal param, do not use
+        extra_java_info: (JavaInfo) additional outputs to merge
         is_test_rule_class: (bool) Whether this rule is a test rule
 
     Returns:
@@ -131,18 +131,12 @@ def basic_java_binary(
             )
         ],
     )
-    if extension_registry_provider:
-        runtime_classpath = depset(order = "preorder", direct = [extension_registry_provider.class_jar], transitive = [runtime_classpath])
-        java_info = java_common.merge(
-            [
-                java_info,
-                JavaInfo(
-                    output_jar = extension_registry_provider.class_jar,
-                    compile_jar = None,
-                    source_jar = extension_registry_provider.src_jar,
-                ),
-            ],
-        )
+    if extra_java_info:
+        runtime_classpath = depset(order = "preorder", transitive = [
+            extra_java_info.transitive_runtime_jars,
+            runtime_classpath,
+        ])
+        java_info = java_common.merge([java_info, extra_java_info])
         compilation_info = JavaCompilationInfo(
             compilation_classpath = compilation_info.compilation_classpath,
             runtime_classpath = runtime_classpath,
@@ -192,13 +186,13 @@ def basic_java_binary(
         _generate_coverage_manifest(ctx, coverage_config.manifest, java_attrs.runtime_classpath)
         files_to_build.append(coverage_config.manifest)
 
-    if extension_registry_provider:
-        files_to_build.append(extension_registry_provider.class_jar)
+    if extra_java_info:
+        files_to_build.extend(extra_java_info.runtime_output_jars)
         output_groups["_direct_source_jars"] = (
-            output_groups["_direct_source_jars"] + [extension_registry_provider.src_jar]
+            output_groups["_direct_source_jars"] + extra_java_info.source_jars
         )
         output_groups["_source_jars"] = depset(
-            direct = [extension_registry_provider.src_jar],
+            direct = extra_java_info.source_jars,
             transitive = [output_groups["_source_jars"]],
         )
 
