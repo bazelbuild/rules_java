@@ -21,15 +21,15 @@ for config in "$@"; do
     IFS=, read -r name url mirror_url hash strip_prefix <<< "${config}"
     echo "fetching $name from $url to ${TMP_FILE}"
     curl --silent -o ${TMP_FILE} -L "$url"
-    actual_hash=`sha256sum ${TMP_FILE} | cut -d' ' -f1`
+    actual_hash=$(sha256sum ${TMP_FILE} | cut -d' ' -f1)
     if [ "${hash}" != "${actual_hash}" ]; then
       echo "ERROR: wrong hash for ${name}! wanted: ${hash}, got: ${actual_hash}"
       exit 1
     fi
     if [[ -z "${url##*.tar.gz}" ]]; then
-      root_dir=`tar ztf ${TMP_FILE} --exclude='*/*'`
+      root_dir=$(tar ztf ${TMP_FILE} --exclude='*/*')
     elif [[ -z "${url##*.zip}" ]]; then
-      root_dir=`unzip -Z1 ${TMP_FILE} | head -n1`
+      root_dir=$(unzip -Z1 ${TMP_FILE} | head -n1)
     else
       echo "ERROR: unexpected archive type for ${name}"
       exit 1
@@ -40,7 +40,7 @@ for config in "$@"; do
     fi
     if [[ -n "${mirror_url}" ]]; then
       echo "checking mirror: ${mirror_url}"
-      curl --silent --fail -I -L ${mirror_url} > /dev/null || { _MISSING_MIRRORS+="${mirror_url}"; }
+      curl --silent --fail -I -L ${mirror_url} > /dev/null || { _MISSING_MIRRORS+=("${mirror_url}"); }
     fi
 done
 
