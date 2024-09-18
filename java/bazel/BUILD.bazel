@@ -13,7 +13,7 @@
 # limitations under the License.
 load(":repositories_util.bzl", "FLAT_CONFIGS")
 
-# run this to generate _REMOTE_JDK_CONFIGS_LIST in repositories.bzl
+# build this to generate _REMOTE_JDK_CONFIGS_LIST in repositories.bzl
 # this downloads all the jdks and computes their sha256 sum, so can take a while
 # TODO(hvd): make this a sh_binary to update the configs in place
 genrule(

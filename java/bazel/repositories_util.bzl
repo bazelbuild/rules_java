@@ -72,23 +72,17 @@ _RELEASE_CONFIGS = {
     },
     "21": {
         "zulu": {
-            "release": "21.34.19-ca-jdk21.0.3",
+            "release": "21.36.17-ca-jdk21.0.4",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
-                "windows": ["x86_64"],
+                "windows": ["arm64", "x86_64"],
             },
         },
         "adoptium": {
-            "release": "21.0.2+13",
+            "release": "21.0.4+7",
             "platforms": {
                 "linux": ["ppc", "s390x"],
-            },
-        },
-        "microsoft": {
-            "release": "21.0.0",
-            "platforms": {
-                "windows": ["arm64"],
             },
         },
     },
