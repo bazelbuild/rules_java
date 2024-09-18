@@ -90,7 +90,6 @@ _RELEASE_CONFIGS = {
 
 _STRIP_PREFIX_OVERRIDES = {
     "remotejdk11_win_arm64": "jdk-11.0.13+8",
-    "remotejdk21_win_arm64": "jdk-21+35",
 }
 
 def _name_for_remote_jdk(version, os, cpu):
