@@ -499,10 +499,10 @@ java_toolchain(<a href="#java_toolchain-name">name</a>, <a href="#java_toolchain
                <a href="#java_toolchain-javac_supports_worker_multiplex_sandboxing">javac_supports_worker_multiplex_sandboxing</a>, <a href="#java_toolchain-javac_supports_workers">javac_supports_workers</a>, <a href="#java_toolchain-javacopts">javacopts</a>,
                <a href="#java_toolchain-jspecify_implicit_deps">jspecify_implicit_deps</a>, <a href="#java_toolchain-jspecify_javacopts">jspecify_javacopts</a>, <a href="#java_toolchain-jspecify_packages">jspecify_packages</a>, <a href="#java_toolchain-jspecify_processor">jspecify_processor</a>,
                <a href="#java_toolchain-jspecify_processor_class">jspecify_processor_class</a>, <a href="#java_toolchain-jspecify_stubs">jspecify_stubs</a>, <a href="#java_toolchain-jvm_opts">jvm_opts</a>, <a href="#java_toolchain-licenses">licenses</a>, <a href="#java_toolchain-misc">misc</a>, <a href="#java_toolchain-oneversion">oneversion</a>,
-               <a href="#java_toolchain-oneversion_allowlist_for_tests">oneversion_allowlist_for_tests</a>, <a href="#java_toolchain-oneversion_whitelist">oneversion_whitelist</a>, <a href="#java_toolchain-package_configuration">package_configuration</a>,
-               <a href="#java_toolchain-proguard_allowlister">proguard_allowlister</a>, <a href="#java_toolchain-reduced_classpath_incompatible_processors">reduced_classpath_incompatible_processors</a>, <a href="#java_toolchain-singlejar">singlejar</a>,
-               <a href="#java_toolchain-source_version">source_version</a>, <a href="#java_toolchain-target_version">target_version</a>, <a href="#java_toolchain-timezone_data">timezone_data</a>, <a href="#java_toolchain-tools">tools</a>, <a href="#java_toolchain-turbine_data">turbine_data</a>, <a href="#java_toolchain-turbine_jvm_opts">turbine_jvm_opts</a>,
-               <a href="#java_toolchain-xlint">xlint</a>)
+               <a href="#java_toolchain-oneversion_allowlist">oneversion_allowlist</a>, <a href="#java_toolchain-oneversion_allowlist_for_tests">oneversion_allowlist_for_tests</a>, <a href="#java_toolchain-oneversion_whitelist">oneversion_whitelist</a>,
+               <a href="#java_toolchain-package_configuration">package_configuration</a>, <a href="#java_toolchain-proguard_allowlister">proguard_allowlister</a>, <a href="#java_toolchain-reduced_classpath_incompatible_processors">reduced_classpath_incompatible_processors</a>,
+               <a href="#java_toolchain-singlejar">singlejar</a>, <a href="#java_toolchain-source_version">source_version</a>, <a href="#java_toolchain-target_version">target_version</a>, <a href="#java_toolchain-timezone_data">timezone_data</a>, <a href="#java_toolchain-tools">tools</a>, <a href="#java_toolchain-turbine_data">turbine_data</a>,
+               <a href="#java_toolchain-turbine_jvm_opts">turbine_jvm_opts</a>, <a href="#java_toolchain-xlint">xlint</a>)
 </pre>
 
 <p>
@@ -571,8 +571,9 @@ java_toolchain(
 | <a id="java_toolchain-licenses"></a>licenses |  -   | List of strings | optional |  `[]`  |
 | <a id="java_toolchain-misc"></a>misc |  Deprecated: use javacopts instead   | List of strings | optional |  `[]`  |
 | <a id="java_toolchain-oneversion"></a>oneversion |  Label of the one-version enforcement binary.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
+| <a id="java_toolchain-oneversion_allowlist"></a>oneversion_allowlist |  Label of the one-version allowlist.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
 | <a id="java_toolchain-oneversion_allowlist_for_tests"></a>oneversion_allowlist_for_tests |  Label of the one-version allowlist for tests.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
-| <a id="java_toolchain-oneversion_whitelist"></a>oneversion_whitelist |  Label of the one-version allowlist.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
+| <a id="java_toolchain-oneversion_whitelist"></a>oneversion_whitelist |  Deprecated: use oneversion_allowlist instead   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
 | <a id="java_toolchain-package_configuration"></a>package_configuration |  Configuration that should be applied to the specified package groups.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
 | <a id="java_toolchain-proguard_allowlister"></a>proguard_allowlister |  Label of the Proguard allowlister.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `"@bazel_tools//tools/jdk:proguard_whitelister"`  |
 | <a id="java_toolchain-reduced_classpath_incompatible_processors"></a>reduced_classpath_incompatible_processors |  Internal API, do not use!   | List of strings | optional |  `[]`  |
