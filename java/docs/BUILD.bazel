@@ -1,0 +1,39 @@
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
+exports_files(
+    ["rules.md"],
+    visibility = ["//test:__pkg__"],
+)
+
+bzl_library(
+    name = "rules_bzl",
+    srcs = ["rules.bzl"],
+    deps = [
+        "//java/bazel/rules",
+        "//java/common/rules:toolchain_rules",
+    ],
+)
+
+stardoc(
+    name = "rule_docs",
+    out = "rules_docs.out",
+    input = "rules.bzl",
+    rule_template = ":rule.vm",
+    symbol_names = [
+        # core rules
+        "java_binary",
+        "java_import",
+        "java_library",
+        "java_plugin",
+        "java_test",
+
+        # toolchain rules
+        "java_package_configuration",
+        "java_runtime",
+        "java_toolchain",
+    ],
+    table_of_contents_template = "@stardoc//stardoc:templates/markdown_tables/table_of_contents.vm",
+    visibility = ["//test:__pkg__"],
+    deps = [":rules_bzl"],
+)

@@ -21,7 +21,7 @@ load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules:java_import.bzl", "JAVA_IMPORT_ATTRS")
 load("//java/common/rules/impl:bazel_java_import_impl.bzl", "bazel_java_import_rule")
 
-visibility(["//java"])
+visibility(["//java", "//java/docs"])
 
 def _proxy(ctx):
     return bazel_java_import_rule(

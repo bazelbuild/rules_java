@@ -1,3 +1,5 @@
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+
 # Copyright 2024 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,6 +44,18 @@ sh_test(
         ])
         for name, config in JAVA_TOOLS_CONFIG["artifacts"].items()
     ],
+)
+
+diff_test(
+    name = "docs_up_to_date_test",
+    failure_message = """
+    Docs are no longer up to date. Regenerate them by running:
+
+    bazel build //java/docs:rule_docs && \
+    cp bazel-bin/java/docs/rules_docs.out java/docs/rules.md
+    """,
+    file1 = "//java/docs:rules.md",
+    file2 = "//java/docs:rule_docs",
 )
 
 validate_configs()
