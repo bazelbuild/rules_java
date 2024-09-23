@@ -31,7 +31,6 @@ bzl_library(
         "java_import.bzl",
         "java_library.bzl",
         "java_plugin.bzl",
-        "java_toolchain.bzl",
     ],
     visibility = [
         "//java:__subpackages__",
@@ -45,12 +44,25 @@ bzl_library(
     ],
 )
 
+bzl_library(
+    name = "toolchain_rules",
+    srcs = [
+        "java_package_configuration.bzl",
+        "java_runtime.bzl",
+        "java_toolchain.bzl",
+    ],
+    visibility = [
+        "//java:__subpackages__",
+    ],
+)
+
 filegroup(
     name = "for_bazel_tests",
     testonly = 1,
     srcs = [
         "BUILD",
         ":core_rules",
+        ":toolchain_rules",
         "//java/common/rules/impl:for_bazel_tests",
         "@rules_cc//cc/private/rules_impl:srcs",
     ],

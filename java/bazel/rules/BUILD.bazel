@@ -22,7 +22,19 @@ filegroup(
 bzl_library(
     name = "rules",
     srcs = glob(["*.bzl"]),
-    visibility = ["//java:__pkg__"],
+    visibility = [
+        "//java:__pkg__",
+        "//java/docs:__pkg__",
+    ],
+    deps = [
+        "//java/common",
+        "//java/common/rules:core_rules",
+        "//java/common/rules/impl",
+        "@bazel_skylib//lib:paths",
+        "@rules_cc//cc:find_cc_toolchain_bzl",
+        "@rules_cc//cc/common",
+        "@rules_proto//proto:defs",
+    ],
 )
 
 filegroup(
