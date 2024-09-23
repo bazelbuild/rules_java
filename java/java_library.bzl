@@ -13,8 +13,6 @@
 # limitations under the License.
 """java_library rule"""
 
-load("//java/bazel/rules:bazel_java_library.bzl", _java_library = "java_library")
-
 def java_library(**attrs):
     """Bazel java_library rule.
 
@@ -24,4 +22,5 @@ def java_library(**attrs):
       **attrs: Rule attributes
     """
 
-    _java_library(**attrs)
+    # buildifier: disable=native-java
+    native.java_library(**attrs)

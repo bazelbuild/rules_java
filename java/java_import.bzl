@@ -13,8 +13,6 @@
 # limitations under the License.
 """java_import rule"""
 
-load("//java/bazel/rules:bazel_java_import.bzl", _java_import = "java_import")
-
 def java_import(**attrs):
     """Bazel java_import rule.
 
@@ -24,4 +22,5 @@ def java_import(**attrs):
       **attrs: Rule attributes
     """
 
-    _java_import(**attrs)
+    # buildifier: disable=native-java
+    native.java_import(**attrs)

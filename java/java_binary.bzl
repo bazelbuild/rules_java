@@ -13,8 +13,6 @@
 # limitations under the License.
 """java_binary rule"""
 
-load("//java/bazel/rules:bazel_java_binary_wrapper.bzl", _java_binary = "java_binary")
-
 def java_binary(**attrs):
     """Bazel java_binary rule.
 
@@ -24,4 +22,5 @@ def java_binary(**attrs):
       **attrs: Rule attributes
     """
 
-    _java_binary(**attrs)
+    # buildifier: disable=native-java
+    native.java_binary(**attrs)

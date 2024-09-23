@@ -13,8 +13,6 @@
 # limitations under the License.
 """java_test rule"""
 
-load("//java/bazel/rules:bazel_java_test.bzl", _java_test = "java_test")
-
 def java_test(**attrs):
     """Bazel java_test rule.
 
@@ -24,4 +22,5 @@ def java_test(**attrs):
       **attrs: Rule attributes
     """
 
-    _java_test(**attrs)
+    # buildifier: disable=native-java
+    native.java_test(**attrs)
