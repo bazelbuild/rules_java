@@ -55,7 +55,7 @@ diff_test(
     cp bazel-bin/java/docs/rules_docs.out java/docs/rules.md
     """,
     file1 = "//java/docs:rules.md",
-    file2 = "//java/docs:rule_docs",
+    file2 = "//java/docs:rules_docs",
 )
 
 validate_configs()

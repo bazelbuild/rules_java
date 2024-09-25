@@ -14,11 +14,8 @@
 
 """Defines a java_binary rule class that is non-executable.
 
-There are three physical rule classes for java_binary and we want all of them
+There are two physical rule classes for java_binary and we want both of them
 to have a name string of "java_binary" because various tooling expects that.
-But we also need the rule classes to be defined in separate files. That way the
-hash of their bzl environments will be different. See http://b/226379109,
-specifically #20, for details.
 """
 
 load(":bazel_java_binary.bzl", "make_java_binary")

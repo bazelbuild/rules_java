@@ -16,7 +16,7 @@ bzl_library(
 )
 
 stardoc(
-    name = "rule_docs",
+    name = "rules_docs",
     out = "rules_docs.out",
     input = "rules.bzl",
     rule_template = ":rule.vm",

@@ -54,7 +54,7 @@ test code. The test runner's main method is invoked instead of the main class be
 
 <p>
 See the section on <code>java_binary()</code> arguments. This rule also
-supports all <a href="${link common-definitions#common-attributes-tests}">attributes common
+supports all <a href="https://bazel.build/reference/be/common-definitions#common-attributes-tests">attributes common
 to all test rules (*_test)</a>.
 </p>
 
@@ -126,7 +126,7 @@ Whether to encode build information into the binary. Possible values:
 <ul>
 <li>
   <code>stamp = 1</code>: Always stamp the build information into the binary, even in
-  <a href="${link user-manual#flag--stamp}"><code>--nostamp</code></a> builds. <b>This
+  <a href="https://bazel.build/docs/user-manual#stamp"><code>--nostamp</code></a> builds. <b>This
   setting should be avoided</b>, since it potentially kills remote caching for the
   binary and any downstream actions that depend on it.
 </li>
@@ -136,7 +136,7 @@ Whether to encode build information into the binary. Possible values:
 </li>
 <li>
   <code>stamp = -1</code>: Embedding of build information is controlled by the
-  <a href="${link user-manual#flag--stamp}"><code>--[no]stamp</code></a> flag.
+  <a href="https://bazel.build/docs/user-manual#stamp"><code>--[no]stamp</code></a> flag.
 </li>
 </ul>
 <p>Stamped binaries are <em>not</em> rebuilt unless their dependencies change.</p>

@@ -42,7 +42,7 @@ java_import = rule(
     doc = """
 <p>
   This rule allows the use of precompiled <code>.jar</code> files as
-  libraries for <code><a href="${link java_library}">java_library</a></code> and
+  libraries for <code><a href="#java_library">java_library</a></code> and
   <code>java_binary</code> rules.
 </p>
 
