@@ -26,23 +26,28 @@ JAVA_TOOLS_CONFIG = {
     "release": "false",
     "artifacts": {
         "java_tools_linux": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v13.9/java_tools_linux-v13.9-rc1.zip",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.9/java_tools_linux-v13.9.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.9/java_tools_linux-v13.9.zip",
             "sha": "7a3d7b1cd080efdf49ab2a3818177799416734acf2bd23040aa9037141287548",
         },
         "java_tools_windows": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v13.9/java_tools_windows-v13.9-rc1.zip",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.9/java_tools_windows-v13.9.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.9/java_tools_windows-v13.9.zip",
             "sha": "6a17ac1921d60af5dca780f4200fd0f9963441bd7afff53b9efad6e7156c699d",
         },
         "java_tools_darwin_x86_64": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v13.9/java_tools_darwin_x86_64-v13.9-rc1.zip",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.9/java_tools_darwin_x86_64-v13.9.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.9/java_tools_darwin_x86_64-v13.9.zip",
             "sha": "802bfb5085cec0ac5745a637ae2e7a7152c54230ba542d093a10bd48ba29ba6f",
         },
         "java_tools_darwin_arm64": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v13.9/java_tools_darwin_arm64-v13.9-rc1.zip",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.9/java_tools_darwin_arm64-v13.9.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.9/java_tools_darwin_arm64-v13.9.zip",
             "sha": "9fa400a43153b048ae5a785e3ee533d675ed6a994ab3c763f50bd15a28544c10",
         },
         "java_tools": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/release_candidates/java/v13.9/java_tools-v13.9-rc1.zip",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.9/java_tools-v13.9.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.9/java_tools-v13.9.zip",
             "sha": "3b92e0c1884ac0e9683e87c3c49e1098cff91faeacdb76cc90d92efb0df861cf",
         },
     },
@@ -57,6 +62,7 @@ def java_tools_repos():
             sha256 = config["sha"],
             urls = [
                 config["mirror_url"],
+                config["github_url"],
             ],
         )
 
