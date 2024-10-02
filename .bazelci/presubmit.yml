@@ -23,15 +23,14 @@ buildifier: latest
 tasks:
 # TODO: add config for 8.0.0 once released
 # Bazel 7.x
-# TODO: fix versions after 7.4.0
   ubuntu2004:
     name: "Bazel 7.x"
-    bazel: "9e3fa2a2e98db4aa10918a981325cfa9473e4ed8"
+    bazel: "7.3.2"
     build_targets: *build_targets
     test_targets: *test_targets
   ubuntu2004_integration:
     name: "Bazel 7.x Integration"
-    bazel: "9e3fa2a2e98db4aa10918a981325cfa9473e4ed8"
+    bazel: "7.3.2"
     platform: ubuntu2004
     working_directory: "test/repo"
     shell_commands:
@@ -42,11 +41,11 @@ tasks:
       - "@rules_java//java/..."
   macos:
     name: "Bazel 7.x"
-    bazel: "9e3fa2a2e98db4aa10918a981325cfa9473e4ed8"
+    bazel: "7.3.2"
     build_targets: *build_targets
   windows:
     name: "Bazel 7.x"
-    bazel: "9e3fa2a2e98db4aa10918a981325cfa9473e4ed8"
+    bazel: "7.3.2"
     build_targets: *build_targets
 # Bazel@HEAD
   ubuntu2004_head:
