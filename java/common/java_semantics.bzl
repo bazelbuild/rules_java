@@ -15,7 +15,7 @@
 
 load("@rules_cc//cc/common:cc_helper.bzl", "cc_helper")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 def _find_java_toolchain(ctx):
     return ctx.toolchains["@bazel_tools//tools/jdk:toolchain_type"].java

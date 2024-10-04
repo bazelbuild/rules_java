@@ -17,7 +17,7 @@
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 _java_common_internal = java_common.internal_DO_NOT_USE()
 

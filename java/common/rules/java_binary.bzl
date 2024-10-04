@@ -23,7 +23,7 @@ load("//java/common:java_semantics.bzl", "PLATFORMS_ROOT", "semantics")
 load(":basic_java_library.bzl", "BASIC_JAVA_LIBRARY_IMPLICIT_ATTRS")
 load(":rule_util.bzl", "merge_attrs")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 BootClassPathInfo = java_common.BootClassPathInfo
 

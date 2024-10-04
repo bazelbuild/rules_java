@@ -27,8 +27,6 @@ load("//java/common/rules/impl:java_binary_deploy_jar.bzl", "create_deploy_archi
 load("//java/common/rules/impl:java_binary_impl.bzl", "basic_java_binary")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
 
-visibility("//java/docs")
-
 def _bazel_java_binary_impl(ctx):
     return bazel_base_binary_impl(ctx, is_test_rule_class = False) + helper.executable_providers(ctx)
 

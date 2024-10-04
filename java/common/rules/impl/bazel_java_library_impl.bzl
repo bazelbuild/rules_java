@@ -18,7 +18,7 @@ Definition of java_library rule.
 
 load("//java/common/rules/impl:basic_java_library_impl.bzl", "basic_java_library", "construct_defaultinfo")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 def bazel_java_library_rule(
         ctx,

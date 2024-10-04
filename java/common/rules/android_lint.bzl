@@ -16,7 +16,7 @@
 
 load("//java/common:java_semantics.bzl", "semantics", _semantics_tokenize_javacopts = "tokenize_javacopts")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 def _tokenize_opts(opts_depset):
     opts = reversed(opts_depset.to_list())

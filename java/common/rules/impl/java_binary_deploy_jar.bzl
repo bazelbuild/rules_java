@@ -17,7 +17,7 @@
 load("//java/common:java_semantics.bzl", "semantics")
 load(":java_helper.bzl", "helper")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 def _get_build_info(ctx, stamp):
     if helper.is_stamping_enabled(ctx, stamp):

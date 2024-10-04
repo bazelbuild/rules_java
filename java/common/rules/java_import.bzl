@@ -19,7 +19,7 @@ Definition of java_import rule.
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 _ALLOWED_RULES_IN_DEPS_FOR_JAVA_IMPORT = [
     "java_library",

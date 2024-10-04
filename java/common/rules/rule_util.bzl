@@ -13,7 +13,7 @@
 # limitations under the License.
 """Defines rule utilities."""
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 def merge_attrs(*attribute_dicts, override_attrs = {}, remove_attrs = []):
     """Merges attributes together.

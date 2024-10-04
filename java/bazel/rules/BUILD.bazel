@@ -22,10 +22,7 @@ filegroup(
 bzl_library(
     name = "rules",
     srcs = glob(["*.bzl"]),
-    visibility = [
-        "//java:__pkg__",
-        "//java/docs:__pkg__",
-    ],
+    visibility = ["//visibility:public"],  # for Bazel docgen
     deps = [
         "//java/common",
         "//java/common/rules:core_rules",

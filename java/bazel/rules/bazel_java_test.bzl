@@ -19,8 +19,6 @@ load("//java/common/rules:rule_util.bzl", "merge_attrs")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
 load(":bazel_java_binary.bzl", "BASE_BINARY_ATTRS", "bazel_base_binary_impl", "make_binary_rule")
 
-visibility(["//java", "//java/docs"])
-
 def _bazel_java_test_impl(ctx):
     return bazel_base_binary_impl(ctx, is_test_rule_class = True) + helper.test_providers(ctx)
 

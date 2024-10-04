@@ -22,8 +22,6 @@ load("//java/common/rules:android_lint.bzl", "android_lint_subrule")
 load("//java/common/rules:java_library.bzl", "JAVA_LIBRARY_ATTRS")
 load("//java/common/rules/impl:bazel_java_library_impl.bzl", "bazel_java_library_rule")
 
-visibility(["//java/..."])
-
 def _proxy(ctx):
     return bazel_java_library_rule(
         ctx,

@@ -20,7 +20,7 @@ the supplied value of the `create_executable` attribute.
 
 load("//java/common:java_semantics.bzl", "semantics")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 def register_legacy_java_binary_rules(
         rule_exec,

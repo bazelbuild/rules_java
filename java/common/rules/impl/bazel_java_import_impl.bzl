@@ -24,7 +24,7 @@ load("//java/common/rules/impl:basic_java_library_impl.bzl", "construct_defaulti
 load("//java/common/rules/impl:import_deps_check.bzl", "import_deps_check")
 load(":proguard_validation.bzl", "validate_proguard_specs")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 _java_common_internal = java_common.internal_DO_NOT_USE()
 _run_ijar_private_for_builtins = _java_common_internal.run_ijar_private_for_builtins

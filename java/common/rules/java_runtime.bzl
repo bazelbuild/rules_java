@@ -21,7 +21,7 @@ load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common:java_semantics.bzl", "PLATFORMS_ROOT")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 ToolchainInfo = platform_common.ToolchainInfo
 

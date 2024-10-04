@@ -21,7 +21,7 @@ load("//java/common/rules/impl:java_helper.bzl", "helper")
 load(":java_package_configuration.bzl", "JavaPackageConfigurationInfo")
 load(":java_runtime.bzl", "JavaRuntimeInfo")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 _java_common_internal = java_common.internal_DO_NOT_USE()
 ToolchainInfo = platform_common.ToolchainInfo

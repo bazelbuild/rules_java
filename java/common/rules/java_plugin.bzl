@@ -19,7 +19,7 @@ Definition of java_plugin rule.
 load(":java_library.bzl", "JAVA_LIBRARY_ATTRS")
 load(":rule_util.bzl", "merge_attrs")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 JAVA_PLUGIN_ATTRS = merge_attrs(
     JAVA_LIBRARY_ATTRS,

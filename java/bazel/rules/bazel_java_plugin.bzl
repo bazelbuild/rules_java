@@ -24,8 +24,6 @@ load("//java/common/rules:java_plugin.bzl", "JAVA_PLUGIN_ATTRS")
 load("//java/common/rules:rule_util.bzl", "merge_attrs")
 load("//java/common/rules/impl:basic_java_library_impl.bzl", "basic_java_library", "construct_defaultinfo")
 
-visibility(["//java/..."])
-
 def bazel_java_plugin_rule(
         ctx,
         srcs = [],

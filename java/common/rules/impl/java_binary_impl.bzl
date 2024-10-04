@@ -24,7 +24,7 @@ load("//java/common/rules/impl:basic_java_library_impl.bzl", "basic_java_library
 load(":java_binary_deploy_jar.bzl", "create_deploy_archive")
 load(":java_helper.bzl", "helper")
 
-visibility(["//java/..."])
+# copybara: default visibility
 
 _java_common_internal = java_common.internal_DO_NOT_USE()
 JavaCompilationInfo = _java_common_internal.JavaCompilationInfo
