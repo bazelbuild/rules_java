@@ -12,6 +12,9 @@ bzl_library(
     name = "impl",
     srcs = glob(["*.bzl"]),
     visibility = ["//java:__subpackages__"],
+    deps = [
+        "@protobuf//bazel/common:proto_info_bzl",
+    ],
 )
 
 filegroup(

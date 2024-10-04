@@ -14,9 +14,9 @@
 
 """ Implementation of java_binary for bazel """
 
+load("@protobuf//bazel/common:proto_info.bzl", "ProtoInfo")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("@rules_proto//proto:defs.bzl", "ProtoInfo")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
