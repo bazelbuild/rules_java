@@ -1,6 +1,6 @@
 module(
     name = "rules_java",
-    version = "8.0.0-rc1",
+    version = "8.0.0-rc2",
     bazel_compatibility = [">=7.3.2"],
     compatibility_level = 1,
 )
@@ -9,13 +9,7 @@ bazel_dep(name = "platforms", version = "0.0.4")
 bazel_dep(name = "rules_cc", version = "0.0.10")
 bazel_dep(name = "bazel_features", version = "1.11.0")
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
-bazel_dep(name = "protobuf", version = "29.0-rc1")
-single_version_override(
-    module_name = "protobuf",
-    patch_strip = 1,
-    patches = ["//:protobuf_29.0-rc1.patch"],
-    version = "29.0-rc1",
-)
+bazel_dep(name = "protobuf", version = "27.0")
 
 # Required by @remote_java_tools, which is loaded via module extension.
 bazel_dep(name = "rules_proto", version = "6.0.2")

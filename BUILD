@@ -3,7 +3,6 @@ licenses(["notice"])
 exports_files([
     "LICENSE",
     "WORKSPACE",
-    "protobuf_29.0-rc1.patch",
 ])
 
 filegroup(
