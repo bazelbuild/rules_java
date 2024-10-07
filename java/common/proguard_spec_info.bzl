@@ -13,4 +13,14 @@
 # limitations under the License.
 """ProguardSpecInfo provider"""
 
-ProguardSpecInfo = ProguardSpecProvider
+def _proguard_spec_info_init(specs):
+    # The constructor supports positional parameter, i.e ProguardSpecInfo([file])
+    return {"specs": specs}
+
+ProguardSpecInfo, _ = provider(
+    doc = "Information about proguard specs for Android binaries.",
+    fields = {
+        "specs": "A list of proguard specs files",
+    },
+    init = _proguard_spec_info_init,
+)
