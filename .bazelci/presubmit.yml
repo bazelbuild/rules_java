@@ -17,6 +17,7 @@ build_targets_bzlmod: &build_targets_bzlmod
 
 test_targets: &test_targets
   - "//test/..."
+  - "//java/test/..."
 
 buildifier: latest
 
