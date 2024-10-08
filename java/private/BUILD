@@ -13,7 +13,6 @@ bzl_library(
 bzl_library(
     name = "proto_support",
     srcs = ["proto_support.bzl"],
-    visibility = ["@protobuf//bazel:__subpackages__"],
     deps = [":private"],
 )
 
