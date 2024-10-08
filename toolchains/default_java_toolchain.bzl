@@ -68,6 +68,10 @@ DEFAULT_JAVACOPTS = [
     "-Xep:UseCorrectAssertInTests:OFF",
 ]
 
+# If this is changed, the docs for "{,tool_}java_language_version" also
+# need to be updated in the Bazel user manual
+_DEFAULT_JAVA_LANGUAGE_VERSION = "11"
+
 # Default java_toolchain parameters
 _BASE_TOOLCHAIN_CONFIGURATION = dict(
     forcibly_disable_header_compilation = False,
@@ -88,8 +92,8 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
     # Code to enumerate target JVM boot classpath uses host JVM. Because
     # java_runtime-s are involved, its implementation is in @bazel_tools.
     bootclasspath = [Label("//toolchains:platformclasspath")],
-    source_version = "8",
-    target_version = "8",
+    source_version = _DEFAULT_JAVA_LANGUAGE_VERSION,
+    target_version = _DEFAULT_JAVA_LANGUAGE_VERSION,
     reduced_classpath_incompatible_processors = [
         "dagger.hilt.processor.internal.root.RootProcessor",  # see b/21307381
     ],
@@ -137,10 +141,6 @@ NONPREBUILT_TOOLCHAIN_CONFIGURATION = dict(
     oneversion = Label("@remote_java_tools//:one_version_cc_bin"),
 )
 
-# If this is changed, the docs for "{,tool_}java_language_version" also
-# need to be updated in the Bazel user manual
-_DEFAULT_SOURCE_VERSION = "8"
-
 def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION, toolchain_definition = True, exec_compatible_with = [], target_compatible_with = [], **kwargs):
     """Defines a remote java_toolchain with appropriate defaults for Bazel.
 
@@ -164,7 +164,7 @@ def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION
     )
     if toolchain_definition:
         source_version = toolchain_args["source_version"]
-        if source_version == _DEFAULT_SOURCE_VERSION:
+        if source_version == _DEFAULT_JAVA_LANGUAGE_VERSION:
             native.config_setting(
                 name = name + "_default_version_setting",
                 values = {"java_language_version": ""},
