@@ -26,6 +26,8 @@ bzl_library(
         ":core_rules",
         "//java/common",
         "//java/toolchains:toolchain_rules",
+        "@protobuf//bazel:java_lite_proto_library_bzl",
+        "@protobuf//bazel:java_proto_library_bzl",
     ],
 )
 

@@ -12,7 +12,6 @@ bazel_dep(name = "bazel_skylib", version = "1.6.1")
 bazel_dep(name = "protobuf", version = "27.0")
 
 # Required by @remote_java_tools, which is loaded via module extension.
-bazel_dep(name = "rules_proto", version = "6.0.2")
 bazel_dep(name = "rules_license", version = "0.0.3")
 bazel_dep(name = "abseil-cpp", version = "20230802.1", repo_name = "com_google_absl")
 
