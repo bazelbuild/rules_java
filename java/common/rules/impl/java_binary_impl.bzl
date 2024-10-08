@@ -447,7 +447,7 @@ def _auto_create_deploy_jar(ctx, info, launcher_info, main_class, coverage_main_
         resources = java_attrs.resources,
         classpath_resources = java_attrs.classpath_resources,
         runtime_classpath = runtime_classpath,
-        manifest_lines = info.manifest_lines,
+        manifest_lines = [],
         build_info_files = [],
         build_target = str(ctx.label),
         output = output,
