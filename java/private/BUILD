@@ -10,6 +10,13 @@ bzl_library(
     visibility = ["//java:__subpackages__"],
 )
 
+bzl_library(
+    name = "proto_support",
+    srcs = ["proto_support.bzl"],
+    visibility = ["@protobuf//bazel:__subpackages__"],
+    deps = [":private"],
+)
+
 filegroup(
     name = "srcs",
     srcs = glob(["**"]),
@@ -22,6 +29,7 @@ filegroup(
     srcs = [
         "BUILD",
         ":private",
+        ":proto_support",
     ],
     visibility = ["//java:__pkg__"],
 )
