@@ -522,7 +522,7 @@ Label of the one-version allowlist for tests.
             """,
         ),
         "package_configuration": attr.label_list(
-            cfg = "exec",
+            cfg = "target",
             providers = [JavaPackageConfigurationInfo],
             doc = """
 Configuration that should be applied to the specified package groups.

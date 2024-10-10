@@ -21,6 +21,8 @@ load("//java/common/rules/impl:java_helper.bzl", "helper")
 
 _java_common_internal = java_common.internal_DO_NOT_USE()
 
+BootClassPathInfo = java_common.BootClassPathInfo
+
 JavaPackageConfigurationInfo = provider(
     "A provider for Java per-package configuration",
     fields = [
@@ -28,6 +30,7 @@ JavaPackageConfigurationInfo = provider(
         "javac_opts",
         "matches",
         "package_specs",
+        "system",
     ],
 )
 
@@ -41,6 +44,7 @@ def _rule_impl(ctx):
     javacopts = _java_common_internal.expand_java_opts(ctx, "javacopts", tokenize = True)
     javacopts_depset = helper.detokenize_javacopts(javacopts)
     package_specs = [package[PackageSpecificationInfo] for package in ctx.attr.packages]
+    system = ctx.attr.system[BootClassPathInfo] if ctx.attr.system else None
     return [
         DefaultInfo(),
         JavaPackageConfigurationInfo(
@@ -48,6 +52,7 @@ def _rule_impl(ctx):
             javac_opts = javacopts_depset,
             matches = lambda label: _matches(package_specs, label),
             package_specs = package_specs,
+            system = system,
         ),
     ]
 
@@ -104,10 +109,17 @@ Java compiler flags.
             """,
         ),
         "data": attr.label_list(
+            cfg = "exec",
             allow_files = True,
             doc = """
 The list of files needed by this configuration at runtime.
             """,
+        ),
+        "system": attr.label(
+            providers = [BootClassPathInfo],
+            doc = """
+Corresponds to javac's --system flag.
+""",
         ),
         # buildifier: disable=attr-licenses
         "output_licenses": attr.license() if hasattr(attr, "license") else attr.string_list(),

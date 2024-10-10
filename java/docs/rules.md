@@ -247,7 +247,7 @@ java_library(<a href="#java_library-name">name</a>, <a href="#java_library-deps"
 ## java_package_configuration
 
 <pre>
-java_package_configuration(<a href="#java_package_configuration-name">name</a>, <a href="#java_package_configuration-data">data</a>, <a href="#java_package_configuration-javacopts">javacopts</a>, <a href="#java_package_configuration-output_licenses">output_licenses</a>, <a href="#java_package_configuration-packages">packages</a>)
+java_package_configuration(<a href="#java_package_configuration-name">name</a>, <a href="#java_package_configuration-data">data</a>, <a href="#java_package_configuration-javacopts">javacopts</a>, <a href="#java_package_configuration-output_licenses">output_licenses</a>, <a href="#java_package_configuration-packages">packages</a>, <a href="#java_package_configuration-system">system</a>)
 </pre>
 
 <p>
@@ -295,6 +295,7 @@ java_toolchain(
 | <a id="java_package_configuration-javacopts"></a>javacopts |  Java compiler flags.   | List of strings | optional |  `[]`  |
 | <a id="java_package_configuration-output_licenses"></a>output_licenses |  -   | List of strings | optional |  `[]`  |
 | <a id="java_package_configuration-packages"></a>packages |  The set of <code><a href="${link package_group}">package_group</a></code>s the configuration should be applied to.   | <a href="https://bazel.build/concepts/labels">List of labels</a> | optional |  `[]`  |
+| <a id="java_package_configuration-system"></a>system |  Corresponds to javac's --system flag.   | <a href="https://bazel.build/concepts/labels">Label</a> | optional |  `None`  |
 
 
 <a id="java_plugin"></a>
