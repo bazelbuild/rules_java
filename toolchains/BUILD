@@ -1,5 +1,5 @@
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load(
     ":default_java_toolchain.bzl",
     "DEFAULT_TOOLCHAIN_CONFIGURATION",
