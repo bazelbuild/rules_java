@@ -8,9 +8,11 @@ bzl_library(
     visibility = ["//java:__subpackages__"],
 )
 
+# Exposed for use by the protobuf.
 bzl_library(
     name = "proto_support",
     srcs = ["proto_support.bzl"],
+    visibility = ["//visibility:public"],
     deps = [":private"],
 )
 
