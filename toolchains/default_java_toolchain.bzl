@@ -56,6 +56,7 @@ JDK9_JVM_OPTS = BASE_JDK9_JVM_OPTS
 DEFAULT_JAVACOPTS = [
     "-XDskipDuplicateBridges=true",
     "-XDcompilePolicy=simple",
+    "-XDshould-stop.ifError=FLOW",  # See b/27049950, https://github.com/google/error-prone/issues/4595
     "-g",
     "-parameters",
     # https://github.com/bazelbuild/bazel/issues/15219
