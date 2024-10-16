@@ -226,9 +226,9 @@ def _create_stub(ctx, java_attrs, launcher, executable, jvm_flags, main_class, c
 
     if runfiles_enabled:
         prefix = "" if helper.is_absolute_target_platform_path(ctx, java_executable) else "${JAVA_RUNFILES}/"
-        java_bin = "JAVABIN=${JAVABIN:-" + prefix + java_executable + "}"
+        java_bin = "JAVABIN=\"${JAVABIN:-" + prefix + java_executable + "}\""
     else:
-        java_bin = "JAVABIN=${JAVABIN:-$(rlocation " + java_executable + ")}"
+        java_bin = "JAVABIN=\"${JAVABIN:-$(rlocation " + java_executable + ")}\""
 
     td = ctx.actions.template_dict()
     td.add_joined(
