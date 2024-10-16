@@ -22,33 +22,33 @@ load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
 # visible for tests
 JAVA_TOOLS_CONFIG = {
-    "version": "v13.11",
+    "version": "v13.12",
     "release": "true",
     "artifacts": {
         "java_tools_linux": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.11/java_tools_linux-v13.11.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.11/java_tools_linux-v13.11.zip",
-            "sha": "f9b681214026eaa725e6b407e25c2cd052d10566ba4ea7baddb2f5bdb465fab7",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.12/java_tools_linux-v13.12.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.12/java_tools_linux-v13.12.zip",
+            "sha": "ecdf36b1d93d1e6c270f6acf6e9cfd95b6ce52ce5e798f8a57aae6041d881cb9",
         },
         "java_tools_windows": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.11/java_tools_windows-v13.11.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.11/java_tools_windows-v13.11.zip",
-            "sha": "20068b019dd665dcab83aeda3f76af3451e84aa8f64be5a777bcf095447c4be5",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.12/java_tools_windows-v13.12.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.12/java_tools_windows-v13.12.zip",
+            "sha": "da590aa0bbc4f2967edcb7cc05cd0260412b6b057f9256bdd518a262a5f483c7",
         },
         "java_tools_darwin_x86_64": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.11/java_tools_darwin_x86_64-v13.11.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.11/java_tools_darwin_x86_64-v13.11.zip",
-            "sha": "6f75919c53f6d345e97668afbdcd5a9ea6648e7ed6cd743d4dfcd9f5ff22907b",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.12/java_tools_darwin_x86_64-v13.12.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.12/java_tools_darwin_x86_64-v13.12.zip",
+            "sha": "2a5c700567cae1f3dcfe42e702ee2fc5b1e4b66dfc13e8a2b5ccdddf12910e55",
         },
         "java_tools_darwin_arm64": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.11/java_tools_darwin_arm64-v13.11.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.11/java_tools_darwin_arm64-v13.11.zip",
-            "sha": "f18f5a307c571518d252a151393f0076b4a371651f99edcf922bb791842149ec",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.12/java_tools_darwin_arm64-v13.12.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.12/java_tools_darwin_arm64-v13.12.zip",
+            "sha": "97159db5a1f54301bc067ef1773c1eb7f7bc2f875bcb97a9e15baf4b08b129f2",
         },
         "java_tools": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.11/java_tools-v13.11.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.11/java_tools-v13.11.zip",
-            "sha": "43a8075de2ec06aea77a0c7b57abc08031645e0361850900280f8f7f4cdb72e2",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.12/java_tools-v13.12.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.12/java_tools-v13.12.zip",
+            "sha": "5f065d70984f607d1560f023348158bbbf6babdf4c4bbdd528ee867628b7fa1e",
         },
     },
 }

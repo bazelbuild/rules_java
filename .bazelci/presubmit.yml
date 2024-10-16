@@ -53,7 +53,14 @@ tasks:
     name: "Bazel@HEAD"
     bazel: last_green
     platform: ubuntu2004
-    build_targets: *build_targets
+    build_targets:
+      # TODO: use *build_targets after protobuf is fixed
+      - "//..."
+      - "@remote_java_tools//java_tools/..."
+      - "-//toolchains/..."
+      - "-//test/repo/..."
+      - "-//java/docs/..."
+      - "-//test:docs_up_to_date_test"
   ubuntu2004_integration_head:
     name: "Bazel@HEAD Integration"
     bazel: last_green
