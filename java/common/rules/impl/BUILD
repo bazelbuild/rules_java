@@ -10,11 +10,21 @@ filegroup(
 
 bzl_library(
     name = "impl",
-    srcs = glob(["*.bzl"]),
+    srcs = glob(
+        ["*.bzl"],
+        exclude = ["java_helper.bzl"],
+    ),
     visibility = ["//java:__subpackages__"],
     deps = [
+        ":java_helper_bzl",
         "@protobuf//bazel/common:proto_info_bzl",
     ],
+)
+
+bzl_library(
+    name = "java_helper_bzl",
+    srcs = ["java_helper.bzl"],
+    visibility = ["//java:__subpackages__"],
 )
 
 filegroup(

@@ -47,7 +47,7 @@ bzl_library(
         "//java/bazel/rules",  # copybara-use-repo-external-label
         "//java/common",
         "//java/common/rules:core_rules",
-        "//java/private",
+        "//java/private:native_bzl",
     ],
 )
 
