@@ -214,7 +214,7 @@ Useful if the library will be provided by the runtime environment during executi
 of such libraries are the IDE APIs for IDE plug-ins or <code>tools.jar</code> for anything
 running on a standard JDK.
 <p>
-  Note that <code>neverlink = 1</code> does not prevent the compiler from inlining material
+  Note that <code>neverlink = True</code> does not prevent the compiler from inlining material
   from this library into compilation targets that depend on it, as permitted by the Java
   Language Specification (e.g., <code>static final</code> constants of <code>String</code>
   or of primitive types). The preferred use case is therefore when the runtime library is

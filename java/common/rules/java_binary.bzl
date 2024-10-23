@@ -170,7 +170,7 @@ linked into a binary named <code>{name}_nativedeps</code>, where <code>{name}</c
 is the <code>name</code> attribute of this java_binary rule. In this case,
 the linker will remove any code it thinks is unused from the resulting binary,
 which means any C++ code accessed only via JNI may not be linked in unless
-that <code>cc_library</code> target specifies <code>alwayslink = 1</code>.</li>
+that <code>cc_library</code> target specifies <code>alwayslink = True</code>.</li>
 </ul>
 
 <p>When using any launcher other than the default JDK launcher, the format
