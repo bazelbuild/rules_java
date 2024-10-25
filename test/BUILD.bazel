@@ -51,7 +51,7 @@ diff_test(
     failure_message = """
     Docs are no longer up to date. Regenerate them by running:
 
-    bazel build //java/docs:rule_docs && \
+    bazel build //java/docs:rules_docs && \
     cp bazel-bin/java/docs/rules_docs.out java/docs/rules.md
     """,
     file1 = "//java/docs:rules.md",

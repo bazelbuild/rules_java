@@ -5,6 +5,9 @@ build_targets: &build_targets
   # TODO: Look into broken targets in //toolchains
   - "-//toolchains/..."
   - "-//test/repo/..."
+  # TODO: re-enable docs after protobuf is fixed
+  - "-//java/docs/..."
+  - "-//test:docs_up_to_date_test"
 
 build_targets_bzlmod: &build_targets_bzlmod
   - "//..."
@@ -53,14 +56,7 @@ tasks:
     name: "Bazel@HEAD"
     bazel: last_green
     platform: ubuntu2004
-    build_targets:
-      # TODO: use *build_targets after protobuf is fixed
-      - "//..."
-      - "@remote_java_tools//java_tools/..."
-      - "-//toolchains/..."
-      - "-//test/repo/..."
-      - "-//java/docs/..."
-      - "-//test:docs_up_to_date_test"
+    build_targets: *build_targets
   ubuntu2004_integration_head:
     name: "Bazel@HEAD Integration"
     bazel: last_green
