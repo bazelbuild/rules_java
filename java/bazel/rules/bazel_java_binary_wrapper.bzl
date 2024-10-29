@@ -29,7 +29,7 @@ load(":bazel_java_binary_nonexec.bzl", java_bin_nonexec = "java_binary")
 
 _java_common_internal = java_common.internal_DO_NOT_USE()
 
-visibility(["//java"])
+# copybara: default visibility
 
 def java_binary(**kwargs):
     if _java_common_internal.incompatible_disable_non_executable_java_binary():
