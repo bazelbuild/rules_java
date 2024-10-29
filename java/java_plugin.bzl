@@ -13,7 +13,7 @@
 # limitations under the License.
 """java_plugin rule"""
 
-load("//java/bazel/rules:bazel_java_plugin.bzl", _java_plugin = "java_plugin")
+load("@compatibility_proxy//:proxy.bzl", _java_plugin = "java_plugin")
 
 def java_plugin(**attrs):
     """Bazel java_plugin rule.

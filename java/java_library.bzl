@@ -13,7 +13,7 @@
 # limitations under the License.
 """java_library rule"""
 
-load("//java/bazel/rules:bazel_java_library.bzl", _java_library = "java_library")
+load("@compatibility_proxy//:proxy.bzl", _java_library = "java_library")
 
 def java_library(**attrs):
     """Bazel java_library rule.

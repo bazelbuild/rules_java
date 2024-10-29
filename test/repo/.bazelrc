@@ -1,4 +1,3 @@
 build:bzlmod --experimental_enable_bzlmod
 
 common --incompatible_disallow_empty_glob
-common --experimental_rule_extension_api

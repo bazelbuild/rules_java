@@ -13,7 +13,7 @@
 # limitations under the License.
 """java_import rule"""
 
-load("//java/bazel/rules:bazel_java_import.bzl", _java_import = "java_import")
+load("@compatibility_proxy//:proxy.bzl", _java_import = "java_import")
 
 def java_import(**attrs):
     """Bazel java_import rule.

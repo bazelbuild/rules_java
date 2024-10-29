@@ -16,6 +16,7 @@
 load("@bazel_features//:features.bzl", "bazel_features")
 load(
     "//java:repositories.bzl",
+    "compatibility_proxy_repo",
     "java_tools_repos",
     "local_jdk_repo",
     "remote_jdk11_repos",
@@ -38,3 +39,8 @@ def _toolchains_impl(module_ctx):
         return None
 
 toolchains = module_extension(_toolchains_impl)
+
+def _compat_proxy_impl(_unused):
+    compatibility_proxy_repo()
+
+compatibility_proxy = module_extension(_compat_proxy_impl)

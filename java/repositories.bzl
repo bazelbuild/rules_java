@@ -390,3 +390,45 @@ def rules_java_toolchains(name = "toolchains"):
                 "@" + item.name + "_toolchain_config_repo//:toolchain",
                 "@" + item.name + "_toolchain_config_repo//:bootstrap_runtime_toolchain",
             )
+
+def _compatibility_proxy_repo_impl(rctx):
+    # TODO: use @bazel_features
+    bazel = native.bazel_version
+    rctx.file("BUILD.bazel", "")
+    if not bazel or bazel >= "8":
+        rctx.file(
+            "proxy.bzl",
+            """
+load("@rules_java//java/bazel/rules:bazel_java_binary_wrapper.bzl", _java_binary = "java_binary") # copybara-use-repo-external-label
+load("@rules_java//java/bazel/rules:bazel_java_import.bzl", _java_import = "java_import") # copybara-use-repo-external-label
+load("@rules_java//java/bazel/rules:bazel_java_library.bzl", _java_library = "java_library") # copybara-use-repo-external-label
+load("@rules_java//java/bazel/rules:bazel_java_plugin.bzl", _java_plugin = "java_plugin") # copybara-use-repo-external-label
+load("@rules_java//java/bazel/rules:bazel_java_test.bzl", _java_test = "java_test") # copybara-use-repo-external-label
+
+java_binary = _java_binary
+java_import = _java_import
+java_library = _java_library
+java_plugin = _java_plugin
+java_test = _java_test
+            """,
+        )
+    else:
+        rctx.file(
+            "proxy.bzl",
+            """
+java_binary = native.java_binary
+java_import = native.java_import
+java_library = native.java_library
+java_plugin = native.java_plugin
+java_test = native.java_test
+            """,
+        )
+
+_compatibility_proxy_repo_rule = repository_rule(
+    _compatibility_proxy_repo_impl,
+    # force reruns on server restarts to use correct native.bazel_version
+    local = True,
+)
+
+def compatibility_proxy_repo():
+    maybe(_compatibility_proxy_repo_rule, name = "compatibility_proxy")

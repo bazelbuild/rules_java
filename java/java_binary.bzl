@@ -13,7 +13,7 @@
 # limitations under the License.
 """java_binary rule"""
 
-load("//java/bazel/rules:bazel_java_binary_wrapper.bzl", _java_binary = "java_binary")
+load("@compatibility_proxy//:proxy.bzl", _java_binary = "java_binary")
 
 def java_binary(**attrs):
     """Bazel java_binary rule.
