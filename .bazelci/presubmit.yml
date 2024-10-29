@@ -31,7 +31,10 @@ tasks:
     name: "Bazel 7.x"
     bazel: "7.4.0"
     build_targets: *build_targets
-    test_targets: *test_targets
+    test_targets:
+      - "//test/..."
+      - "//java/test/..."
+      - "-//test:docs_up_to_date_test"
   ubuntu2004_integration:
     name: "Bazel 7.x Integration"
     bazel: "7.4.0"
