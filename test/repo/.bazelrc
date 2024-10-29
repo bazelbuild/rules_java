@@ -2,6 +2,3 @@ build:bzlmod --experimental_enable_bzlmod
 
 common --incompatible_disallow_empty_glob
 common --experimental_rule_extension_api
-
-# TODO: remove once https://github.com/bazelbuild/bazel/commit/384e381fa841537987691f170ed9408dcfeed2ea is available
-common --experimental_google_legacy_api
