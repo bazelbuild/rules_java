@@ -1,15 +1,21 @@
-load("@rules_java//java:defs.bzl", "java_binary", "java_library")  # copybara-use-repo-external-label
+load("@rules_java//java:defs.bzl", "java_binary", "java_library", "java_test")  # copybara-use-repo-external-label
 load("@rules_java//toolchains:default_java_toolchain.bzl", "default_java_toolchain")  # copybara-use-repo-external-label
 
 java_library(
     name = "lib",
-    srcs = glob(["src/*.java"]),
+    srcs = ["src/Main.java"],
 )
 
 java_binary(
     name = "bin",
     main_class = "Main",
     runtime_deps = [":lib"],
+)
+
+java_test(
+    name = "MyTest",
+    srcs = ["src/MyTest.java"],
+    deps = ["@my_jar//jar"],
 )
 
 default_java_toolchain(

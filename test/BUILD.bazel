@@ -1,6 +1,3 @@
-load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
-load("@rules_shell//shell:sh_test.bzl", "sh_test")
-
 # Copyright 2024 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +11,10 @@ load("@rules_shell//shell:sh_test.bzl", "sh_test")
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load("//java:java_library", "java_library")
 load("//java:repositories.bzl", "JAVA_TOOLS_CONFIG", "REMOTE_JDK_CONFIGS")
 load(":check_remotejdk_configs_match.bzl", "validate_configs")
 
@@ -57,6 +58,12 @@ diff_test(
     """,
     file1 = "//java/docs:rules.md",
     file2 = "//java/docs:rules_docs",
+)
+
+# Make a sample jar for the http_jar test.
+java_library(
+    name = "my_jar",
+    srcs = ["MyLib.java"],
 )
 
 validate_configs()
