@@ -360,6 +360,35 @@ def remote_jdk21_repos():
     """Imports OpenJDK 21 repositories."""
     _remote_jdk_repos_for_version("21")
 
+def protobuf_repo():
+    maybe(
+        http_archive,
+        name = "protobuf",
+        sha256 = "da288bf1daa6c04d03a9051781caa52aceb9163586bff9aa6cfb12f69b9395aa",
+        strip_prefix = "protobuf-27.0",
+        url = "https://github.com/protocolbuffers/protobuf/releases/download/v27.0/protobuf-27.0.tar.gz",
+    )
+
+def rules_cc_repo():
+    maybe(
+        http_archive,
+        name = "rules_cc",
+        sha256 = "d9bdd3ec66b6871456ec9c965809f43a0901e692d754885e89293807762d3d80",
+        strip_prefix = "rules_cc-0.0.13",
+        urls = ["https://github.com/bazelbuild/rules_cc/releases/download/0.0.13/rules_cc-0.0.13.tar.gz"],
+    )
+
+def bazel_skylib_repo():
+    maybe(
+        http_archive,
+        name = "bazel_skylib",
+        sha256 = "f7be3474d42aae265405a592bb7da8e171919d74c16f082a5457840f06054728",
+        urls = [
+            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.2.1/bazel-skylib-1.2.1.tar.gz",
+            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.2.1/bazel-skylib-1.2.1.tar.gz",
+        ],
+    )
+
 def rules_java_dependencies():
     """An utility method to load all dependencies of rules_java.
 
@@ -372,6 +401,10 @@ def rules_java_dependencies():
     remote_jdk17_repos()
     remote_jdk21_repos()
     java_tools_repos()
+    compatibility_proxy_repo()
+    protobuf_repo()
+    rules_cc_repo()
+    bazel_skylib_repo()
 
 def rules_java_toolchains(name = "toolchains"):
     """An utility method to load all Java toolchains.
