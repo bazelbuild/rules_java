@@ -17,3 +17,5 @@
 # Ignore jekyll build output.
 /production
 /.sass-cache
+# Ignore MODULE.bazel.lock as this is a library project.
+MODULE.bazel.lock
