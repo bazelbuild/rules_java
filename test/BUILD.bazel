@@ -14,7 +14,7 @@
 
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
-load("//java:java_library", "java_library")
+load("//java:java_library.bzl", "java_library")
 load("//java:repositories.bzl", "JAVA_TOOLS_CONFIG", "REMOTE_JDK_CONFIGS")
 load(":check_remotejdk_configs_match.bzl", "validate_configs")
 
