@@ -92,6 +92,7 @@ REMOTE_JDK_REPOS = [(("remote_jdk" if version == "8" else "remotejdk") + version
 # Dev dependencies
 bazel_dep(name = "rules_pkg", version = "0.9.1", dev_dependency = True)
 bazel_dep(name = "stardoc", version = "0.7.1", dev_dependency = True)
+bazel_dep(name = "rules_shell", version = "0.2.0", dev_dependency = True)
 
 # Compatibility layer
 compat = use_extension("//java:extensions.bzl", "compatibility_proxy")

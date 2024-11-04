@@ -1,4 +1,5 @@
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
 # Copyright 2024 The Bazel Authors. All rights reserved.
 #
