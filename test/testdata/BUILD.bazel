@@ -5,4 +5,3 @@ java_library(
     name = "my_jar",
     srcs = ["MyLib.java"],
 )
-
