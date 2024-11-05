@@ -42,6 +42,8 @@ tasks:
       - "//..."
       - "//:bin_deploy.jar"
       - "@rules_java//java/..."
+    test_targets:
+      - "//:MyTest"
   macos:
     name: "Bazel 7.x"
     bazel: "7.4.0"
@@ -67,6 +69,8 @@ tasks:
       - "//..."
       - "//:bin_deploy.jar"
       - "@rules_java//java/..."
+    test_targets:
+      - "//:MyTest"
   macos_head:
     name: "Bazel@HEAD"
     bazel: last_green
@@ -94,6 +98,7 @@ tasks:
     build_targets:
     - "//..."
     - "//:bin_deploy.jar"
+    - "-//:MyTest"
   macos_bazel6:
     name: "Bazel 6.x"
     bazel: 6.5.0

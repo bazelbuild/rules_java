@@ -6,6 +6,13 @@ archive_override(
     urls = ["file:///tmp/rules_java-HEAD.tar.gz"],
 )
 
+http_jar = use_repo_rule("@rules_java//java:http_jar.bzl", "http_jar")
+
+http_jar(
+    name = "my_jar",
+    urls = ["file:///tmp/my_jar.jar"],
+)
+
 java_toolchains = use_extension("@rules_java//java:extensions.bzl", "toolchains")
 use_repo(
     java_toolchains,

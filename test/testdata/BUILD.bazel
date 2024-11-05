@@ -1,0 +1,7 @@
+load("//java:java_library.bzl", "java_library")
+
+# Make a sample jar for the http_jar test.
+java_library(
+    name = "my_jar",
+    srcs = ["MyLib.java"],
+)
