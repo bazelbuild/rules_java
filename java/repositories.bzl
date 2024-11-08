@@ -49,6 +49,7 @@ JAVA_TOOLS_CONFIG = {
             "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.13/java_tools-v13.13.zip",
             "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v13.13/java_tools-v13.13.zip",
             "sha": "df895d5067f2dad4524109ebfddac442d2514d0e2f95f6abc098cfae98b9bbb5",
+            "build_file": "@rules_java//toolchains:BUILD.java_tools",
         },
     },
 }
@@ -64,6 +65,7 @@ def java_tools_repos():
                 config["mirror_url"],
                 config["github_url"],
             ],
+            build_file = config.get("build_file"),
         )
 
 def local_jdk_repo():
@@ -363,7 +365,7 @@ def remote_jdk21_repos():
 def protobuf_repo():
     maybe(
         http_archive,
-        name = "protobuf",
+        name = "com_google_protobuf",
         sha256 = "da288bf1daa6c04d03a9051781caa52aceb9163586bff9aa6cfb12f69b9395aa",
         strip_prefix = "protobuf-27.0",
         url = "https://github.com/protocolbuffers/protobuf/releases/download/v27.0/protobuf-27.0.tar.gz",
@@ -373,9 +375,9 @@ def rules_cc_repo():
     maybe(
         http_archive,
         name = "rules_cc",
-        sha256 = "d9bdd3ec66b6871456ec9c965809f43a0901e692d754885e89293807762d3d80",
-        strip_prefix = "rules_cc-0.0.13",
-        urls = ["https://github.com/bazelbuild/rules_cc/releases/download/0.0.13/rules_cc-0.0.13.tar.gz"],
+        sha256 = "f4aadd8387f381033a9ad0500443a52a0cea5f8ad1ede4369d3c614eb7b2682e",
+        strip_prefix = "rules_cc-0.0.15",
+        urls = ["https://github.com/bazelbuild/rules_cc/releases/download/0.0.15/rules_cc-0.0.15.tar.gz"],
     )
 
 def bazel_skylib_repo():

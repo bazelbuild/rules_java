@@ -13,8 +13,8 @@
 # limitations under the License.
 """Starlark rules for building Java projects."""
 
-load("@protobuf//bazel:java_lite_proto_library.bzl", _java_lite_proto_library = "java_lite_proto_library")
-load("@protobuf//bazel:java_proto_library.bzl", _java_proto_library = "java_proto_library")
+load("@com_google_protobuf//bazel:java_lite_proto_library.bzl", _java_lite_proto_library = "java_lite_proto_library")
+load("@com_google_protobuf//bazel:java_proto_library.bzl", _java_proto_library = "java_proto_library")
 load("//java:java_binary.bzl", _java_binary = "java_binary")
 load("//java:java_import.bzl", _java_import = "java_import")
 load("//java:java_library.bzl", _java_library = "java_library")
