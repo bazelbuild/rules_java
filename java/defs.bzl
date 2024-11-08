@@ -43,8 +43,17 @@ java_package_configuration = _java_package_configuration
 
 # Proto rules
 # Deprecated: don't use java proto libraries from here
-java_proto_library = _java_proto_library
-java_lite_proto_library = _java_lite_proto_library
+def java_proto_library(**kwargs):
+    if "deprecation" not in kwargs:
+        _java_proto_library(deprecation = "Use java_proto_library from com_google_protobuf", **kwargs)
+    else:
+        _java_proto_library(**kwargs)
+
+def java_lite_proto_library(**kwargs):
+    if "deprecation" not in kwargs:
+        _java_lite_proto_library(deprecation = "Use java_lite_proto_library from com_google_protobuf", **kwargs)
+    else:
+        _java_lite_proto_library(**kwargs)
 
 # Modules and providers
 
