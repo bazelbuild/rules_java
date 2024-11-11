@@ -85,12 +85,12 @@ tasks:
 # Bazel 6.x
   ubuntu2004_bazel6:
     name: "Bazel 6.x"
-    bazel: 6.5.0
+    bazel: 6.3.0
     platform: ubuntu2004
     build_targets: *build_targets_bazel6
   ubuntu2004_integration_bazel6:
     name: "Bazel 6.x Integration"
-    bazel: "6.5.0"
+    bazel: 6.3.0
     platform: ubuntu2004
     working_directory: "test/repo"
     shell_commands:
@@ -101,11 +101,11 @@ tasks:
     - "-//:MyTest"
   macos_bazel6:
     name: "Bazel 6.x"
-    bazel: 6.5.0
+    bazel: 6.3.0
     platform: macos
     build_targets: *build_targets_bazel6
   windows_bazel6:
     name: "Bazel 6.x"
-    bazel: 6.5.0
+    bazel: 6.3.0
     platform: windows
     build_targets: *build_targets_bazel6
