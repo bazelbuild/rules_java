@@ -1,6 +1,9 @@
 """Test dependencies for rules_java."""
 
 load("@bazel_skylib//lib:modules.bzl", "modules")
+
+# TODO: Use http_jar from //java:http_jar.bzl once it doesn't refert to cache.bzl from @bazel_tools
+# anymore, which isn't available in Bazel 6.
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
 
 def test_repositories():
