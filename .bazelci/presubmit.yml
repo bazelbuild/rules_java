@@ -44,6 +44,24 @@ tasks:
       - "@rules_java//java/..."
     test_targets:
       - "//:MyTest"
+  ubuntu2004_integration_workspace:
+    name: "Bazel 7.x Integration (WORKSPACE)"
+    bazel: "7.4.0"
+    platform: ubuntu2004
+    working_directory: "test/repo"
+    shell_commands:
+      - sh setup.sh
+    build_targets:
+      - "//..."
+      - "//:bin_deploy.jar"
+    build_flags:
+      - "--noenable_bzlmod"
+      - "--enable_workspace"
+    test_targets:
+      - "//:MyTest"
+    test_flags:
+      - "--noenable_bzlmod"
+      - "--enable_workspace"
   macos:
     name: "Bazel 7.x"
     bazel: "7.4.0"
@@ -71,6 +89,24 @@ tasks:
       - "@rules_java//java/..."
     test_targets:
       - "//:MyTest"
+  ubuntu2004_integration_head_workspace:
+    name: "Bazel@HEAD Integration (WORKSPACE)"
+    bazel: "last_green"
+    platform: ubuntu2004
+    working_directory: "test/repo"
+    shell_commands:
+      - sh setup.sh
+    build_targets:
+      - "//..."
+      - "//:bin_deploy.jar"
+    build_flags:
+      - "--noenable_bzlmod"
+      - "--enable_workspace"
+    test_targets:
+      - "//:MyTest"
+    test_flags:
+      - "--noenable_bzlmod"
+      - "--enable_workspace"
   macos_head:
     name: "Bazel@HEAD"
     bazel: last_green
@@ -98,7 +134,8 @@ tasks:
     build_targets:
     - "//..."
     - "//:bin_deploy.jar"
-    - "-//:MyTest"
+    test_targets:
+    - "//:MyTest"
   macos_bazel6:
     name: "Bazel 6.x"
     bazel: 6.3.0

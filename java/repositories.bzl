@@ -366,9 +366,9 @@ def protobuf_repo():
     maybe(
         http_archive,
         name = "com_google_protobuf",
-        sha256 = "da288bf1daa6c04d03a9051781caa52aceb9163586bff9aa6cfb12f69b9395aa",
-        strip_prefix = "protobuf-27.0",
-        url = "https://github.com/protocolbuffers/protobuf/releases/download/v27.0/protobuf-27.0.tar.gz",
+        sha256 = "ce5d00b78450a0ca400bf360ac00c0d599cc225f049d986a27e9a4e396c5a84a",
+        strip_prefix = "protobuf-29.0-rc2",
+        url = "https://github.com/protocolbuffers/protobuf/releases/download/v29.0-rc2/protobuf-29.0-rc2.tar.gz",
     )
 
 def rules_cc_repo():
@@ -439,23 +439,29 @@ load("@rules_java//java/bazel/rules:bazel_java_import.bzl", _java_import = "java
 load("@rules_java//java/bazel/rules:bazel_java_library.bzl", _java_library = "java_library") # copybara-use-repo-external-label
 load("@rules_java//java/bazel/rules:bazel_java_plugin.bzl", _java_plugin = "java_plugin") # copybara-use-repo-external-label
 load("@rules_java//java/bazel/rules:bazel_java_test.bzl", _java_test = "java_test") # copybara-use-repo-external-label
+load("@rules_java//java:http_jar.bzl", _http_jar = "http_jar") # copybara-use-repo-external-label
 
 java_binary = _java_binary
 java_import = _java_import
 java_library = _java_library
 java_plugin = _java_plugin
 java_test = _java_test
+
+http_jar = _http_jar
             """,
         )
     else:
         rctx.file(
             "proxy.bzl",
             """
+load("@bazel_tools//tools/build_defs/repo:http.bzl", _http_jar = "http_jar")
 java_binary = native.java_binary
 java_import = native.java_import
 java_library = native.java_library
 java_plugin = native.java_plugin
 java_test = native.java_test
+
+http_jar = _http_jar
             """,
         )
 

@@ -41,6 +41,10 @@ load("//java:repositories.bzl", "rules_java_dependencies", "rules_java_toolchain
 
 rules_java_dependencies()
 
+load("@com_google_protobuf//bazel/private:proto_bazel_features.bzl", "proto_bazel_features")  # buildifier: disable=bzl-visibility
+
+proto_bazel_features(name = "proto_bazel_features")
+
 rules_java_toolchains()
 
 load("@stardoc//:setup.bzl", "stardoc_repositories")
