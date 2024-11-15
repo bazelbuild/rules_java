@@ -50,3 +50,7 @@ rules_java_toolchains()
 load("@stardoc//:setup.bzl", "stardoc_repositories")
 
 stardoc_repositories()
+
+load("//test:repositories.bzl", "test_repositories")
+
+test_repositories()
