@@ -21,3 +21,9 @@ java_plugin(
     srcs = ["AutoBazelRepositoryProcessor.java"],
     processor_class = "com.google.devtools.build.runfiles.AutoBazelRepositoryProcessor",
 )
+
+filegroup(
+    name = "srcs",
+    srcs = glob(["**"]),
+    visibility = ["//java/runfiles:__pkg__"],
+)

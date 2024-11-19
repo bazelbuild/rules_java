@@ -13,6 +13,7 @@ filegroup(
         "//java/common:srcs",
         "//java/private:srcs",
         "//java/proto:srcs",
+        "//java/runfiles:srcs",
         "//java/toolchains:srcs",
     ],
     visibility = ["//:__pkg__"],
