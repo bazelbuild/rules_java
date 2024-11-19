@@ -27,15 +27,3 @@ filegroup(
     srcs = glob(["**"]),
     visibility = ["//java/runfiles:__pkg__"],
 )
-
-filegroup(
-    name = "for_bazel_tests",
-    srcs = [
-        "AutoBazelRepository.java",
-        "AutoBazelRepositoryProcessor.java",
-        "BUILD.bazel",
-        "Runfiles.java",
-        "Util.java",
-    ],
-    visibility = ["//java/runfiles:__pkg__"],
-)
