@@ -15,7 +15,13 @@ java_binary(
 java_test(
     name = "MyTest",
     srcs = ["src/MyTest.java"],
-    deps = ["@my_jar//jar"],
+    data = [
+        "src/data.txt",
+    ],
+    deps = [
+        "@my_jar//jar",
+        "@rules_java//java/runfiles",
+    ],
 )
 
 default_java_toolchain(

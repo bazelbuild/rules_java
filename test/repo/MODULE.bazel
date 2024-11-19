@@ -1,4 +1,4 @@
-module(name = "fake_repo_for_testing")
+module(name = "integration_test_repo")
 
 bazel_dep(name = "rules_java", version = "7.5.0")
 archive_override(
