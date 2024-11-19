@@ -13,6 +13,7 @@ filegroup(
         "//java/common:srcs",
         "//java/private:srcs",
         "//java/proto:srcs",
+        "//java/runfiles:srcs",
         "//java/toolchains:srcs",
     ],
     visibility = ["//:__pkg__"],
@@ -76,6 +77,7 @@ filegroup(
         "//java/bazel/rules:for_bazel_tests",  # copybara-use-repo-external-label
         "//java/common:for_bazel_tests",
         "//java/private:for_bazel_tests",
+        "//java/runfiles:for_bazel_tests",
         "//java/toolchains:for_bazel_tests",
         "@bazel_skylib//lib:test_deps",
     ],

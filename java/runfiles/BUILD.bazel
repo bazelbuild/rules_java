@@ -3,3 +3,21 @@ alias(
     actual = "//java/runfiles/src/main/java/com/google/devtools/build/runfiles",
     visibility = ["//visibility:public"],
 )
+
+filegroup(
+    name = "srcs",
+    srcs = glob(["**"]) + [
+        "//java/runfiles/src/main/java/com/google/devtools/build/runfiles:srcs",
+    ],
+    visibility = ["//java:__pkg__"],
+)
+
+filegroup(
+    name = "for_bazel_tests",
+    srcs = [
+        "BUILD.bazel",
+    ] + [
+        "//java/runfiles/src/main/java/com/google/devtools/build/runfiles:for_bazel_tests",
+    ],
+    visibility = ["//java:__pkg__"],
+)
