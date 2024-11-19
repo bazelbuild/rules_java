@@ -6,22 +6,28 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 def _compatibility_proxy_repo_impl(rctx):
     # TODO: use @bazel_features
     bazel = native.bazel_version
-    rctx.file("BUILD.bazel", "")
+    rctx.file(
+        "BUILD.bazel",
+        """
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+bzl_library(name = "proxy_bzl", srcs = ["proxy.bzl"], visibility = ["//visibility:public"])
+        """,
+    )
     if not bazel or bazel >= "8":
         rctx.file(
             "proxy.bzl",
             """
-load("@rules_java//java/bazel/rules:bazel_java_binary_wrapper.bzl", _java_binary = "java_binary") # copybara-use-repo-external-label
-load("@rules_java//java/bazel/rules:bazel_java_import.bzl", _java_import = "java_import") # copybara-use-repo-external-label
-load("@rules_java//java/bazel/rules:bazel_java_library.bzl", _java_library = "java_library") # copybara-use-repo-external-label
-load("@rules_java//java/bazel/rules:bazel_java_plugin.bzl", _java_plugin = "java_plugin") # copybara-use-repo-external-label
-load("@rules_java//java/bazel/rules:bazel_java_test.bzl", _java_test = "java_test") # copybara-use-repo-external-label
-load("@rules_java//java/common/rules:java_package_configuration.bzl", _java_package_configuration = "java_package_configuration") # copybara-use-repo-external-label
-load("@rules_java//java/common/rules:java_runtime.bzl", _java_runtime = "java_runtime") # copybara-use-repo-external-label
-load("@rules_java//java/common/rules:java_toolchain.bzl", _java_toolchain = "java_toolchain") # copybara-use-repo-external-label
-load("@rules_java//java/private:java_common.bzl", _java_common = "java_common") # copybara-use-repo-external-label
-load("@rules_java//java/private:java_info.bzl", _JavaInfo = "JavaInfo", _JavaPluginInfo = "JavaPluginInfo") # copybara-use-repo-external-label
-load("@rules_java//java:http_jar.bzl", _http_jar = "http_jar") # copybara-use-repo-external-label
+load("@rules_java//java/bazel/rules:bazel_java_binary_wrapper.bzl", _java_binary = "java_binary")
+load("@rules_java//java/bazel/rules:bazel_java_import.bzl", _java_import = "java_import")
+load("@rules_java//java/bazel/rules:bazel_java_library.bzl", _java_library = "java_library")
+load("@rules_java//java/bazel/rules:bazel_java_plugin.bzl", _java_plugin = "java_plugin")
+load("@rules_java//java/bazel/rules:bazel_java_test.bzl", _java_test = "java_test")
+load("@rules_java//java/common/rules:java_package_configuration.bzl", _java_package_configuration = "java_package_configuration")
+load("@rules_java//java/common/rules:java_runtime.bzl", _java_runtime = "java_runtime")
+load("@rules_java//java/common/rules:java_toolchain.bzl", _java_toolchain = "java_toolchain")
+load("@rules_java//java/private:java_common.bzl", _java_common = "java_common")
+load("@rules_java//java/private:java_info.bzl", _JavaInfo = "JavaInfo", _JavaPluginInfo = "JavaPluginInfo")
+load("@rules_java//java:http_jar.bzl", _http_jar = "http_jar")
 
 java_binary = _java_binary
 java_import = _java_import
@@ -43,7 +49,7 @@ http_jar = _http_jar
             "proxy.bzl",
             """
 load("@bazel_tools//tools/build_defs/repo:http.bzl", _http_jar = "http_jar")
-load("@rules_java//java/private:native.bzl", "native_java_common", "NativeJavaInfo", "NativeJavaPluginInfo") # copybara-use-repo-external-label
+load("@rules_java//java/private:native.bzl", "native_java_common", "NativeJavaInfo", "NativeJavaPluginInfo")
 
 java_binary = native.java_binary
 java_import = native.java_import

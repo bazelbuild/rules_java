@@ -9,7 +9,7 @@ def print_rel_notes(*, name, version, archive):
               changelog=$$(/usr/bin/git log tags/$$last_rel..origin/master --format=oneline --)
               sha=$$(/usr/bin/sha256sum $(SRCS) | cut -d ' '  -f1)
               cat > $@ <<EOF
-**Changes since $$last_rel
+**Changes since $$last_rel**
 $$changelog
 
 **MODULE.bazel setup**
