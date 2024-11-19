@@ -3,7 +3,6 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.devtools.build.runfiles.AutoBazelRepository;
 import com.google.devtools.build.runfiles.Runfiles;
-import java.beans.Transient;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,7 +20,7 @@ public class MyTest {
     assertEquals(MyLib.myStr(), "my_string");
   }
 
-  @Transient
+  @Test
   public void runfiles() throws IOException {
     Runfiles runfiles = Runfiles.preload().withSourceRepository(AutoBazelRepository_MyTest.NAME);
     Path path = Paths.get(runfiles.rlocation("integration_test_repo/src/data.txt"));
