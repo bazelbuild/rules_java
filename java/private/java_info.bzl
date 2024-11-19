@@ -19,14 +19,9 @@ Definition of JavaInfo and JavaPluginInfo provider.
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common:java_semantics.bzl", "semantics")
-load(":native.bzl", _native_java_common = "native_java_common")
+load(":native.bzl", "get_internal_java_common")
 
-visibility("private")
-
-# TODO(hvd): remove this when:
-# - we have a general provider-type checking API
-# - no longer need to check for --experimental_google_legacy_api
-_java_common_internal = _native_java_common.internal_DO_NOT_USE()
+# copybara: default visibility
 
 _JavaOutputInfo = provider(
     doc = "The outputs of Java compilation.",
@@ -175,7 +170,7 @@ def merge(
         "compilation_info": None,
     }
 
-    if _java_common_internal.google_legacy_api_enabled():
+    if get_internal_java_common().google_legacy_api_enabled():
         cc_info = semantics.minimize_cc_info(cc_common.merge_cc_infos(cc_infos = [p.cc_link_params_info for p in providers]))
         result.update(
             cc_link_params_info = cc_info,
@@ -188,7 +183,7 @@ def merge(
                 transitive = [p.transitive_native_libraries for p in providers],
             ),
         )
-    return _java_common_internal.wrap_java_info(_new_javainfo(**result))
+    return get_internal_java_common().wrap_java_info(_new_javainfo(**result))
 
 def to_java_binary_info(java_info, compilation_info):
     """Get a copy of the given JavaInfo with minimal info returned by a java_binary
@@ -496,10 +491,10 @@ def java_info_for_compilation(
             compilation_info = None,
             annotation_processing = None,
         )
-    return _java_common_internal.wrap_java_info(_new_javainfo(**result))
+    return get_internal_java_common().wrap_java_info(_new_javainfo(**result))
 
 def _validate_provider_list(provider_list, what, expected_provider_type):
-    _java_common_internal.check_provider_instances(provider_list, what, expected_provider_type)
+    get_internal_java_common().check_provider_instances(provider_list, what, expected_provider_type)
 
 def _compute_concatenated_deps(deps, runtime_deps, exports):
     deps_exports = []
@@ -627,7 +622,7 @@ def _javainfo_init_base(
         "_constraints": [],
     }
 
-    if _java_common_internal.google_legacy_api_enabled():
+    if get_internal_java_common().google_legacy_api_enabled():
         transitive_cc_infos = [dep.cc_link_params_info for dep in concatenated_deps.runtimedeps_exports_deps]
         transitive_cc_infos.extend(native_libraries)
         cc_info = semantics.minimize_cc_info(cc_common.merge_cc_infos(cc_infos = transitive_cc_infos))
@@ -737,7 +732,7 @@ def _javainfo_init(
     # TODO: When this flag is removed, move this logic into _javainfo_init_base
     #  and remove the special case from java_info_for_compilation.
     module_flags_deps = concatenated_deps.deps_exports
-    if _java_common_internal._incompatible_java_info_merge_runtime_module_flags():
+    if get_internal_java_common().incompatible_java_info_merge_runtime_module_flags():
         module_flags_deps = concatenated_deps.runtimedeps_exports_deps
 
     result.update(

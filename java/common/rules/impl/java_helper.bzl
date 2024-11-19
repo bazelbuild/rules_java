@@ -450,6 +450,35 @@ def _get_relative(path_a, path_b):
         return path_b
     return paths.normalize(paths.join(path_a, path_b))
 
+def _tokenize_javacopts(ctx = None, opts = []):
+    """Tokenizes a list or depset of options to a list.
+
+    Iff opts is a depset, we reverse the flattened list to ensure right-most
+    duplicates are preserved in their correct position.
+
+    If the ctx parameter is omitted, a slow, but pure Starlark, implementation
+    of shell tokenization is used. Otherwise, tokenization is performed using
+    ctx.tokenize() which has significantly better performance (up to 100x for
+    large options lists).
+
+    Args:
+        ctx: (RuleContext|None) the rule context
+        opts: (depset[str]|[str]) the javac options to tokenize
+    Returns:
+        [str] list of tokenized options
+    """
+    if hasattr(opts, "to_list"):
+        opts = reversed(opts.to_list())
+    if ctx:
+        return [
+            token
+            for opt in opts
+            for token in ctx.tokenize(opt)
+        ]
+    else:
+        # TODO: optimize and use the pure Starlark implementation in cc_helper
+        return semantics.tokenize_javacopts(opts)
+
 helper = struct(
     collect_all_targets_as_deps = _collect_all_targets_as_deps,
     filter_launcher_for_target = _filter_launcher_for_target,
@@ -474,6 +503,7 @@ helper = struct(
     create_single_jar = _create_single_jar,
     shell_escape = _shell_escape,
     detokenize_javacopts = _detokenize_javacopts,
+    tokenize_javacopts = _tokenize_javacopts,
     derive_output_file = _derive_output_file,
     is_stamping_enabled = _is_stamping_enabled,
     get_relative = _get_relative,

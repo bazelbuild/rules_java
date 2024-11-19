@@ -16,9 +16,9 @@
 Common code for reuse across java_* rules
 """
 
-load("//java/common:java_common.bzl", "java_common")
-load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/common:java_semantics.bzl", "semantics")
+load("//java/private:java_common.bzl", "java_common")
+load("//java/private:java_info.bzl", "JavaPluginInfo")
 load(":rule_util.bzl", "merge_attrs")
 
 visibility([

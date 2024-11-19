@@ -15,16 +15,17 @@ bzl_library(
     srcs = [
         "boot_class_path_info.bzl",
         "java_common.bzl",
+        "java_common_internal.bzl",
         "java_info.bzl",
         "message_bundle_info.bzl",
     ],
     visibility = ["//java:__subpackages__"],
     deps = [
         ":native_bzl",
-        "//java/common",
         "//java/common/rules:toolchain_rules",
         "//java/common/rules/impl:java_helper_bzl",
         "@bazel_skylib//lib:paths",
+        "@rules_cc//cc:find_cc_toolchain_bzl",
         "@rules_cc//cc/common",
     ],
 )
@@ -48,6 +49,7 @@ filegroup(
     testonly = 1,
     srcs = [
         "BUILD",
+        ":internals",
         ":native_bzl",
         ":proto_support",
     ],

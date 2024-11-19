@@ -13,13 +13,13 @@
 # limitations under the License.
 """Support for Java compilation of protocol buffer generated code."""
 
-load("//java/private:native.bzl", "native_java_common")
+load("//java/common:java_common.bzl", "java_common")
 
 # Partial support, because internal symbols are not available in older Bazel version
 # TODO: Once Java rules are moved into the rules_java, this should become a full support.
 
 def compile(*, injecting_rule_kind, enable_jspecify, include_compilation_info, **kwargs):  # buildifier: disable=unused-variable
-    return native_java_common.compile(**kwargs)
+    return java_common.compile(**kwargs)
 
 def merge(providers, *, merge_java_outputs = True, merge_source_jars = True):  # buildifier: disable=unused-variable
-    return native_java_common.merge(providers)
+    return java_common.merge(providers)

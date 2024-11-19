@@ -17,9 +17,9 @@ Definition of java_library rule.
 """
 
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("//java/common:java_info.bzl", "JavaInfo")
-load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/common:java_semantics.bzl", "semantics")
+load("//java/private:java_common.bzl", "java_common")
+load("//java/private:java_info.bzl", "JavaInfo", "JavaPluginInfo")
 load(":basic_java_library.bzl", "BASIC_JAVA_LIBRARY_IMPLICIT_ATTRS")
 load(":rule_util.bzl", "merge_attrs")
 

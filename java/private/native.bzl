@@ -21,6 +21,8 @@
 
 """Lovely workaround to be able to expose native constants pretending to be Starlark."""
 
+# Unused with Bazel@HEAD, used by the compatibility layer for older Bazel versions
+
 # buildifier: disable=native-java
 native_java_common = java_common
 
@@ -29,3 +31,10 @@ NativeJavaInfo = JavaInfo
 
 # buildifier: disable=native-java
 NativeJavaPluginInfo = JavaPluginInfo
+
+# Used for some private native APIs that we can't replicate just yet in Starlark
+# getattr() for loading this file with Bazel 6, where we won't use this
+def get_internal_java_common():
+    if hasattr(native_java_common, "internal_DO_NOT_USE"):
+        return native_java_common.internal_DO_NOT_USE()
+    return None

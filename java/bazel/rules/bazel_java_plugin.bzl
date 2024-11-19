@@ -16,13 +16,13 @@
 Definition of java_plugin rule.
 """
 
-load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules:android_lint.bzl", "android_lint_subrule")
 load("//java/common/rules:java_library.bzl", "JAVA_LIBRARY_IMPLICIT_ATTRS")
 load("//java/common/rules:java_plugin.bzl", "JAVA_PLUGIN_ATTRS")
 load("//java/common/rules:rule_util.bzl", "merge_attrs")
 load("//java/common/rules/impl:basic_java_library_impl.bzl", "basic_java_library", "construct_defaultinfo")
+load("//java/private:java_info.bzl", "JavaPluginInfo")
 
 def bazel_java_plugin_rule(
         ctx,

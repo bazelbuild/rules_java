@@ -18,7 +18,9 @@ Definition of the BootClassPathInfo provider.
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-visibility("private")
+visibility(
+    ["//java/..."],
+)
 
 def _init(bootclasspath = [], auxiliary = [], system = None):
     """The <code>BootClassPathInfo</code> constructor.

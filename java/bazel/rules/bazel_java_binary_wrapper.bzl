@@ -18,21 +18,19 @@ This is needed since the `executable` nature of the target must be computed from
 the supplied value of the `create_executable` attribute.
 """
 
-load("//java/common:java_common.bzl", "java_common")
 load(
     "//java/common/rules:java_binary_wrapper.bzl",
     "register_java_binary_rules",
     "register_legacy_java_binary_rules",
 )
+load("//java/private:native.bzl", "get_internal_java_common")
 load(":bazel_java_binary.bzl", java_bin_exec = "java_binary")
 load(":bazel_java_binary_nonexec.bzl", java_bin_nonexec = "java_binary")
-
-_java_common_internal = java_common.internal_DO_NOT_USE()
 
 # copybara: default visibility
 
 def java_binary(**kwargs):
-    if _java_common_internal.incompatible_disable_non_executable_java_binary():
+    if get_internal_java_common().incompatible_disable_non_executable_java_binary():
         register_java_binary_rules(
             java_bin_exec,
             **kwargs

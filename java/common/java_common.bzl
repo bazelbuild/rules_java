@@ -13,6 +13,6 @@
 # limitations under the License.
 """java_common module"""
 
-load("//java/private:native.bzl", "native_java_common")
+load("@compatibility_proxy//:proxy.bzl", _java_common = "java_common")
 
-java_common = native_java_common
+java_common = _java_common

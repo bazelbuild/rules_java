@@ -362,51 +362,9 @@ def remote_jdk21_repos():
     """Imports OpenJDK 21 repositories."""
     _remote_jdk_repos_for_version("21")
 
-def protobuf_repo():
-    maybe(
-        http_archive,
-        name = "com_google_protobuf",
-        sha256 = "ce5d00b78450a0ca400bf360ac00c0d599cc225f049d986a27e9a4e396c5a84a",
-        strip_prefix = "protobuf-29.0-rc2",
-        url = "https://github.com/protocolbuffers/protobuf/releases/download/v29.0-rc2/protobuf-29.0-rc2.tar.gz",
-    )
-
-def rules_cc_repo():
-    maybe(
-        http_archive,
-        name = "rules_cc",
-        sha256 = "f4aadd8387f381033a9ad0500443a52a0cea5f8ad1ede4369d3c614eb7b2682e",
-        strip_prefix = "rules_cc-0.0.15",
-        urls = ["https://github.com/bazelbuild/rules_cc/releases/download/0.0.15/rules_cc-0.0.15.tar.gz"],
-    )
-
-def bazel_skylib_repo():
-    maybe(
-        http_archive,
-        name = "bazel_skylib",
-        sha256 = "bc283cdfcd526a52c3201279cda4bc298652efa898b10b4db0837dc51652756f",
-        urls = [
-            "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.7.1/bazel-skylib-1.7.1.tar.gz",
-            "https://github.com/bazelbuild/bazel-skylib/releases/download/1.7.1/bazel-skylib-1.7.1.tar.gz",
-        ],
-    )
-
 def rules_java_dependencies():
-    """An utility method to load all dependencies of rules_java.
-
-    Loads the remote repositories used by default in Bazel.
-    """
-
-    local_jdk_repo()
-    remote_jdk8_repos()
-    remote_jdk11_repos()
-    remote_jdk17_repos()
-    remote_jdk21_repos()
-    java_tools_repos()
-    compatibility_proxy_repo()
-    protobuf_repo()
-    rules_cc_repo()
-    bazel_skylib_repo()
+    """DEPRECATED: No-op, kept for backwards compatibility"""
+    print("DEPRECATED: use rules_java_dependencies() from rules_java_deps.bzl")  # buildifier: disable=print
 
 def rules_java_toolchains(name = "toolchains"):
     """An utility method to load all Java toolchains.
@@ -414,6 +372,13 @@ def rules_java_toolchains(name = "toolchains"):
     Args:
         name: The name of this macro (not used)
     """
+    local_jdk_repo()
+    remote_jdk8_repos()
+    remote_jdk11_repos()
+    remote_jdk17_repos()
+    remote_jdk21_repos()
+    java_tools_repos()
+
     native.register_toolchains(
         "//toolchains:all",
         "@local_jdk//:runtime_toolchain_definition",
@@ -425,51 +390,3 @@ def rules_java_toolchains(name = "toolchains"):
                 "@" + item.name + "_toolchain_config_repo//:toolchain",
                 "@" + item.name + "_toolchain_config_repo//:bootstrap_runtime_toolchain",
             )
-
-def _compatibility_proxy_repo_impl(rctx):
-    # TODO: use @bazel_features
-    bazel = native.bazel_version
-    rctx.file("BUILD.bazel", "")
-    if not bazel or bazel >= "8":
-        rctx.file(
-            "proxy.bzl",
-            """
-load("@rules_java//java/bazel/rules:bazel_java_binary_wrapper.bzl", _java_binary = "java_binary") # copybara-use-repo-external-label
-load("@rules_java//java/bazel/rules:bazel_java_import.bzl", _java_import = "java_import") # copybara-use-repo-external-label
-load("@rules_java//java/bazel/rules:bazel_java_library.bzl", _java_library = "java_library") # copybara-use-repo-external-label
-load("@rules_java//java/bazel/rules:bazel_java_plugin.bzl", _java_plugin = "java_plugin") # copybara-use-repo-external-label
-load("@rules_java//java/bazel/rules:bazel_java_test.bzl", _java_test = "java_test") # copybara-use-repo-external-label
-load("@rules_java//java:http_jar.bzl", _http_jar = "http_jar") # copybara-use-repo-external-label
-
-java_binary = _java_binary
-java_import = _java_import
-java_library = _java_library
-java_plugin = _java_plugin
-java_test = _java_test
-
-http_jar = _http_jar
-            """,
-        )
-    else:
-        rctx.file(
-            "proxy.bzl",
-            """
-load("@bazel_tools//tools/build_defs/repo:http.bzl", _http_jar = "http_jar")
-java_binary = native.java_binary
-java_import = native.java_import
-java_library = native.java_library
-java_plugin = native.java_plugin
-java_test = native.java_test
-
-http_jar = _http_jar
-            """,
-        )
-
-_compatibility_proxy_repo_rule = repository_rule(
-    _compatibility_proxy_repo_impl,
-    # force reruns on server restarts to use correct native.bazel_version
-    local = True,
-)
-
-def compatibility_proxy_repo():
-    maybe(_compatibility_proxy_repo_rule, name = "compatibility_proxy")

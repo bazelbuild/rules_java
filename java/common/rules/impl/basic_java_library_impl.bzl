@@ -17,20 +17,16 @@ Common code for reuse across java_* rules
 """
 
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("//java/common:java_common.bzl", "java_common")
-load("//java/common:java_info.bzl", "JavaInfo")
-load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/common/rules:android_lint.bzl", "android_lint_subrule")
+load("//java/private:boot_class_path_info.bzl", "BootClassPathInfo")
+load("//java/private:java_common_internal.bzl", "target_kind")
+load("//java/private:java_info.bzl", "JavaInfo", "JavaPluginInfo")
 load(":compile_action.bzl", "compile_action")
 load(":proguard_validation.bzl", "validate_proguard_specs")
 
 visibility([
     "//java/...",
 ])
-
-_java_common_internal = java_common.internal_DO_NOT_USE()
-BootClassPathInfo = java_common.BootClassPathInfo
-target_kind = _java_common_internal.target_kind
 
 def _filter_srcs(srcs, ext):
     return [f for f in srcs if f.extension == ext]

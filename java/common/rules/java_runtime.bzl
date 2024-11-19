@@ -18,7 +18,7 @@ Definition of java_runtime rule and JavaRuntimeInfo provider.
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("//java/common:java_semantics.bzl", "PLATFORMS_ROOT")
+load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
 
 # copybara: default visibility
@@ -249,7 +249,7 @@ The feature version of the Java runtime. I.e., the integer returned by
         # buildifier: disable=attr-licenses
         "output_licenses": attr.license() if hasattr(attr, "license") else attr.string_list(),
         "_windows_constraints": attr.label_list(
-            default = [paths.join(PLATFORMS_ROOT, "os:windows")],
+            default = [paths.join(semantics.PLATFORMS_ROOT, "os:windows")],
         ),
     },
     fragments = ["java"],

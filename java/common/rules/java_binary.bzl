@@ -16,18 +16,17 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("//java/common:java_common.bzl", "java_common")
-load("//java/common:java_info.bzl", "JavaInfo")
-load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
-load("//java/common:java_semantics.bzl", "PLATFORMS_ROOT", "semantics")
+load("//java/common:java_semantics.bzl", "semantics")
+load("//java/private:java_common.bzl", "java_common")
+load("//java/private:java_info.bzl", "JavaInfo", "JavaPluginInfo")
+load("//java/private:native.bzl", "get_internal_java_common")
 load(":basic_java_library.bzl", "BASIC_JAVA_LIBRARY_IMPLICIT_ATTRS")
 load(":rule_util.bzl", "merge_attrs")
 
 # copybara: default visibility
 
 BootClassPathInfo = java_common.BootClassPathInfo
-
-_java_common_internal = java_common.internal_DO_NOT_USE()
+_PLATFORMS_ROOT = semantics.PLATFORMS_ROOT
 
 BASIC_JAVA_BINARY_ATTRIBUTES = merge_attrs(
     BASIC_JAVA_LIBRARY_IMPLICIT_ATTRS,
@@ -321,10 +320,10 @@ binaries and not libraries, due to the danger of namespace conflicts.
         ),
         "_java_toolchain_type": attr.label(default = semantics.JAVA_TOOLCHAIN_TYPE),
         "_windows_constraints": attr.label_list(
-            default = [paths.join(PLATFORMS_ROOT, "os:windows")],
+            default = [paths.join(_PLATFORMS_ROOT, "os:windows")],
         ),
         "_build_info_translator": attr.label(default = semantics.BUILD_INFO_TRANSLATOR_LABEL),
-    } | ({} if _java_common_internal.incompatible_disable_non_executable_java_binary() else {"create_executable": attr.bool(default = True, doc = "Deprecated, use <code>java_single_jar</code> instead.")}),
+    } | ({} if get_internal_java_common().incompatible_disable_non_executable_java_binary() else {"create_executable": attr.bool(default = True, doc = "Deprecated, use <code>java_single_jar</code> instead.")}),
 )
 
 BASE_TEST_ATTRIBUTES = {
@@ -367,11 +366,11 @@ The Java class to be loaded by the test runner.<br/>
     "env_inherit": attr.string_list(),
     "_apple_constraints": attr.label_list(
         default = [
-            paths.join(PLATFORMS_ROOT, "os:ios"),
-            paths.join(PLATFORMS_ROOT, "os:macos"),
-            paths.join(PLATFORMS_ROOT, "os:tvos"),
-            paths.join(PLATFORMS_ROOT, "os:visionos"),
-            paths.join(PLATFORMS_ROOT, "os:watchos"),
+            paths.join(_PLATFORMS_ROOT, "os:ios"),
+            paths.join(_PLATFORMS_ROOT, "os:macos"),
+            paths.join(_PLATFORMS_ROOT, "os:tvos"),
+            paths.join(_PLATFORMS_ROOT, "os:visionos"),
+            paths.join(_PLATFORMS_ROOT, "os:watchos"),
         ],
     ),
     "_legacy_any_type_attrs": attr.string_list(default = ["stamp"]),

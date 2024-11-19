@@ -18,6 +18,8 @@ Definition of java_toolchain rule and JavaToolchainInfo provider.
 
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
+load("//java/private:boot_class_path_info.bzl", "BootClassPathInfo")
+load("//java/private:java_info.bzl", "JavaPluginDataInfo")
 load(":java_package_configuration.bzl", "JavaPackageConfigurationInfo")
 load(":java_runtime.bzl", "JavaRuntimeInfo")
 
@@ -25,8 +27,6 @@ load(":java_runtime.bzl", "JavaRuntimeInfo")
 
 _java_common_internal = java_common.internal_DO_NOT_USE()
 ToolchainInfo = platform_common.ToolchainInfo
-BootClassPathInfo = java_common.BootClassPathInfo
-JavaPluginDataInfo = _java_common_internal.JavaPluginDataInfo
 
 def _java_toolchain_info_init(**_kwargs):
     fail("JavaToolchainInfo instantiation is a private API")

@@ -13,6 +13,8 @@
 # limitations under the License.
 """java_toolchain rule"""
 
+load("@compatibility_proxy//:proxy.bzl", _java_toolchain = "java_toolchain")
+
 def java_toolchain(**attrs):
     """Bazel java_toolchain rule.
 
@@ -22,5 +24,4 @@ def java_toolchain(**attrs):
       **attrs: Rule attributes
     """
 
-    # buildifier: disable=native-java
-    native.java_toolchain(**attrs)
+    _java_toolchain(**attrs)

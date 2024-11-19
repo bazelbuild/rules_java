@@ -16,7 +16,7 @@ bzl_library(
     name = "common",
     srcs = glob(["*.bzl"]),
     visibility = ["//visibility:public"],
-    deps = ["//java/private:native_bzl"],
+    deps = ["//java/private:internals"],
 )
 
 filegroup(

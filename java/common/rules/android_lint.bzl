@@ -14,13 +14,13 @@
 
 """Creates the android lint action for java rules"""
 
-load("//java/common:java_semantics.bzl", "semantics", _semantics_tokenize_javacopts = "tokenize_javacopts")
+load("//java/common:java_semantics.bzl", "semantics")
 
 # copybara: default visibility
 
 def _tokenize_opts(opts_depset):
     opts = reversed(opts_depset.to_list())
-    return _semantics_tokenize_javacopts(opts)
+    return semantics.tokenize_javacopts(opts)
 
 def _android_lint_action(ctx, source_files, source_jars, compilation_info):
     """
@@ -112,7 +112,7 @@ def _android_lint_action(ctx, source_files, source_jars, compilation_info):
     args.add_all(linter.lint_opts)
 
     for package_config in linter.package_config:
-        if package_config.matches(ctx.label):
+        if package_config.matches(package_config.package_specs, ctx.label):
             # wrap in a list so that map_each passes the depset to _tokenize_opts
             package_opts = [package_config.javac_opts]
             args.add_all(package_opts, map_each = _tokenize_opts)

@@ -17,17 +17,15 @@ Definition of java_import rule.
 """
 
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("//java/common:java_common.bzl", "java_common")
-load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules/impl:basic_java_library_impl.bzl", "construct_defaultinfo")
 load("//java/common/rules/impl:import_deps_check.bzl", "import_deps_check")
+load("//java/private:java_common.bzl", "java_common")
+load("//java/private:java_common_internal.bzl", _run_ijar_private_for_builtins = "run_ijar")
+load("//java/private:java_info.bzl", "JavaInfo")
 load(":proguard_validation.bzl", "validate_proguard_specs")
 
 # copybara: default visibility
-
-_java_common_internal = java_common.internal_DO_NOT_USE()
-_run_ijar_private_for_builtins = _java_common_internal.run_ijar_private_for_builtins
 
 def _filter_provider(provider, *attrs):
     return [dep[provider] for attr in attrs for dep in attr if provider in dep]

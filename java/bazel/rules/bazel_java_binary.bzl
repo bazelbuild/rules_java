@@ -15,7 +15,6 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "use_cc_toolchain")
-load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load(
     "//java/common/rules:android_lint.bzl",
@@ -26,6 +25,7 @@ load("//java/common/rules:rule_util.bzl", "merge_attrs")
 load("//java/common/rules/impl:java_binary_deploy_jar.bzl", "create_deploy_archives")
 load("//java/common/rules/impl:java_binary_impl.bzl", "basic_java_binary")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
+load("//java/private:java_info.bzl", "JavaInfo")
 
 def _bazel_java_binary_impl(ctx):
     return bazel_base_binary_impl(ctx, is_test_rule_class = False) + helper.executable_providers(ctx)

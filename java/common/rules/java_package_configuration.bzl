@@ -14,14 +14,11 @@
 
 """Implementation for the java_package_configuration rule"""
 
-load("//java/common:java_common.bzl", "java_common")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
+load("//java/private:boot_class_path_info.bzl", "BootClassPathInfo")
+load("//java/private:native.bzl", "get_internal_java_common")
 
 # copybara: default visibility
-
-_java_common_internal = java_common.internal_DO_NOT_USE()
-
-BootClassPathInfo = java_common.BootClassPathInfo
 
 JavaPackageConfigurationInfo = provider(
     "A provider for Java per-package configuration",
@@ -41,7 +38,7 @@ def _matches(package_specs, label):
     return False
 
 def _rule_impl(ctx):
-    javacopts = _java_common_internal.expand_java_opts(ctx, "javacopts", tokenize = True)
+    javacopts = get_internal_java_common().expand_java_opts(ctx, "javacopts", tokenize = True)
     javacopts_depset = helper.detokenize_javacopts(javacopts)
     package_specs = [package[PackageSpecificationInfo] for package in ctx.attr.packages]
     system = ctx.attr.system[BootClassPathInfo] if ctx.attr.system else None
@@ -50,7 +47,7 @@ def _rule_impl(ctx):
         JavaPackageConfigurationInfo(
             data = depset(ctx.files.data),
             javac_opts = javacopts_depset,
-            matches = lambda label: _matches(package_specs, label),
+            matches = _matches,
             package_specs = package_specs,
             system = system,
         ),

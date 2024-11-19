@@ -21,6 +21,11 @@ load("//java/common/rules:java_toolchain.bzl", "JavaToolchainInfo")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
 load(":boot_class_path_info.bzl", "BootClassPathInfo")
 load(
+    ":java_common_internal.bzl",
+    _compile_internal = "compile",
+    _run_ijar_internal = "run_ijar",
+)
+load(
     ":java_info.bzl",
     "JavaInfo",
     "JavaPluginInfo",
@@ -30,11 +35,9 @@ load(
     _java_info_set_annotation_processing = "set_annotation_processing",
 )
 load(":message_bundle_info.bzl", "MessageBundleInfo")
-load(":native.bzl", _native_java_common = "native_java_common")
+load(":native.bzl", "get_internal_java_common")
 
-visibility("private")
-
-_java_common_internal = _native_java_common.internal_DO_NOT_USE()
+# copybara: default visibility
 
 JavaRuntimeClasspathInfo = provider(
     "Provider for the runtime classpath contributions of a Java binary.",
@@ -65,7 +68,7 @@ def _compile(
         enable_annotation_processing = True,
         add_exports = [],
         add_opens = []):
-    return _java_common_internal.compile(
+    return _compile_internal(
         ctx,
         output,
         java_toolchain,
@@ -92,8 +95,8 @@ def _compile(
     )
 
 def _run_ijar(actions, jar, java_toolchain, target_label = None):
-    _java_common_internal.check_java_toolchain_is_declared_on_rule(actions)
-    return _java_common_internal.run_ijar_private_for_builtins(
+    get_internal_java_common().check_java_toolchain_is_declared_on_rule(actions)
+    return _run_ijar_internal(
         actions = actions,
         jar = jar,
         java_toolchain = java_toolchain,
@@ -117,7 +120,7 @@ def _stamp_jar(actions, jar, java_toolchain, target_label):
         (File) The output artifact
 
     """
-    _java_common_internal.check_java_toolchain_is_declared_on_rule(actions)
+    get_internal_java_common().check_java_toolchain_is_declared_on_rule(actions)
     output = actions.declare_file(paths.replace_extension(jar.basename, "-stamped.jar"), sibling = jar)
     args = actions.args()
     args.add(jar)
@@ -156,7 +159,7 @@ def _pack_sources(
     Returns:
         (File) The output artifact
     """
-    _java_common_internal.check_java_toolchain_is_declared_on_rule(actions)
+    get_internal_java_common().check_java_toolchain_is_declared_on_rule(actions)
     return helper.create_single_jar(
         actions,
         toolchain = java_toolchain,
@@ -287,7 +290,7 @@ def _java_toolchain_label(java_toolchain):
         # (discouraged) use of --experimental_google_legacy_api.
         return None
 
-    _java_common_internal.check_provider_instances([java_toolchain], "java_toolchain", JavaToolchainInfo)
+    get_internal_java_common().check_provider_instances([java_toolchain], "java_toolchain", JavaToolchainInfo)
     return java_toolchain.label
 
 def _make_java_common():
@@ -307,7 +310,7 @@ def _make_java_common():
         "BootClassPathInfo": BootClassPathInfo,
         "JavaRuntimeClasspathInfo": JavaRuntimeClasspathInfo,
     }
-    if _java_common_internal.google_legacy_api_enabled():
+    if get_internal_java_common().google_legacy_api_enabled():
         methods.update(
             MessageBundleInfo = _get_message_bundle_info(),  # struct field that is None in bazel
             add_constraints = _add_constraints,

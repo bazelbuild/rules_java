@@ -17,11 +17,9 @@ Java compile action
 """
 
 load("//java/common:java_semantics.bzl", "semantics")
+load("//java/private:java_common_internal.bzl", _compile_private_for_builtins = "compile")
 
 visibility("private")
-
-_java_common_internal = java_common.internal_DO_NOT_USE()
-_compile_private_for_builtins = _java_common_internal.compile
 
 def _filter_strict_deps(mode):
     return "error" if mode in ["strict", "default"] else mode

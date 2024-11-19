@@ -13,6 +13,8 @@
 # limitations under the License.
 """java_runtime rule"""
 
+load("@compatibility_proxy//:proxy.bzl", _java_runtime = "java_runtime")
+
 def java_runtime(**attrs):
     """Bazel java_runtime rule.
 
@@ -22,5 +24,4 @@ def java_runtime(**attrs):
       **attrs: Rule attributes
     """
 
-    # buildifier: disable=native-java
-    native.java_runtime(**attrs)
+    _java_runtime(**attrs)

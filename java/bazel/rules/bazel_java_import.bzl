@@ -16,10 +16,10 @@
 Definition of java_import rule.
 """
 
-load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules:java_import.bzl", "JAVA_IMPORT_ATTRS")
 load("//java/common/rules/impl:bazel_java_import_impl.bzl", "bazel_java_import_rule")
+load("//java/private:java_info.bzl", "JavaInfo")
 
 def _proxy(ctx):
     return bazel_java_import_rule(

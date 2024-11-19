@@ -13,6 +13,8 @@
 # limitations under the License.
 """java_package_configuration rule"""
 
+load("@compatibility_proxy//:proxy.bzl", _java_package_configuration = "java_package_configuration")
+
 def java_package_configuration(**attrs):
     """Bazel java_package_configuration rule.
 
@@ -22,5 +24,4 @@ def java_package_configuration(**attrs):
       **attrs: Rule attributes
     """
 
-    # buildifier: disable=native-java
-    native.java_package_configuration(**attrs)
+    _java_package_configuration(**attrs)

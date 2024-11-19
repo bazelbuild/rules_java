@@ -90,7 +90,7 @@ REMOTE_JDK_REPOS = [(("remote_jdk" if version == "8" else "remotejdk") + version
 [register_toolchains("@" + name + "_toolchain_config_repo//:all") for name in REMOTE_JDK_REPOS]
 
 # Compatibility layer
-compat = use_extension("//java:extensions.bzl", "compatibility_proxy")
+compat = use_extension("//java:rules_java_deps.bzl", "compatibility_proxy")
 use_repo(compat, "compatibility_proxy")
 
 # Dev dependencies

@@ -17,20 +17,19 @@
 load("@com_google_protobuf//bazel/common:proto_info.bzl", "ProtoInfo")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
-load("//java/common:java_common.bzl", "java_common")
-load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules/impl:basic_java_library_impl.bzl", "basic_java_library", "collect_deps")
+load("//java/private:java_common.bzl", "java_common")
+load(
+    "//java/private:java_common_internal.bzl",
+    "collect_native_deps_dirs",
+    "get_runtime_classpath_for_archive",
+)
+load("//java/private:java_info.bzl", "JavaCompilationInfo", "JavaInfo", "to_java_binary_info")
 load(":java_binary_deploy_jar.bzl", "create_deploy_archive")
 load(":java_helper.bzl", "helper")
 
 # copybara: default visibility
-
-_java_common_internal = java_common.internal_DO_NOT_USE()
-JavaCompilationInfo = _java_common_internal.JavaCompilationInfo
-collect_native_deps_dirs = _java_common_internal.collect_native_deps_dirs
-get_runtime_classpath_for_archive = _java_common_internal.get_runtime_classpath_for_archive
-to_java_binary_info = _java_common_internal.to_java_binary_info
 
 InternalDeployJarInfo = provider(
     "Provider for passing info to deploy jar rule",
