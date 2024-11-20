@@ -20,12 +20,12 @@ load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
 load("//java/private:boot_class_path_info.bzl", "BootClassPathInfo")
 load("//java/private:java_info.bzl", "JavaPluginDataInfo")
+load("//java/private:native.bzl", "get_internal_java_common")
 load(":java_package_configuration.bzl", "JavaPackageConfigurationInfo")
 load(":java_runtime.bzl", "JavaRuntimeInfo")
 
 # copybara: default visibility
 
-_java_common_internal = java_common.internal_DO_NOT_USE()
 ToolchainInfo = platform_common.ToolchainInfo
 
 def _java_toolchain_info_init(**_kwargs):
@@ -99,7 +99,7 @@ def _java_toolchain_impl(ctx):
         ijar = ctx.attr.ijar.files_to_run if ctx.attr.ijar else None,
         jacocorunner = ctx.attr.jacocorunner.files_to_run if ctx.attr.jacocorunner else None,
         java_runtime = java_runtime,
-        jvm_opt = depset(_java_common_internal.expand_java_opts(ctx, "jvm_opts", tokenize = False, exec_paths = True)),
+        jvm_opt = depset(get_internal_java_common().expand_java_opts(ctx, "jvm_opts", tokenize = False, exec_paths = True)),
         label = ctx.label,
         proguard_allowlister = ctx.attr.proguard_allowlister.files_to_run if ctx.attr.proguard_allowlister else None,
         single_jar = ctx.attr.singlejar.files_to_run,
@@ -164,8 +164,8 @@ def _get_javac_opts(ctx):
         opts.extend(["-target", ctx.attr.target_version])
     if ctx.attr.xlint:
         opts.append("-Xlint:" + ",".join(ctx.attr.xlint))
-    opts.extend(_java_common_internal.expand_java_opts(ctx, "misc", tokenize = True))
-    opts.extend(_java_common_internal.expand_java_opts(ctx, "javacopts", tokenize = True))
+    opts.extend(get_internal_java_common().expand_java_opts(ctx, "misc", tokenize = True))
+    opts.extend(get_internal_java_common().expand_java_opts(ctx, "javacopts", tokenize = True))
     return opts
 
 def _get_android_lint_tool(ctx):
