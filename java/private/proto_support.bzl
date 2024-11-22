@@ -13,7 +13,7 @@
 # limitations under the License.
 """Support for Java compilation of protocol buffer generated code."""
 
-load("//java/common:java_common.bzl", "java_common")
+load("@compatibility_proxy//:proxy.bzl", "java_common")
 
 # Partial support, because internal symbols are not available in older Bazel version
 # TODO: Once Java rules are moved into the rules_java, this should become a full support.

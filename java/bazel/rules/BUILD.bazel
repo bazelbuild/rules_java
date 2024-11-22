@@ -24,9 +24,10 @@ bzl_library(
     srcs = glob(["*.bzl"]),
     visibility = ["//visibility:public"],  # for Bazel docgen
     deps = [
-        "//java/common",
+        "//java/common:semantics_bzl",
         "//java/common/rules:core_rules",
         "//java/common/rules/impl",
+        "//java/private:internals",
         "@bazel_skylib//lib:paths",
         "@rules_cc//cc:find_cc_toolchain_bzl",
         "@rules_cc//cc/common",

@@ -14,12 +14,30 @@ filegroup(
 
 bzl_library(
     name = "common",
-    srcs = glob(["*.bzl"]),
+    srcs = glob(
+        ["*.bzl"],
+        exclude = [
+            "java_semantics.bzl",
+            "proguard_spec_info.bzl",
+        ],
+    ),
+    visibility = ["//visibility:public"],
+    deps = ["@compatibility_proxy//:proxy_bzl"],
+)
+
+bzl_library(
+    name = "semantics_bzl",
+    srcs = ["java_semantics.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "//java/private:internals",
-        "@compatibility_proxy//:proxy_bzl",
+        "@rules_cc//cc/common",
     ],
+)
+
+bzl_library(
+    name = "proguard_spec_info_bzl",
+    srcs = ["proguard_spec_info.bzl"],
+    visibility = ["//visibility:public"],
 )
 
 filegroup(

@@ -6,14 +6,25 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 def _compatibility_proxy_repo_impl(rctx):
     # TODO: use @bazel_features
     bazel = native.bazel_version
-    rctx.file(
-        "BUILD.bazel",
-        """
-load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
-bzl_library(name = "proxy_bzl", srcs = ["proxy.bzl"], visibility = ["//visibility:public"])
-        """,
-    )
     if not bazel or bazel >= "8":
+        rctx.file(
+            "BUILD.bazel",
+            """
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+exports_files(['proxy.bzl'], visibility = ["@rules_java//test:__pkg__"])
+bzl_library(
+    name = "proxy_bzl",
+    srcs = ["proxy.bzl"],
+    deps = [
+        "@rules_java//java/bazel/rules",
+        "@rules_java//java/common/rules:toolchain_rules",
+        "@rules_java//java/private:internals",
+        "@rules_java//java:http_jar_bzl",
+    ],
+    visibility = ["//visibility:public"]
+)
+            """,
+        )
         rctx.file(
             "proxy.bzl",
             """
@@ -45,6 +56,22 @@ http_jar = _http_jar
             """,
         )
     else:
+        rctx.file(
+            "BUILD.bazel",
+            """
+load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+exports_files(['proxy.bzl'], visibility = ["@rules_java//test:__pkg__"])
+bzl_library(
+    name = "proxy_bzl",
+    srcs = ["proxy.bzl"],
+    deps = [
+        "@rules_java//java/private:native_bzl",
+        "@bazel_tools//tools:bzl_srcs",
+    ],
+    visibility = ["//visibility:public"]
+)
+            """,
+        )
         rctx.file(
             "proxy.bzl",
             """

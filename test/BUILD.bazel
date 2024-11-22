@@ -60,3 +60,9 @@ diff_test(
 )
 
 validate_configs()
+
+starlark_doc_extract(
+    name = "proxy_bzl_graph",
+    src = "@compatibility_proxy//:proxy.bzl",
+    deps = ["@compatibility_proxy//:proxy_bzl"],
+)

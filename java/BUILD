@@ -65,6 +65,13 @@ bzl_library(
     deps = ["//java/common"],
 )
 
+bzl_library(
+    name = "http_jar_bzl",
+    srcs = ["http_jar.bzl"],
+    visibility = ["//visibility:public"],
+    deps = ["@bazel_tools//tools:bzl_srcs"],
+)
+
 filegroup(
     name = "for_bazel_tests",
     testonly = 1,

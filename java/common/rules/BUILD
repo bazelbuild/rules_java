@@ -38,7 +38,7 @@ bzl_library(
     deps = [
         ":android_lint_bzl",
         ":rule_util_bzl",
-        "//java/common",
+        "//java/private:internals",
         "@bazel_skylib//lib:paths",
         "@rules_cc//cc/common",
     ],
@@ -53,6 +53,7 @@ bzl_library(
     ],
     visibility = [
         "//java:__subpackages__",
+        "@compatibility_proxy//:__pkg__",
     ],
 )
 

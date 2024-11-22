@@ -7,7 +7,10 @@ bzl_library(
     srcs = [
         "native.bzl",
     ],
-    visibility = ["//java:__subpackages__"],
+    visibility = [
+        "//java:__subpackages__",
+        "@compatibility_proxy//:__pkg__",
+    ],
 )
 
 bzl_library(
@@ -19,7 +22,10 @@ bzl_library(
         "java_info.bzl",
         "message_bundle_info.bzl",
     ],
-    visibility = ["//java:__subpackages__"],
+    visibility = [
+        "//java:__subpackages__",
+        "@compatibility_proxy//:__pkg__",
+    ],
     deps = [
         ":native_bzl",
         "//java/common/rules:toolchain_rules",
@@ -35,7 +41,7 @@ bzl_library(
     name = "proto_support",
     srcs = ["proto_support.bzl"],
     visibility = ["//visibility:public"],
-    deps = [":native_bzl"],
+    deps = ["@compatibility_proxy//:proxy_bzl"],
 )
 
 filegroup(

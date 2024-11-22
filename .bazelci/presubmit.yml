@@ -4,7 +4,6 @@ build_targets: &build_targets
   - "@remote_java_tools//java_tools/..."
   # TODO: Look into broken targets in //toolchains
   - "-//toolchains/..."
-  - "-//test/repo/..."
   # TODO: re-enable docs after protobuf is fixed
   - "-//java/docs/..."
   - "-//test:docs_up_to_date_test"
