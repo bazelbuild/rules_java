@@ -22,7 +22,11 @@ bzl_library(
         ],
     ),
     visibility = ["//visibility:public"],
-    deps = ["@compatibility_proxy//:proxy_bzl"],
+    deps = [
+        ":proguard_spec_info_bzl",
+        ":semantics_bzl",
+        "@compatibility_proxy//:proxy_bzl",
+    ],
 )
 
 bzl_library(
