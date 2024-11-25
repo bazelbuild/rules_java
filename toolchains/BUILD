@@ -15,6 +15,7 @@ load(
     "java_runtime_version_alias",
     "java_toolchain_alias",
 )
+load(":utf8_environment.bzl", "utf8_environment")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -280,6 +281,11 @@ alias(
         "@bazel_tools//src/conditions:linux_x86_64": ":turbine_direct_graal_linux",
         "@bazel_tools//src/conditions:windows": ":turbine_direct_graal_windows",
     }),
+)
+
+utf8_environment(
+    name = "utf8_environment",
+    visibility = ["//visibility:private"],
 )
 
 bootclasspath(

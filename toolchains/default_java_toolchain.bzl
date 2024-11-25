@@ -16,6 +16,7 @@
 
 load("//java/common:java_common.bzl", "java_common")
 load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
+load(":utf8_environment.bzl", "Utf8EnvironmentInfo")
 
 # JVM options, without patching java.compiler and jdk.compiler modules.
 BASE_JDK9_JVM_OPTS = [
@@ -223,6 +224,7 @@ def _java_home(java_executable):
 
 def _bootclasspath_impl(ctx):
     exec_javabase = ctx.attr.java_runtime_alias[java_common.JavaRuntimeInfo]
+    env = ctx.attr._utf8_environment[Utf8EnvironmentInfo].environment
 
     class_dir = ctx.actions.declare_directory("%s_classes" % ctx.label.name)
 
@@ -243,6 +245,7 @@ def _bootclasspath_impl(ctx):
         inputs = [ctx.file.src] + ctx.files.java_runtime_alias,
         outputs = [class_dir],
         arguments = [args],
+        env = env,
         execution_requirements = _SUPPORTS_PATH_MAPPING,
     )
 
@@ -281,6 +284,7 @@ def _bootclasspath_impl(ctx):
         inputs = inputs,
         outputs = [bootclasspath],
         arguments = [args],
+        env = env,
         execution_requirements = _SUPPORTS_PATH_MAPPING,
     )
     return [
@@ -303,6 +307,10 @@ _bootclasspath = rule(
         "src": attr.label(
             cfg = "exec",
             allow_single_file = True,
+        ),
+        "_utf8_environment": attr.label(
+            default = ":utf8_environment",
+            cfg = "exec",
         ),
     },
     toolchains = [_JAVA_BOOTSTRAP_RUNTIME_TOOLCHAIN_TYPE],
