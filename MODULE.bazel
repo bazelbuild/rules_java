@@ -97,6 +97,7 @@ use_repo(compat, "compatibility_proxy")
 bazel_dep(name = "rules_pkg", version = "0.9.1", dev_dependency = True)
 bazel_dep(name = "stardoc", version = "0.7.1", dev_dependency = True)
 bazel_dep(name = "rules_shell", version = "0.2.0", dev_dependency = True)
+bazel_dep(name = "rules_testing", version = "0.7.0", dev_dependency = True)
 
 test_repositories = use_extension("//test:repositories.bzl", "test_repositories_ext", dev_dependency = True)
 use_repo(test_repositories, "guava", "truth")
