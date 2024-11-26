@@ -1,4 +1,4 @@
-load("@rules_java//java:defs.bzl", "java_library", "java_plugin")
+load("//java:defs.bzl", "java_library", "java_plugin")
 
 java_library(
     name = "runfiles",
