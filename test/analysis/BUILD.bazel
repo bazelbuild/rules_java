@@ -1,0 +1,5 @@
+load(":bootclasspath_tests.bzl", "bootclasspath_tests")
+
+bootclasspath_tests(
+    name = "bootclasspath_tests",
+)

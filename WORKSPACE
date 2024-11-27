@@ -53,6 +53,13 @@ load("@stardoc//:setup.bzl", "stardoc_repositories")
 
 stardoc_repositories()
 
+http_archive(
+    name = "rules_testing",
+    sha256 = "28c2d174471b587bf0df1fd3a10313f22c8906caf4050f8b46ec4648a79f90c3",
+    strip_prefix = "rules_testing-0.7.0",
+    url = "https://github.com/bazelbuild/rules_testing/releases/download/v0.7.0/rules_testing-v0.7.0.tar.gz",
+)
+
 load("//test:repositories.bzl", "test_repositories")
 
 test_repositories()
