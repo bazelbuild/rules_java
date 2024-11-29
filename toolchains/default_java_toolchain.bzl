@@ -422,6 +422,9 @@ _bootclasspath = rule(
             cfg = "exec",
             allow_single_file = True,
         ),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
         "_incompatible_language_version_bootclasspath": attr.label(
             default = "//java:incompatible_language_version_bootclasspath",
         ),
