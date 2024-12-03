@@ -38,7 +38,6 @@ def create_deploy_archives(
         hermetic = False,
         add_exports = depset(),
         add_opens = depset(),
-        shared_archive = None,
         one_version_level = "OFF",
         one_version_allowlist = None,
         extra_args = [],
@@ -55,7 +54,6 @@ def create_deploy_archives(
         hermetic: (bool)
         add_exports: (depset)
         add_opens: (depset)
-        shared_archive: (File) Optional .jsa artifact
         one_version_level: (String) Optional one version check level, default OFF
         one_version_allowlist: (File) Optional allowlist for one version check
         extra_args: (list[Args]) Optional arguments for the deploy jar action
@@ -87,7 +85,6 @@ def create_deploy_archives(
         build_info_files,
         build_target,
         output = ctx.outputs.deployjar,
-        shared_archive = shared_archive,
         one_version_level = one_version_level,
         one_version_allowlist = one_version_allowlist,
         multi_release = multi_release,
@@ -131,7 +128,6 @@ def create_deploy_archive(
         build_info_files,
         build_target,
         output,
-        shared_archive = None,
         one_version_level = "OFF",
         one_version_allowlist = None,
         multi_release = False,
@@ -156,7 +152,6 @@ def create_deploy_archive(
         build_info_files: (list[File]) build info files for stamping
         build_target: (String) the owner build target label name string
         output: (File) the output jar artifact
-        shared_archive: (File) Optional .jsa artifact
         one_version_level: (String) Optional one version check level, default OFF
         one_version_allowlist: (File) Optional allowlist for one version check
         multi_release: (bool)
@@ -217,18 +212,15 @@ def create_deploy_archive(
             java_home = runtime.java_home
             lib_modules = runtime.lib_modules
             hermetic_files = runtime.hermetic_files
+            default_cds = runtime.default_cds
             args.add("--hermetic_java_home", java_home)
             args.add("--jdk_lib_modules", lib_modules)
             args.add_all("--resources", hermetic_files)
             input_files.append(lib_modules)
             transitive_input_files.append(hermetic_files)
-
-            if shared_archive == None:
-                shared_archive = runtime.default_cds
-
-    if shared_archive:
-        input_files.append(shared_archive)
-        args.add("--cds_archive", shared_archive)
+            if default_cds:
+                input_files.append(default_cds)
+                args.add("--cds_archive", default_cds)
 
     args.add_all("--add_exports", add_exports)
     args.add_all("--add_opens", add_opens)
