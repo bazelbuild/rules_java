@@ -89,7 +89,7 @@ toolchain(
     # the same configuration, this constraint will not result in toolchain resolution failures.
     exec_compatible_with = {target_compatible_with},
     target_settings = [":version_or_prefix_version_setting"],
-    toolchain_type = "@rules_java//toolchains:bootstrap_runtime_toolchain_type",
+    toolchain_type = "@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type",
     toolchain = "{toolchain}",
 )
 """.format(

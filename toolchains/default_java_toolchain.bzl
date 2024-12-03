@@ -211,7 +211,7 @@ def java_runtime_files(name, srcs):
             tags = ["manual"],
         )
 
-_JAVA_BOOTSTRAP_RUNTIME_TOOLCHAIN_TYPE = Label("//toolchains:bootstrap_runtime_toolchain_type")
+_JAVA_BOOTSTRAP_RUNTIME_TOOLCHAIN_TYPE = Label("@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type")
 
 # Opt the Java bootstrap actions into path mapping:
 # https://github.com/bazelbuild/bazel/commit/a239ea84832f18ee8706682145e9595e71b39680
