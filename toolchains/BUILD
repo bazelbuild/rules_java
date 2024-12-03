@@ -33,6 +33,14 @@ filegroup(
     srcs = glob(["*.bzl"]),
 )
 
+# If enabled, the bootclasspath for Java compilation will be extracted from a Java runtime matching
+# the version specified with `--java_language_version` rather than the runtime specified with
+# `--java_runtime_version`.
+bool_flag(
+    name = "incompatible_language_version_bootclasspath",
+    build_setting_default = False,
+)
+
 # A single binary distribution of a JDK (e.g., OpenJDK 17 for Windows arm64) provides three
 # different types of toolchains from the perspective of Bazel:
 

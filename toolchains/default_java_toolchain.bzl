@@ -426,7 +426,7 @@ _bootclasspath = rule(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
         ),
         "_incompatible_language_version_bootclasspath": attr.label(
-            default = "//java:incompatible_language_version_bootclasspath",
+            default = "//toolchains:incompatible_language_version_bootclasspath",
         ),
         "_utf8_environment": attr.label(
             default = ":utf8_environment",

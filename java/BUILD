@@ -5,14 +5,6 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
-# If enabled, the bootclasspath for Java compilation will be extracted from a Java runtime matching
-# the version specified with `--java_language_version` rather than the runtime specified with
-# `--java_runtime_version`.
-bool_flag(
-    name = "incompatible_language_version_bootclasspath",
-    build_setting_default = False,
-)
-
 filegroup(
     name = "srcs",
     srcs = glob(["**"]) + [
