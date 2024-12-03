@@ -268,7 +268,7 @@ toolchain(
 toolchain(
    name = "bootstrap_runtime_toolchain_definition",
    target_settings = [":localjdk_setting"],
-   toolchain_type = "@rules_java//toolchains:bootstrap_runtime_toolchain_type",
+   toolchain_type = "@rules_java//tools/jdk:bootstrap_runtime_toolchain_type",
    toolchain = ":jdk",
 )
 '''
