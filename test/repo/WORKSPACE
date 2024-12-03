@@ -13,6 +13,8 @@ load("@com_google_protobuf//bazel/private:proto_bazel_features.bzl", "proto_baze
 
 proto_bazel_features(name = "proto_bazel_features")
 
+register_toolchains("//:all")
+
 load("@rules_java//java:repositories.bzl", "rules_java_toolchains")
 
 rules_java_toolchains()

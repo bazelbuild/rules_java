@@ -26,4 +26,5 @@ java_test(
 
 default_java_toolchain(
     name = "my_funky_toolchain",
+    bootclasspath = ["@bazel_tools//tools/jdk:platformclasspath"],
 )
