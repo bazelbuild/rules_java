@@ -42,6 +42,7 @@ filegroup(
 bool_flag(
     name = "incompatible_language_version_bootclasspath",
     build_setting_default = False,
+    visibility = ["//visibility:private"],
 )
 
 # A single binary distribution of a JDK (e.g., OpenJDK 17 for Windows arm64) provides three
@@ -296,14 +297,6 @@ alias(
     }),
 )
 
-config_setting(
-    name = "incompatible_language_version_bootclasspath_enabled",
-    flag_values = {
-        ":incompatible_language_version_bootclasspath": "True",
-    },
-    visibility = ["//visibility:private"],
-)
-
 string_setting(
     name = "java_language_version",
     build_setting_default = "",
@@ -325,6 +318,14 @@ language_version_bootstrap_runtime(
 
 utf8_environment(
     name = "utf8_environment",
+    visibility = ["//visibility:private"],
+)
+
+config_setting(
+    name = "incompatible_language_version_bootclasspath_enabled",
+    flag_values = {
+        ":incompatible_language_version_bootclasspath": "True",
+    },
     visibility = ["//visibility:private"],
 )
 

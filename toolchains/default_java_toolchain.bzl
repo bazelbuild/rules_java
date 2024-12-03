@@ -14,7 +14,6 @@
 
 """Rules for defining default_java_toolchain"""
 
-load("//java/common:java_common.bzl", "java_common")
 load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
 load(":bootclasspath.bzl", _bootclasspath = "bootclasspath")
 

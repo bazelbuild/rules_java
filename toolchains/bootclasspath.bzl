@@ -15,6 +15,7 @@
 """Rules for extracting a platform classpath from Java runtimes."""
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+load("//java/common:java_common.bzl", "java_common")
 load(":utf8_environment.bzl", "Utf8EnvironmentInfo")
 
 visibility("private")
@@ -148,8 +149,7 @@ def _bootclasspath_impl(ctx):
     args.add("DumpPlatformClassPath")
     args.add(bootclasspath)
 
-    incompatible_language_version_bootclasspath = ctx.attr._incompatible_language_version_bootclasspath[BuildSettingInfo].value
-    if incompatible_language_version_bootclasspath:
+    if ctx.attr.language_version_bootstrap_runtime:
         # The attribute is subject to a split transition.
         language_version_bootstrap_runtime = ctx.attr.language_version_bootstrap_runtime[0]
         if java_common.JavaRuntimeInfo in language_version_bootstrap_runtime:
@@ -229,9 +229,6 @@ _bootclasspath = rule(
         ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
-        ),
-        "_incompatible_language_version_bootclasspath": attr.label(
-            default = "//toolchains:incompatible_language_version_bootclasspath",
         ),
         "_utf8_environment": attr.label(
             default = ":utf8_environment",
