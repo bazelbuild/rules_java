@@ -37,7 +37,8 @@ load("@rules_java//java/common/rules:java_package_configuration.bzl", _java_pack
 load("@rules_java//java/common/rules:java_runtime.bzl", _java_runtime = "java_runtime")
 load("@rules_java//java/common/rules:java_toolchain.bzl", _java_toolchain = "java_toolchain")
 load("@rules_java//java/private:java_common.bzl", _java_common = "java_common")
-load("@rules_java//java/private:java_info.bzl", _JavaInfo = "JavaInfo", _JavaPluginInfo = "JavaPluginInfo")
+load("@rules_java//java/private:java_common_internal.bzl", _java_common_internal_compile = "compile")
+load("@rules_java//java/private:java_info.bzl", _JavaInfo = "JavaInfo", _JavaPluginInfo = "JavaPluginInfo", _java_info_internal_merge = "merge")
 load("@rules_java//java:http_jar.bzl", _http_jar = "http_jar")
 
 java_binary = _java_binary
@@ -51,7 +52,8 @@ java_toolchain = _java_toolchain
 java_common = _java_common
 JavaInfo = _JavaInfo
 JavaPluginInfo = _JavaPluginInfo
-
+java_common_internal_compile = _java_common_internal_compile
+java_info_internal_merge = _java_info_internal_merge
 http_jar = _http_jar
             """,
         )
@@ -91,6 +93,8 @@ java_toolchain = native.java_toolchain
 java_common = native_java_common
 JavaInfo = NativeJavaInfo
 JavaPluginInfo = NativeJavaPluginInfo
+java_common_internal_compile = None
+java_info_internal_merge = None
 
 http_jar = _http_jar
             """,

@@ -24,9 +24,7 @@ load("//java/private:java_info.bzl", "JavaInfo", "JavaPluginInfo")
 load(":compile_action.bzl", "compile_action")
 load(":proguard_validation.bzl", "validate_proguard_specs")
 
-visibility([
-    "//java/...",
-])
+# copybara: default multiline visibility
 
 def _filter_srcs(srcs, ext):
     return [f for f in srcs if f.extension == ext]

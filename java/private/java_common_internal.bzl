@@ -27,9 +27,7 @@ load(
 )
 load(":native.bzl", "get_internal_java_common")
 
-visibility([
-    "//java/...",
-])
+# copybara: default multiline visibility
 
 def compile(
         ctx,

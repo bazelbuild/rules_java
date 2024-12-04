@@ -21,9 +21,7 @@ load("//java/private:java_common.bzl", "java_common")
 load("//java/private:java_info.bzl", "JavaPluginInfo")
 load(":rule_util.bzl", "merge_attrs")
 
-visibility([
-    "//java/...",
-])
+# copybara: default multiline visibility
 
 BASIC_JAVA_LIBRARY_IMPLICIT_ATTRS = merge_attrs(
     {
