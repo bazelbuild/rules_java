@@ -19,7 +19,7 @@ load("@rules_java//java:repositories.bzl", "rules_java_toolchains")
 
 rules_java_toolchains()
 
-load("@compatibility_proxy//:proxy.bzl", "http_jar")
+load("@rules_java//java:http_jar.bzl", "http_jar")
 
 http_jar(
     name = "my_jar",

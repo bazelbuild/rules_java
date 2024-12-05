@@ -19,7 +19,7 @@ bzl_library(
         "@rules_java//java/bazel/rules",
         "@rules_java//java/common/rules:toolchain_rules",
         "@rules_java//java/private:internals",
-        "@rules_java//java:http_jar_bzl",
+        "@rules_java//java/bazel:http_jar_bzl",
     ],
     visibility = ["//visibility:public"]
 )
@@ -33,13 +33,13 @@ load("@rules_java//java/bazel/rules:bazel_java_import.bzl", _java_import = "java
 load("@rules_java//java/bazel/rules:bazel_java_library.bzl", _java_library = "java_library")
 load("@rules_java//java/bazel/rules:bazel_java_plugin.bzl", _java_plugin = "java_plugin")
 load("@rules_java//java/bazel/rules:bazel_java_test.bzl", _java_test = "java_test")
+load("@rules_java//java/bazel:http_jar.bzl", _http_jar = "http_jar")
 load("@rules_java//java/common/rules:java_package_configuration.bzl", _java_package_configuration = "java_package_configuration")
 load("@rules_java//java/common/rules:java_runtime.bzl", _java_runtime = "java_runtime")
 load("@rules_java//java/common/rules:java_toolchain.bzl", _java_toolchain = "java_toolchain")
 load("@rules_java//java/private:java_common.bzl", _java_common = "java_common")
 load("@rules_java//java/private:java_common_internal.bzl", _java_common_internal_compile = "compile")
 load("@rules_java//java/private:java_info.bzl", _JavaInfo = "JavaInfo", _JavaPluginInfo = "JavaPluginInfo", _java_info_internal_merge = "merge")
-load("@rules_java//java:http_jar.bzl", _http_jar = "http_jar")
 
 java_binary = _java_binary
 java_import = _java_import
