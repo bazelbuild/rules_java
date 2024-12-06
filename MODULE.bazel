@@ -1,6 +1,6 @@
 module(
     name = "rules_java",
-    version = "8.6.1",
+    version = "8.6.2",
     bazel_compatibility = [">=6.4.0"],
     compatibility_level = 1,
 )
