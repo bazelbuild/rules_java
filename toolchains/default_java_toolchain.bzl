@@ -14,9 +14,8 @@
 
 """Rules for defining default_java_toolchain"""
 
-load("//java/common:java_common.bzl", "java_common")
 load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
-load(":utf8_environment.bzl", "Utf8EnvironmentInfo")
+load(":bootclasspath.bzl", _bootclasspath = "bootclasspath")
 
 # JVM options, without patching java.compiler and jdk.compiler modules.
 BASE_JDK9_JVM_OPTS = [
@@ -213,112 +212,4 @@ def java_runtime_files(name, srcs):
             tags = ["manual"],
         )
 
-_JAVA_BOOTSTRAP_RUNTIME_TOOLCHAIN_TYPE = Label("@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type")
-
-# Opt the Java bootstrap actions into path mapping:
-# https://github.com/bazelbuild/bazel/commit/a239ea84832f18ee8706682145e9595e71b39680
-_SUPPORTS_PATH_MAPPING = {"supports-path-mapping": "1"}
-
-def _java_home(java_executable):
-    return java_executable.dirname[:-len("/bin")]
-
-def _bootclasspath_impl(ctx):
-    exec_javabase = ctx.attr.java_runtime_alias[java_common.JavaRuntimeInfo]
-    env = ctx.attr._utf8_environment[Utf8EnvironmentInfo].environment
-
-    class_dir = ctx.actions.declare_directory("%s_classes" % ctx.label.name)
-
-    args = ctx.actions.args()
-    args.add("-source")
-    args.add("8")
-    args.add("-target")
-    args.add("8")
-    args.add("-Xlint:-options")
-    args.add("-J-XX:-UsePerfData")
-    args.add("-d")
-    args.add_all([class_dir], expand_directories = False)
-    args.add(ctx.file.src)
-
-    ctx.actions.run(
-        executable = "%s/bin/javac" % exec_javabase.java_home,
-        mnemonic = "JavaToolchainCompileClasses",
-        inputs = [ctx.file.src] + ctx.files.java_runtime_alias,
-        outputs = [class_dir],
-        arguments = [args],
-        env = env,
-        execution_requirements = _SUPPORTS_PATH_MAPPING,
-    )
-
-    bootclasspath = ctx.outputs.output_jar
-
-    args = ctx.actions.args()
-    args.add("-XX:+IgnoreUnrecognizedVMOptions")
-    args.add("-XX:-UsePerfData")
-    args.add("--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
-    args.add("--add-exports=jdk.compiler/com.sun.tools.javac.platform=ALL-UNNAMED")
-    args.add("--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
-    args.add_all("-cp", [class_dir], expand_directories = False)
-    args.add("DumpPlatformClassPath")
-    args.add(bootclasspath)
-
-    any_javabase = ctx.toolchains[_JAVA_BOOTSTRAP_RUNTIME_TOOLCHAIN_TYPE].java_runtime
-    any_javabase_files = any_javabase.files.to_list()
-
-    # If possible, add the Java executable to the command line as a File so that it can be path
-    # mapped.
-    java_executable = [f for f in any_javabase_files if f.path == any_javabase.java_executable_exec_path]
-    if len(java_executable) == 1:
-        args.add_all(java_executable, map_each = _java_home)
-    else:
-        args.add(any_javabase.java_home)
-
-    system_files = ("release", "modules", "jrt-fs.jar")
-    system = [f for f in any_javabase_files if f.basename in system_files]
-    if len(system) != len(system_files):
-        system = None
-
-    inputs = depset([class_dir] + ctx.files.java_runtime_alias, transitive = [any_javabase.files])
-    ctx.actions.run(
-        executable = str(exec_javabase.java_executable_exec_path),
-        mnemonic = "JavaToolchainCompileBootClasspath",
-        inputs = inputs,
-        outputs = [bootclasspath],
-        arguments = [args],
-        env = env,
-        execution_requirements = _SUPPORTS_PATH_MAPPING,
-    )
-    return [
-        DefaultInfo(files = depset([bootclasspath])),
-        java_common.BootClassPathInfo(
-            bootclasspath = [bootclasspath],
-            system = system,
-        ),
-        OutputGroupInfo(jar = [bootclasspath]),
-    ]
-
-_bootclasspath = rule(
-    implementation = _bootclasspath_impl,
-    attrs = {
-        "java_runtime_alias": attr.label(
-            cfg = "exec",
-            providers = [java_common.JavaRuntimeInfo],
-        ),
-        "output_jar": attr.output(mandatory = True),
-        "src": attr.label(
-            cfg = "exec",
-            allow_single_file = True,
-        ),
-        "_utf8_environment": attr.label(
-            default = ":utf8_environment",
-            cfg = "exec",
-        ),
-    },
-    toolchains = [_JAVA_BOOTSTRAP_RUNTIME_TOOLCHAIN_TYPE],
-)
-
-def bootclasspath(name, **kwargs):
-    _bootclasspath(
-        name = name,
-        output_jar = name + ".jar",
-        **kwargs
-    )
+bootclasspath = _bootclasspath
