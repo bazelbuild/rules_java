@@ -14,7 +14,7 @@
 
 """Rules for importing a local JDK."""
 
-load("//java:defs.bzl", "java_runtime")
+load("//java/toolchains:java_runtime.bzl", "java_runtime")
 load(":default_java_toolchain.bzl", "default_java_toolchain")
 
 def _detect_java_version(repository_ctx, java_bin):
