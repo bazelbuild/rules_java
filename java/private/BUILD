@@ -44,6 +44,14 @@ bzl_library(
     deps = ["@compatibility_proxy//:proxy_bzl"],
 )
 
+# Exposed for use by the android rules.
+bzl_library(
+    name = "android_support",
+    srcs = ["android_support.bzl"],
+    visibility = ["//visibility:public"],
+    deps = ["@compatibility_proxy//:proxy_bzl"],
+)
+
 filegroup(
     name = "srcs",
     srcs = glob(["**"]),
@@ -55,6 +63,7 @@ filegroup(
     testonly = 1,
     srcs = [
         "BUILD",
+        ":android_support",
         ":internals",
         ":native_bzl",
         ":proto_support",

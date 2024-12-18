@@ -248,6 +248,33 @@ def to_java_binary_info(java_info, compilation_info):
     result.update(_is_binary = True)
     return _new_javainfo(**result)
 
+def to_implicit_exportable(java_info, neverlink = False):
+    result = {
+        "transitive_runtime_jars": depset() if neverlink else java_info.transitive_runtime_jars,
+        "transitive_compile_time_jars": java_info.transitive_compile_time_jars,
+        "compile_jars": java_info.compile_jars,
+        "full_compile_jars": java_info.full_compile_jars,
+        "_transitive_full_compile_time_jars": java_info._transitive_full_compile_time_jars,
+        "_compile_time_java_dependencies": java_info._compile_time_java_dependencies,
+        "_neverlink": neverlink,
+        # unset defaults
+        "source_jars": [],
+        "outputs": _JavaRuleOutputJarsInfo(jars = [], jdeps = None, native_headers = None),
+        "annotation_processing": None,
+        "runtime_output_jars": [],
+        "transitive_source_jars": depset(),
+        "transitive_native_libraries": depset(),
+        "cc_link_params_info": CcInfo(),
+        "module_flags_info": _EMPTY_MODULE_FLAGS_INFO,
+        "plugins": _EMPTY_PLUGIN_DATA,
+        "api_generating_plugins": _EMPTY_PLUGIN_DATA,
+        "java_outputs": [],
+        "compilation_info": None,
+        "_constraints": [],
+        "_is_binary": getattr(java_info, "_is_binary", False),
+    }
+    return _new_javainfo(**result)
+
 def _to_mutable_dict(java_info):
     return {
         key: getattr(java_info, key)

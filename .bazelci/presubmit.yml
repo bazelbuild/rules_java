@@ -25,6 +25,7 @@ test_targets: &test_targets
 
 test_targets_bazel6: &test_targets_bazel6
   - "//java/test/..."
+  - "-//java/test/private/..."
 
 test_target_integration: &test_target_integration
   - "//:MyTest"

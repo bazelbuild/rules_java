@@ -39,7 +39,8 @@ load("@rules_java//java/common/rules:java_runtime.bzl", _java_runtime = "java_ru
 load("@rules_java//java/common/rules:java_toolchain.bzl", _java_toolchain = "java_toolchain")
 load("@rules_java//java/private:java_common.bzl", _java_common = "java_common")
 load("@rules_java//java/private:java_common_internal.bzl", _java_common_internal_compile = "compile")
-load("@rules_java//java/private:java_info.bzl", _JavaInfo = "JavaInfo", _JavaPluginInfo = "JavaPluginInfo", _java_info_internal_merge = "merge")
+load("@rules_java//java/private:java_info.bzl", _JavaInfo = "JavaInfo", _JavaPluginInfo = "JavaPluginInfo",
+  _java_info_internal_merge = "merge", _java_info_to_implicit_exportable = "to_implicit_exportable")
 
 java_binary = _java_binary
 java_import = _java_import
@@ -54,6 +55,7 @@ JavaInfo = _JavaInfo
 JavaPluginInfo = _JavaPluginInfo
 java_common_internal_compile = _java_common_internal_compile
 java_info_internal_merge = _java_info_internal_merge
+java_info_to_implicit_exportable = _java_info_to_implicit_exportable
 http_jar = _http_jar
             """,
         )
@@ -95,6 +97,8 @@ JavaInfo = NativeJavaInfo
 JavaPluginInfo = NativeJavaPluginInfo
 java_common_internal_compile = None
 java_info_internal_merge = None
+# Not available before Bazel 7
+java_info_to_implicit_exportable = getattr(android_common, "enable_implicit_sourceless_deps_exports_compatibility", None)
 
 http_jar = _http_jar
             """,
