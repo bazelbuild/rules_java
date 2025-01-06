@@ -311,6 +311,14 @@ _REMOTE_JDK_CONFIGS_LIST = [
         version = "21",
     ),
     struct(
+        name = "remotejdk21_linux_riscv64",
+        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:riscv64"],
+        sha256 = "b04fd7f52d18268a935f1a7144dae802b25db600ec97156ddd46b3100cbd13da",
+        strip_prefix = "jdk-21.0.4+7",
+        urls = ["https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.4+7/OpenJDK21U-jdk_riscv64_linux_hotspot_21.0.4_7.tar.gz", "https://mirror.bazel.build/github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.4+7/OpenJDK21U-jdk_riscv64_linux_hotspot_21.0.4_7.tar.gz"],
+        version = "21",
+    ),
+    struct(
         name = "remotejdk21_linux_s390x",
         target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:s390x"],
         sha256 = "c900c8d64fab1e53274974fa4a4c736a5a3754485a5c56f4947281480773658a",
