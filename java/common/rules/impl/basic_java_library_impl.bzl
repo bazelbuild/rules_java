@@ -27,6 +27,8 @@ load(":proguard_validation.bzl", "validate_proguard_specs")
 
 # copybara: default multiline visibility
 
+_EMPTY_CC_INFO = CcInfo()
+
 def _filter_srcs(srcs, ext):
     return [f for f in srcs if f.extension == ext]
 
@@ -163,7 +165,7 @@ def basic_java_library(
             debug_context = dependencies_cc_info.debug_context(),
         )
     else:
-        target["CcInfo"] = CcInfo()
+        target["CcInfo"] = _EMPTY_CC_INFO
 
     output_groups = dict(
         compilation_outputs = compilation_info.files_to_build,
