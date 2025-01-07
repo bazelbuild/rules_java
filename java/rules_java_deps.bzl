@@ -1,5 +1,6 @@
 """Module extension for compatibility with previous Bazel versions"""
 
+load("@bazel_skylib//lib:modules.bzl", "modules")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
@@ -113,10 +114,7 @@ _compatibility_proxy_repo_rule = repository_rule(
 def compatibility_proxy_repo():
     maybe(_compatibility_proxy_repo_rule, name = "compatibility_proxy")
 
-def _compat_proxy_impl(_unused):
-    compatibility_proxy_repo()
-
-compatibility_proxy = module_extension(_compat_proxy_impl)
+compatibility_proxy = modules.as_extension(compatibility_proxy_repo)
 
 def protobuf_repo():
     maybe(
