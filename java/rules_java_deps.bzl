@@ -113,8 +113,17 @@ _compatibility_proxy_repo_rule = repository_rule(
 def compatibility_proxy_repo():
     maybe(_compatibility_proxy_repo_rule, name = "compatibility_proxy")
 
-def _compat_proxy_impl(_unused):
+def _compat_proxy_impl(module_ctx):
     compatibility_proxy_repo()
+
+    # module_ctx.extension_metadata has the paramater `reproducible` as of Bazel 7.1.0. We can't
+    # test for it directly and would ideally use bazel_features to check for it, but don't want
+    # to add a dependency for as long as WORKSPACE is still around. Thus, test for it by
+    # checking the availability of another feature introduced in 7.1.0.
+    if hasattr(module_ctx, "watch"):
+        return module_ctx.extension_metadata(reproducible = True)
+    else:
+        return None
 
 compatibility_proxy = module_extension(_compat_proxy_impl)
 
