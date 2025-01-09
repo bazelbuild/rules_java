@@ -72,6 +72,7 @@ JDKS = {
         "linux",
         "linux_aarch64",
         "linux_ppc64le",
+        "linux_riscv64",
         "linux_s390x",
         "macos",
         "macos_aarch64",
