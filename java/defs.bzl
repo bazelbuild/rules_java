@@ -27,6 +27,8 @@ load("//java/toolchains:java_package_configuration.bzl", _java_package_configura
 load("//java/toolchains:java_runtime.bzl", _java_runtime = "java_runtime")
 load("//java/toolchains:java_toolchain.bzl", _java_toolchain = "java_toolchain")
 
+version = "8.7.0"
+
 # Language rules
 
 java_binary = _java_binary
