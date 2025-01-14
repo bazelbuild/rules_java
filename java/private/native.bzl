@@ -23,13 +23,13 @@
 
 # Unused with Bazel@HEAD, used by the compatibility layer for older Bazel versions
 
-# buildifier: disable=native-java
+# buildifier: disable=native-java-common
 native_java_common = java_common
 
-# buildifier: disable=native-java
+# buildifier: disable=native-java-info
 NativeJavaInfo = JavaInfo
 
-# buildifier: disable=native-java
+# buildifier: disable=native-java-plugin-info
 NativeJavaPluginInfo = JavaPluginInfo
 
 # Used for some private native APIs that we can't replicate just yet in Starlark
