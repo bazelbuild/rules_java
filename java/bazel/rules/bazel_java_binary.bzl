@@ -363,7 +363,7 @@ def make_java_binary(executable):
 </p>
 <p>
   The wrapper script accepts several unique flags. Refer to
-  <code>//src/main/java/com/google/devtools/build/lib/bazel/rules/java/java_stub_template.txt</code>
+  <code>java_stub_template.txt</code>
   for a list of configurable flags and environment variables accepted by the wrapper.
 </p>
 

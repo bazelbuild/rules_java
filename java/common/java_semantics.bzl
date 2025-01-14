@@ -91,7 +91,7 @@ semantics = struct(
     ],
     ALLOWED_RULES_IN_DEPS_WITH_WARNING = [],
     LINT_PROGRESS_MESSAGE = "Running Android Lint for: %{label}",
-    JAVA_STUB_TEMPLATE_LABEL = "@bazel_tools//tools/jdk:java_stub_template.txt",
+    JAVA_STUB_TEMPLATE_LABEL = "@rules_java//java/bazel/rules:java_stub_template.txt",  # copybara-use-repo-external-label
     BUILD_INFO_TRANSLATOR_LABEL = "@bazel_tools//tools/build_defs/build_info:java_build_info",
     JAVA_TEST_RUNNER_LABEL = "@bazel_tools//tools/jdk:TestRunner",
     IS_BAZEL = True,
