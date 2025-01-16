@@ -39,6 +39,7 @@ filegroup(
     testonly = 1,
     srcs = [
         "BUILD.bazel",
+        ":java_stub_template.txt",
         ":rules",
     ],
     visibility = ["//java:__pkg__"],
