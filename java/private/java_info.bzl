@@ -183,7 +183,7 @@ def merge(
                 transitive = [p.transitive_native_libraries for p in providers],
             ),
         )
-    return get_internal_java_common().wrap_java_info(_new_javainfo(**result))
+    return _new_javainfo(**result)
 
 def to_java_binary_info(java_info, compilation_info):
     """Get a copy of the given JavaInfo with minimal info returned by a java_binary
@@ -518,7 +518,7 @@ def java_info_for_compilation(
             compilation_info = None,
             annotation_processing = None,
         )
-    return get_internal_java_common().wrap_java_info(_new_javainfo(**result))
+    return _new_javainfo(**result)
 
 def _validate_provider_list(provider_list, what, expected_provider_type):
     get_internal_java_common().check_provider_instances(provider_list, what, expected_provider_type)
