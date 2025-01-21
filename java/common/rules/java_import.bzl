@@ -16,6 +16,7 @@
 Definition of java_import rule.
 """
 
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/private:java_info.bzl", "JavaInfo")
 
