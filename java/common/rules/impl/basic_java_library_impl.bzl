@@ -16,6 +16,7 @@
 Common code for reuse across java_* rules
 """
 
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common/rules:android_lint.bzl", "android_lint_subrule")
 load("//java/private:boot_class_path_info.bzl", "BootClassPathInfo")
@@ -25,6 +26,8 @@ load(":compile_action.bzl", "compile_action")
 load(":proguard_validation.bzl", "validate_proguard_specs")
 
 # copybara: default multiline visibility
+
+_EMPTY_CC_INFO = CcInfo()
 
 def _filter_srcs(srcs, ext):
     return [f for f in srcs if f.extension == ext]
@@ -124,6 +127,7 @@ def basic_java_library(
         resources = list(resources)
         resources.extend(properties)
 
+    native_libraries = _collect_native_libraries(deps, runtime_deps, exports)
     java_info, compilation_info = compile_action(
         ctx,
         ctx.outputs.classjar,
@@ -138,7 +142,7 @@ def basic_java_library(
         resources,
         resource_jars,
         classpath_resources,
-        _collect_native_libraries(deps, runtime_deps, exports),
+        native_libraries,
         javacopts,
         neverlink,
         ctx.fragments.java.strict_java_deps,
@@ -149,6 +153,19 @@ def basic_java_library(
         javabuilder_jvm_flags = javabuilder_jvm_flags,
     )
     target = {"JavaInfo": java_info}
+
+    if native_libraries:
+        dependencies_cc_info = cc_common.merge_cc_infos(cc_infos = native_libraries)
+
+        # Native dependencies have the same semantics as
+        # `cc_library#implementation_deps`. We only want to propagate
+        # `Cc{Debug,Linking}Context` to libraries depending on this.
+        target["CcInfo"] = CcInfo(
+            linking_context = dependencies_cc_info.linking_context,
+            debug_context = dependencies_cc_info.debug_context(),
+        )
+    else:
+        target["CcInfo"] = _EMPTY_CC_INFO
 
     output_groups = dict(
         compilation_outputs = compilation_info.files_to_build,
