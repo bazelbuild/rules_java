@@ -23,7 +23,7 @@ load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 # visible for tests
 JAVA_TOOLS_CONFIG = {
     "version": "v13.15",
-    "release": "false",
+    "release": "true",
     "artifacts": {
         "java_tools_linux": {
             "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v13.15/java_tools_linux-v13.15.zip",
