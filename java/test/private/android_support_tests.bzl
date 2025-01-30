@@ -14,8 +14,11 @@
 """Tests for //java/private:android_support.bzl"""
 
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
+load("@rules_testing//lib:util.bzl", "util")
+load("//java:defs.bzl", "java_library", "java_plugin")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/private:android_support.bzl", "android_support")
+load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
 
 def _impl(ctx):
     return [
@@ -30,25 +33,38 @@ my_rule = rule(
 )
 
 def _test_enable_implicit_sourceless_deps_exports_compatibility(name):
+    util.helper_target(
+        java_plugin,
+        name = "my_plugin",
+        srcs = ["MyPlugin.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = "base",
+        srcs = ["Foo.java"],
+        exported_plugins = [":my_plugin"],
+    )
+    util.helper_target(
+        my_rule,
+        name = "transformed",
+        dep = ":base",
+    )
+
     analysis_test(
         name = name,
         impl = _test_enable_implicit_sourceless_deps_exports_compatibility_impl,
         targets = {
-            "foo": Label(":foo"),
-            "bar": Label(":bar"),
+            "base": Label(":base"),
+            "transformed": Label(":transformed"),
         },
     )
 
 def _test_enable_implicit_sourceless_deps_exports_compatibility_impl(env, targets):
-    # TODO(hvd): write a ProviderSubject for JavaInfo
-    foo_javainfo = targets.foo[JavaInfo]
-    bar_javainfo = targets.bar[JavaInfo]
-    for attr in ["transitive_runtime_jars", "compile_jars", "transitive_compile_time_jars", "full_compile_jars", "_transitive_full_compile_time_jars", "_compile_time_java_dependencies"]:
-        env.expect.that_bool(getattr(foo_javainfo, attr) == getattr(bar_javainfo, attr)).equals(True)
-    env.expect.that_depset_of_files(foo_javainfo.plugins.processor_jars).contains_exactly([
-        "java/test/private/libmy_plugin.jar",
-    ])
-    env.expect.that_depset_of_files(bar_javainfo.plugins.processor_jars).contains_exactly([])
+    base_info = java_info_subject.from_target(env, targets.base)
+    transformed_info = java_info_subject.from_target(env, targets.transformed)
+    transformed_info.compilation_args().equals(base_info.compilation_args())
+    base_info.plugins().processor_jars().contains_exactly(["{package}/libmy_plugin.jar"])
+    transformed_info.plugins().processor_jars().contains_exactly([])
 
 def android_support_tests(name):
     test_suite(

@@ -11,24 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-load("//java:defs.bzl", "java_library", "java_plugin")
-load(":android_support_tests.bzl", "android_support_tests", "my_rule")
-
-java_plugin(
-    name = "my_plugin",
-    srcs = ["MyPlugin.java"],
-)
-
-java_library(
-    name = "foo",
-    srcs = ["Foo.java"],
-    exported_plugins = [":my_plugin"],
-)
-
-my_rule(
-    name = "bar",
-    dep = ":foo",
-)
+load(":android_support_tests.bzl", "android_support_tests")
 
 android_support_tests(name = "android_support_tests")
