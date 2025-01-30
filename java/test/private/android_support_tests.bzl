@@ -62,7 +62,7 @@ def _test_enable_implicit_sourceless_deps_exports_compatibility(name):
 def _test_enable_implicit_sourceless_deps_exports_compatibility_impl(env, targets):
     base_info = java_info_subject.from_target(env, targets.base)
     transformed_info = java_info_subject.from_target(env, targets.transformed)
-    transformed_info.compilation_args().equals(base_info.compilation_args())
+    transformed_info.compilation_args().equals_subject(base_info.compilation_args())
     base_info.plugins().processor_jars().contains_exactly(["{package}/libmy_plugin.jar"])
     transformed_info.plugins().processor_jars().contains_exactly([])
 

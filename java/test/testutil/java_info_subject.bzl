@@ -8,6 +8,7 @@ def _new_java_info_subject(java_info, meta):
     public = struct(
         compilation_args = lambda: _new_java_compilation_args_subject(self.actual, self.meta),
         plugins = lambda: _new_java_info_plugins_subject(self.actual, self.meta),
+        is_binary = lambda: subjects.bool(getattr(java_info, "_is_binary", False), self.meta.derive("_is_binary")),
     )
     return public
 
@@ -20,6 +21,7 @@ def _java_info_subject_from_target(env, target):
     ))
 
 def _new_java_compilation_args_subject(java_info, meta):
+    is_binary = getattr(java_info, "_is_binary", False)
     actual = struct(
         transitive_runtime_jars = java_info.transitive_runtime_jars,
         compile_jars = java_info.compile_jars,
@@ -27,23 +29,23 @@ def _new_java_compilation_args_subject(java_info, meta):
         full_compile_jars = java_info.full_compile_jars,
         _transitive_full_compile_time_jars = java_info._transitive_full_compile_time_jars,
         _compile_time_java_dependencies = java_info._compile_time_java_dependencies,
-        _is_binary = getattr(java_info, "_is_binary", False),
-    )
+    ) if not is_binary else None
     self = struct(
         actual = actual,
         meta = meta,
     )
     return struct(
         equals = lambda other: _java_compilation_args_equals(self, other),
+        equals_subject = lambda other: _java_compilation_args_equals(self, other.actual),
         self = self,
         actual = actual,
     )
 
 def _java_compilation_args_equals(self, other):
-    if self.actual == other.actual:
+    if self.actual == other:
         return
-    for attr in dir(other.actual):
-        other_attr = getattr(other.actual, attr)
+    for attr in dir(other):
+        other_attr = getattr(other, attr)
         this_attr = getattr(self.actual, attr)
         if this_attr != other_attr:
             self.meta.derive(attr).add_failure(

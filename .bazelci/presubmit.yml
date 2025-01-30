@@ -44,6 +44,8 @@ tasks:
     bazel: "7.4.0"
     build_targets: *build_targets
     test_targets: *test_targets
+    test_flags:
+      - "--test_tag_filters=-min_bazel_8"
   ubuntu2004_integration:
     name: "Bazel 7.x Integration"
     bazel: "7.4.0"
@@ -117,6 +119,8 @@ tasks:
     platform: ubuntu2004
     build_targets: *build_targets_bazel6
     test_targets: *test_targets_bazel6
+    test_flags:
+      - "--test_tag_filters=-min_bazel_7,-min_bazel_8"
   ubuntu2004_integration_bazel6:
     name: "Bazel 6.x Integration"
     bazel: 6.4.0
