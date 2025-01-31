@@ -1,5 +1,6 @@
 module(name = "integration_test_repo")
 
+bazel_dep(name = "rules_cc", version = "0.0.15")
 bazel_dep(name = "rules_java", version = "7.5.0")
 archive_override(
     module_name = "rules_java",
