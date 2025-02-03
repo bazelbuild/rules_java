@@ -392,10 +392,13 @@ def _filter_validation_output_group(ctx, output_group):
                    "plugins",
                    "translations",
                    # special ignored attributes
+                   # LINT.IfChange(validation_ignored_attrs)
                    "compatible_with",
                    "restricted_to",
                    "exec_compatible_with",
+                   "exec_group_compatible_with",
                    "target_compatible_with",
+                   # LINT.ThenChange(//jtcg/devtools/build/lib/rules/java/AbstractJavaBinaryConfiguredTargetTest.java:validation_ignored_attrs)
                ]
         ])
         if not ctx.attr.create_executable:
