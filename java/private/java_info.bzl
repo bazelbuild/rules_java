@@ -934,7 +934,8 @@ def _javaplugininfo_init(
         runtime_deps,
         processor_class,
         data = [],
-        generates_api = False):
+        generates_api = False,
+        extra_processor_classes = []):
     """ Constructs JavaPluginInfo
 
     Args:
@@ -951,6 +952,9 @@ def _javaplugininfo_init(
             generated from the sources, reducing the critical path.
             WARNING: This parameter affects build performance, use it only if
             necessary.
+        extra_processor_classes: ([String]) Additional fully qualified class
+            names that the Java compiler uses as an entry point to the
+            annotation processor.
 
     Returns:
         (JavaPluginInfo)
@@ -958,8 +962,9 @@ def _javaplugininfo_init(
 
     java_infos = merge(runtime_deps)
     processor_data = data if type(data) == "depset" else depset(data)
+    processor_classes = ([processor_class] if processor_class else []) + extra_processor_classes
     plugins = _create_plugin_data_info(
-        processor_classes = depset([processor_class]) if processor_class else depset(),
+        processor_classes = depset(processor_classes),
         processor_jars = java_infos.transitive_runtime_jars,
         processor_data = processor_data,
     )
