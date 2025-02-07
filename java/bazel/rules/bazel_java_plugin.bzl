@@ -84,7 +84,7 @@ def bazel_java_plugin_rule(
     # Replace JavaInfo with JavaPluginInfo
     target["JavaPluginInfo"] = JavaPluginInfo(
         runtime_deps = [java_info],
-        processor_class = processor_class if processor_class else None,  # ignore empty string (default)
+        processor_classes = [processor_class] if processor_class else [],  # ignore empty string (default)
         data = data,
         generates_api = generates_api,
     )

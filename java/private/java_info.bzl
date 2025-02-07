@@ -932,10 +932,10 @@ def _merge_plugin_data(datas):
 
 def _javaplugininfo_init(
         runtime_deps,
-        processor_class,
+        processor_class = None,
+        processor_classes = [],
         data = [],
-        generates_api = False,
-        extra_processor_classes = []):
+        generates_api = False):
     """ Constructs JavaPluginInfo
 
     Args:
@@ -943,6 +943,8 @@ def _javaplugininfo_init(
              processor.
         processor_class: (String) The fully qualified class name that the Java
              compiler uses as an entry point to the annotation processor.
+        processor_classes: ([String]) Fully qualified class names that the
+            Java compiler uses as an entry point to the annotation processor.
         data: (depset[File]) The files needed by this annotation
              processor during execution.
         generates_api: (boolean) Set to true when this annotation processor
@@ -952,9 +954,6 @@ def _javaplugininfo_init(
             generated from the sources, reducing the critical path.
             WARNING: This parameter affects build performance, use it only if
             necessary.
-        extra_processor_classes: ([String]) Additional fully qualified class
-            names that the Java compiler uses as an entry point to the
-            annotation processor.
 
     Returns:
         (JavaPluginInfo)
@@ -962,9 +961,8 @@ def _javaplugininfo_init(
 
     java_infos = merge(runtime_deps)
     processor_data = data if type(data) == "depset" else depset(data)
-    processor_classes = ([processor_class] if processor_class else []) + extra_processor_classes
     plugins = _create_plugin_data_info(
-        processor_classes = depset(processor_classes),
+        processor_classes = depset([processor_class] + processor_classes) if processor_class else depset(processor_classes),
         processor_jars = java_infos.transitive_runtime_jars,
         processor_data = processor_data,
     )
