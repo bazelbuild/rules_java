@@ -9,6 +9,7 @@ def _new_java_info_subject(java_info, meta):
         compilation_args = lambda: _new_java_compilation_args_subject(self.actual, self.meta),
         plugins = lambda: _new_java_info_plugins_subject(self.actual, self.meta),
         is_binary = lambda: subjects.bool(getattr(java_info, "_is_binary", False), self.meta.derive("_is_binary")),
+        has_attr = lambda a: subjects.bool(getattr(java_info, a, None) != None, meta = self.meta.derive("{} != None".format(a))).equals(True),
     )
     return public
 
