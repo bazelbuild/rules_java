@@ -24,6 +24,28 @@ java_test(
     ],
 )
 
+genrule(
+    name = "MakeVarGenruleTest",
+    outs = ["success"],
+    cmd = "test -f $(JAVA) && test -d $(JAVABASE) && touch $@",
+    toolchains = ["@rules_java//toolchains:current_java_runtime"],
+    tools = ["@rules_java//toolchains:current_java_runtime"],
+)
+
+sh_test(
+    name = "MakeVarTest",
+    srcs = ["src/MakeVarTest.sh"],
+    data = [
+        "success",
+        "@rules_java//toolchains:current_java_runtime",
+    ],
+    env = {
+        "JAVA_RUNFILES": "$(JAVA_RUNFILES)",
+        "JAVABASE_RUNFILES": "$(JAVABASE_RUNFILES)",
+    },
+    toolchains = ["@rules_java//toolchains:current_java_runtime"],
+)
+
 default_java_toolchain(
     name = "my_funky_toolchain",
     bootclasspath = ["@bazel_tools//tools/jdk:platformclasspath"],

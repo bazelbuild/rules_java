@@ -152,6 +152,8 @@ def _java_runtime_rule_impl(ctx):
         platform_common.TemplateVariableInfo({
             "JAVA": java_binary_exec_path,
             "JAVABASE": java_home,
+            "JAVA_RUNFILES": java_binary_runfiles_path,
+            "JAVABASE_RUNFILES": java_home_runfiles_path,
         }),
         ToolchainInfo(java_runtime = java_runtime_info),
     ]
