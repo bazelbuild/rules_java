@@ -40,7 +40,6 @@ sh_test(
         "@rules_java//toolchains:current_java_runtime",
     ],
     env = {
-        "JAVA_RUNFILES": "$(JAVA_RUNFILES)",
         "JAVABASE_RUNFILES": "$(JAVABASE_RUNFILES)",
     },
     toolchains = ["@rules_java//toolchains:current_java_runtime"],
