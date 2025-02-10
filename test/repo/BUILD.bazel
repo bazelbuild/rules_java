@@ -1,5 +1,6 @@
 load("@rules_java//java:defs.bzl", "java_binary", "java_library", "java_test")  # copybara-use-repo-external-label
 load("@rules_java//toolchains:default_java_toolchain.bzl", "default_java_toolchain")  # copybara-use-repo-external-label
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
 java_library(
     name = "lib",
@@ -22,6 +23,27 @@ java_test(
         "@my_jar//jar",
         "@rules_java//java/runfiles",
     ],
+)
+
+genrule(
+    name = "MakeVarGenruleTest",
+    outs = ["success"],
+    cmd = "test -f $(JAVA) && test -d $(JAVABASE) && touch $@",
+    toolchains = ["@rules_java//toolchains:current_java_runtime"],
+    tools = ["@rules_java//toolchains:current_java_runtime"],
+)
+
+sh_test(
+    name = "MakeVarTest",
+    srcs = ["src/MakeVarTest.sh"],
+    data = [
+        "success",
+        "@rules_java//toolchains:current_java_runtime",
+    ],
+    env = {
+        "JAVABASE_RUNFILES": "$(JAVABASE_RUNFILES)",
+    },
+    toolchains = ["@rules_java//toolchains:current_java_runtime"],
 )
 
 default_java_toolchain(
