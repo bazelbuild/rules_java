@@ -167,7 +167,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
     ),
     struct(
         name = "remotejdk11_linux_ppc64le",
-        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:ppc"],
+        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:ppc64le"],
         sha256 = "42c63651125a149cee2ba781300d75ffa67a25032f95038d50ee6d6177cb2e41",
         strip_prefix = "jdk-11.0.26+4",
         urls = ["https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.26+4/OpenJDK11U-jdk_ppc64le_linux_hotspot_11.0.26_4.tar.gz", "https://mirror.bazel.build/github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.26+4/OpenJDK11U-jdk_ppc64le_linux_hotspot_11.0.26_4.tar.gz"],
@@ -239,7 +239,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
     ),
     struct(
         name = "remotejdk17_linux_ppc64le",
-        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:ppc"],
+        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:ppc64le"],
         sha256 = "f4cb9ee5906a44d110fa381310cd7181d95498d27087d449e7e9b74bddd9def2",
         strip_prefix = "jdk-17.0.14+7",
         urls = ["https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.14+7/OpenJDK17U-jdk_ppc64le_linux_hotspot_17.0.14_7.tar.gz", "https://mirror.bazel.build/github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.14+7/OpenJDK17U-jdk_ppc64le_linux_hotspot_17.0.14_7.tar.gz"],
@@ -303,7 +303,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
     ),
     struct(
         name = "remotejdk21_linux_ppc64le",
-        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:ppc"],
+        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:ppc64le"],
         sha256 = "163724b70b86d5a8461f85092165a9cc5a098ed900fee90d1b0c0be9607ae3d2",
         strip_prefix = "jdk-21.0.6+7",
         urls = ["https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6+7/OpenJDK21U-jdk_ppc64le_linux_hotspot_21.0.6_7.tar.gz", "https://mirror.bazel.build/github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6+7/OpenJDK21U-jdk_ppc64le_linux_hotspot_21.0.6_7.tar.gz"],

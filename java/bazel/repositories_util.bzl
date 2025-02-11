@@ -44,7 +44,7 @@ _RELEASE_CONFIGS = {
         "adoptium": {
             "release": "11.0.26+4",
             "platforms": {
-                "linux": ["ppc", "s390x"],
+                "linux": ["ppc", "ppc64le", "s390x"],
             },
         },
         "microsoft": {
@@ -66,7 +66,7 @@ _RELEASE_CONFIGS = {
         "adoptium": {
             "release": "17.0.14+7",
             "platforms": {
-                "linux": ["ppc", "s390x"],
+                "linux": ["ppc", "ppc64le", "s390x"],
             },
         },
     },
@@ -82,7 +82,7 @@ _RELEASE_CONFIGS = {
         "adoptium": {
             "release": "21.0.6+7",
             "platforms": {
-                "linux": ["ppc", "riscv64", "s390x"],
+                "linux": ["ppc", "ppc64le", "riscv64", "s390x"],
             },
         },
     },
