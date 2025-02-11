@@ -27,7 +27,7 @@ java_test(
 
 genrule(
     name = "MakeVarGenruleTest",
-    outs = ["success"],
+    outs = ["MakeVarGenruleTestSuccess"],
     cmd = "test -f $(JAVA) && test -d $(JAVABASE) && touch $@",
     toolchains = ["@rules_java//toolchains:current_java_runtime"],
     tools = ["@rules_java//toolchains:current_java_runtime"],
@@ -37,11 +37,12 @@ sh_test(
     name = "MakeVarTest",
     srcs = ["src/MakeVarTest.sh"],
     data = [
-        "success",
+        "MakeVarGenruleTestSuccess",
         "@rules_java//toolchains:current_java_runtime",
     ],
     env = {
-        "JAVABASE_RUNFILES": "$(JAVABASE_RUNFILES)",
+        "JAVA_ROOTPATH": "$(JAVA_ROOTPATH)",
+        "JAVABASE_ROOTPATH": "$(JAVABASE_ROOTPATH)",
     },
     toolchains = ["@rules_java//toolchains:current_java_runtime"],
 )
