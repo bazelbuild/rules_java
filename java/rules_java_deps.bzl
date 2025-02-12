@@ -69,7 +69,7 @@ bzl_library(
     name = "proxy_bzl",
     srcs = ["proxy.bzl"],
     deps = [
-        "@rules_java//java/private:native_bzl",
+        "@rules_java//java/private:legacy_native_bzl",
         "@bazel_tools//tools:bzl_srcs",
     ],
     visibility = ["//visibility:public"]
@@ -80,7 +80,7 @@ bzl_library(
             "proxy.bzl",
             """
 load("@bazel_tools//tools/build_defs/repo:http.bzl", _http_jar = "http_jar")
-load("@rules_java//java/private:native.bzl", "native_java_common", "NativeJavaInfo", "NativeJavaPluginInfo")
+load("@rules_java//java/private:legacy_native.bzl", "native_java_common", "NativeJavaInfo", "NativeJavaPluginInfo")
 
 java_binary = native.java_binary
 java_import = native.java_import

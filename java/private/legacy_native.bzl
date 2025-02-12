@@ -12,8 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Redirects for private native APIs"""
+# Redefine native symbols with a new name as a workaround for
+# exporting them in @compatibility_proxy//:proxy.bzl with their original name.
 
-# Used for some private native APIs that we can't replicate just yet in Starlark
-def get_internal_java_common():
-    return java_common.internal_DO_NOT_USE()  # buildifier: disable=native-java-common
+"""Lovely workaround to be able to expose native constants pretending to be Starlark."""
+
+# Unused with Bazel@HEAD, only used by the compatibility layer for older Bazel versions
+
+# buildifier: disable=native-java-common
+native_java_common = java_common
+
+# buildifier: disable=native-java-info
+NativeJavaInfo = JavaInfo
+
+# buildifier: disable=native-java-plugin-info
+NativeJavaPluginInfo = JavaPluginInfo

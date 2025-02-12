@@ -7,10 +7,15 @@ bzl_library(
     srcs = [
         "native.bzl",
     ],
-    visibility = [
-        "//java:__subpackages__",
-        "@compatibility_proxy//:__pkg__",
+    visibility = ["//java:__subpackages__"],
+)
+
+bzl_library(
+    name = "legacy_native_bzl",
+    srcs = [
+        "legacy_native.bzl",
     ],
+    visibility = ["@compatibility_proxy//:__pkg__"],
 )
 
 bzl_library(
