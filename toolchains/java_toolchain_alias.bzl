@@ -14,7 +14,6 @@
 
 """Experimental re-implementations of Java toolchain aliases using toolchain resolution."""
 
-load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//java/common:java_common.bzl", "java_common")
 
 def _java_runtime_alias(ctx):
@@ -27,7 +26,7 @@ def _java_runtime_alias(ctx):
         platform_common.TemplateVariableInfo({
             "JAVA": str(toolchain.java_executable_exec_path),
             "JAVABASE": str(toolchain.java_home),
-            "JAVA_ROOTPATH": paths.join(toolchain.java_home_runfiles_path, "bin/java"),
+            "JAVA_ROOTPATH": str(toolchain.java_executable_runfiles_path),
             "JAVABASE_ROOTPATH": str(toolchain.java_home_runfiles_path),
         }),
         # See b/65239471 for related discussion of handling toolchain runfiles/data.
