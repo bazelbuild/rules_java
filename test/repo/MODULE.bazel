@@ -44,3 +44,5 @@ use_repo(
 )
 
 register_toolchains("//:all")
+
+bazel_dep(name = "rules_shell", version = "0.4.0", dev_dependency = True)
