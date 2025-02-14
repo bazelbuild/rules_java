@@ -16,6 +16,7 @@ build_targets_bazel6: &build_targets_bazel6
 build_targets_integration: &build_targets_integration
   - "//..."
   - "//:bin_deploy.jar"
+  - "-//:native_test"
 
 test_targets: &test_targets
   - "//test/..."
@@ -28,6 +29,10 @@ test_targets_bazel6: &test_targets_bazel6
   - "-//java/test/private/..."
 
 test_target_integration: &test_target_integration
+  - "//:MyTest"
+  - "//:native_test"
+
+test_target_integration_pre_bazel_8: &test_target_integration_pre_bazel_8
   - "//:MyTest"
 
 flags_workspace_integration: &flags_workspace_integration
@@ -54,7 +59,7 @@ tasks:
     shell_commands:
       - sh setup.sh
     build_targets: *build_targets_integration
-    test_targets: *test_target_integration
+    test_targets: *test_target_integration_pre_bazel_8
   ubuntu2004_integration_workspace:
     name: "Bazel 7.x Integration (WORKSPACE)"
     bazel: "7.4.0"
@@ -64,7 +69,7 @@ tasks:
       - sh setup.sh
     build_targets: *build_targets_integration
     build_flags: *flags_workspace_integration
-    test_targets: *test_target_integration
+    test_targets: *test_target_integration_pre_bazel_8
     test_flags: *flags_workspace_integration
   macos:
     name: "Bazel 7.x"
@@ -129,7 +134,7 @@ tasks:
     shell_commands:
     - sh setup.sh
     build_targets: *build_targets_integration
-    test_targets: *test_target_integration
+    test_targets: *test_target_integration_pre_bazel_8
   macos_bazel6:
     name: "Bazel 6.x"
     bazel: 6.4.0

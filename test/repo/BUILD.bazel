@@ -1,10 +1,31 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("@rules_java//java:defs.bzl", "java_binary", "java_library", "java_test")  # copybara-use-repo-external-label
 load("@rules_java//toolchains:default_java_toolchain.bzl", "default_java_toolchain")  # copybara-use-repo-external-label
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
+cc_library(
+    name = "native_dep",
+    srcs = [
+        "src/native_dep.cc",
+    ],
+)
+
 java_library(
     name = "lib",
     srcs = ["src/Main.java"],
+    deps = [
+        ":native_dep",
+    ],
+)
+
+cc_test(
+    name = "native_test",
+    srcs = [
+        "src/native_test.cc",
+    ],
+    deps = [
+        ":lib",
+    ],
 )
 
 java_binary(
