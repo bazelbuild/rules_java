@@ -70,8 +70,8 @@ def _compile(
         add_opens = []):
     return _compile_internal(
         ctx,
-        output,
-        java_toolchain,
+        output = output,
+        java_toolchain = java_toolchain,
         source_jars = source_jars,
         source_files = source_files,
         output_source_jar = output_source_jar,

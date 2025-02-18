@@ -67,17 +67,17 @@ def bazel_java_library_rule(
 
     target, base_info = basic_java_library(
         ctx,
-        srcs,
-        deps,
-        runtime_deps,
-        plugins,
-        exports,
-        exported_plugins,
-        resources,
-        [],  # resource_jars
-        [],  # class_pathresources
-        javacopts,
-        neverlink,
+        srcs = srcs,
+        deps = deps,
+        runtime_deps = runtime_deps,
+        plugins = plugins,
+        exports = exports,
+        exported_plugins = exported_plugins,
+        resources = resources,
+        resource_jars = [],
+        classpath_resources = [],
+        javacopts = javacopts,
+        neverlink = neverlink,
         proguard_specs = proguard_specs,
         add_exports = add_exports,
         add_opens = add_opens,
