@@ -163,14 +163,16 @@ def _test_compile_extend_compile_time_jdeps_rule_outputs_impl(env, targets):
     ])
 
 def _test_compile_bootclasspath(name):
+    files = [
+        "custom-system/lib/jrt-fs.jar",
+        "custom-system/lib/modules",
+        "custom-system/release",
+    ]
     util.helper_target(
         custom_bootclasspath,
         name = name + "/bootclasspath",
-        srcs = [
-            "custom-system/lib/jrt-fs.jar",
-            "custom-system/lib/modules",
-            "custom-system/release",
-        ],
+        bootclasspath = files,
+        system = files,
     )
     util.helper_target(
         custom_library_with_bootclasspath,
@@ -197,6 +199,39 @@ def _test_compile_bootclasspath_impl(env, target):
         "{}/custom-system".format(target.label.package),
     )])
 
+def _test_compile_override_with_empty_bootclasspath(name):
+    util.helper_target(
+        custom_bootclasspath,
+        name = name + "/bootclasspath",
+        bootclasspath = [],
+        system = [
+            "custom-system/lib/jrt-fs.jar",
+            "custom-system/lib/modules",
+            "custom-system/release",
+        ],
+    )
+    util.helper_target(
+        custom_library_with_bootclasspath,
+        name = name + "/custom",
+        srcs = ["Main.java"],
+        bootclasspath = name + "/bootclasspath",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_override_with_empty_bootclasspath_impl,
+        target = name + "/custom",
+        attr_values = {"tags": ["min_bazel_7"]},
+    )
+
+def _test_compile_override_with_empty_bootclasspath_impl(env, target):
+    assert_that_javac = env.expect.that_target(target).action_named("Javac")
+
+    assert_that_javac.contains_flag_values([(
+        "--system",
+        "{}/custom-system".format(target.label.package),
+    )])
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -208,5 +243,6 @@ def java_common_tests(name):
             _test_compile_extend_compile_time_jdeps,
             _test_compile_extend_compile_time_jdeps_rule_outputs,
             _test_compile_bootclasspath,
+            _test_compile_override_with_empty_bootclasspath,
         ],
     )

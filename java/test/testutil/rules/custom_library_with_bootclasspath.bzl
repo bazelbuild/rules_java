@@ -4,13 +4,13 @@ load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_semantics.bzl", "semantics")
 
 def _bootclasspath(ctx):
-    files = ctx.files.srcs
-    return [java_common.BootClassPathInfo(bootclasspath = files, system = files)]
+    return [java_common.BootClassPathInfo(bootclasspath = ctx.files.bootclasspath, system = ctx.files.system)]
 
 custom_bootclasspath = rule(
     implementation = _bootclasspath,
     attrs = {
-        "srcs": attr.label_list(allow_files = True),
+        "bootclasspath": attr.label_list(allow_files = True),
+        "system": attr.label_list(allow_files = True),
     },
 )
 
