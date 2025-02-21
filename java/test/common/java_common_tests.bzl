@@ -4,9 +4,11 @@ load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java/common:java_common.bzl", "java_common")
+load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
 load("//java/test/testutil:rules/custom_library.bzl", "custom_library")
+load("//java/test/testutil:rules/custom_library_extended_compile_jdeps.bzl", "CompileJdepsInfo", "custom_library_extended_jdeps")
 load("//java/test/testutil:rules/custom_library_with_exports.bzl", "custom_library_with_exports")
 load("//java/test/testutil:rules/custom_library_with_sourcepaths.bzl", "custom_library_with_sourcepaths")
 
@@ -74,6 +76,32 @@ def _test_java_plugin_info_impl(env, _target):
         "java_common.JavaPluginInfo == JavaPluginInfo",
     ).equals(True)
 
+# Tests that extended 'compile time jdeps' are consistently updated.
+def _test_compile_extend_compile_time_jdeps(name):
+    util.helper_target(
+        custom_library_extended_jdeps,
+        name = name + "/foo",
+        srcs = ["Foo.java"],
+        extra_jdeps = "Foo.jdeps",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_extend_compile_time_jdeps_impl,
+        target = name + "/foo",
+        attr_values = {"tags": ["min_bazel_7"]},
+    )
+
+def _test_compile_extend_compile_time_jdeps_impl(env, target):
+    before = target[CompileJdepsInfo].before.to_list()
+    assert_that_before = env.expect.that_collection(before)
+    assert_that_after = env.expect.that_collection(target[CompileJdepsInfo].after.to_list())
+
+    assert_that_before.has_size(1)
+    assert_that_after.has_size(2)
+    assert_that_after.contains_at_least(before)
+    assert_that_after.contains_exactly(target[JavaInfo]._compile_time_java_dependencies)
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -82,5 +110,6 @@ def java_common_tests(name):
             _test_compile_sourcepath,
             _test_compile_exports_no_sources,
             _test_java_plugin_info,
+            _test_compile_extend_compile_time_jdeps,
         ],
     )
