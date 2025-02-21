@@ -102,6 +102,65 @@ def _test_compile_extend_compile_time_jdeps_impl(env, target):
     assert_that_after.contains_at_least(before)
     assert_that_after.contains_exactly(target[JavaInfo]._compile_time_java_dependencies)
 
+def _test_compile_extend_compile_time_jdeps_rule_outputs(name):
+    util.helper_target(
+        custom_library_extended_jdeps,
+        name = name + "/foo",
+        srcs = ["Foo.java"],
+        extra_jdeps = "Foo.jdeps",
+    )
+    util.helper_target(
+        custom_library_extended_jdeps,
+        name = name + "/bar",
+        srcs = ["Bar.java"],
+        extra_jdeps = "Bar.jdeps",
+        deps = [name + "/foo"],
+    )
+    util.helper_target(
+        custom_library_extended_jdeps,
+        name = name + "/baz",
+        srcs = ["Baz.java"],
+        extra_jdeps = "Baz.jdeps",
+        exports = [name + "/foo"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_extend_compile_time_jdeps_rule_outputs_impl,
+        targets = {
+            "foo": name + "/foo",
+            "bar": name + "/bar",
+            "baz": name + "/baz",
+        },
+        attr_values = {"tags": ["min_bazel_7"]},
+    )
+
+def _test_compile_extend_compile_time_jdeps_rule_outputs_impl(env, targets):
+    foo = targets.foo
+    compile_time_jdeps = foo[JavaInfo]._compile_time_java_dependencies
+    env.expect.that_depset_of_files(compile_time_jdeps).contains_exactly([
+        "{}/lib{}-hjar.jdeps".format(foo.label.package, foo.label.name),
+        "{}/Foo.jdeps".format(foo.label.package),
+    ])
+
+    # foo's jdeps shouldn't appear in bar's
+    bar = targets.bar
+    compile_time_jdeps = bar[JavaInfo]._compile_time_java_dependencies
+    env.expect.that_depset_of_files(compile_time_jdeps).contains_exactly([
+        "{}/lib{}-hjar.jdeps".format(bar.label.package, bar.label.name),
+        "{}/Bar.jdeps".format(bar.label.package),
+    ])
+
+    # baz exports foo, so we expect jdeps from both targets
+    baz = targets.baz
+    compile_time_jdeps = baz[JavaInfo]._compile_time_java_dependencies
+    env.expect.that_depset_of_files(compile_time_jdeps).contains_exactly([
+        "{}/lib{}-hjar.jdeps".format(foo.label.package, foo.label.name),
+        "{}/Foo.jdeps".format(foo.label.package),
+        "{}/lib{}-hjar.jdeps".format(baz.label.package, baz.label.name),
+        "{}/Baz.jdeps".format(baz.label.package),
+    ])
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -111,5 +170,6 @@ def java_common_tests(name):
             _test_compile_exports_no_sources,
             _test_java_plugin_info,
             _test_compile_extend_compile_time_jdeps,
+            _test_compile_extend_compile_time_jdeps_rule_outputs,
         ],
     )

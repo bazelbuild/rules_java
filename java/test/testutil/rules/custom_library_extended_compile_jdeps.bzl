@@ -15,6 +15,8 @@ def _impl(ctx):
         ctx,
         source_files = ctx.files.srcs,
         output = output_jar,
+        deps = [d[JavaInfo] for d in ctx.attr.deps],
+        exports = [e[JavaInfo] for e in ctx.attr.exports],
         java_toolchain = semantics.find_java_toolchain(ctx),
     )
     jdeps_info = JavaInfo(
@@ -39,6 +41,8 @@ custom_library_extended_jdeps = rule(
     attrs = {
         "srcs": attr.label_list(allow_files = [".java"]),
         "extra_jdeps": attr.label(allow_single_file = True),
+        "deps": attr.label_list(providers = [JavaInfo]),
+        "exports": attr.label_list(providers = [JavaInfo]),
     },
     toolchains = [semantics.JAVA_TOOLCHAIN_TYPE],
     fragments = ["java"],
