@@ -3,6 +3,8 @@
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
+load("//java/common:java_common.bzl", "java_common")
+load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
 load("//java/test/testutil:rules/custom_library.bzl", "custom_library")
 load("//java/test/testutil:rules/custom_library_with_exports.bzl", "custom_library_with_exports")
@@ -58,6 +60,20 @@ def _test_compile_exports_no_sources_impl(env, target):
         ["{package}/libjl.jar"],
     )
 
+def _test_java_plugin_info(name):
+    util.helper_target(native.filegroup, name = name + "/dummy")
+    analysis_test(
+        name = name,
+        impl = _test_java_plugin_info_impl,
+        target = name + "/dummy",  # analysis_test always expects a target
+    )
+
+def _test_java_plugin_info_impl(env, _target):
+    env.expect.that_bool(
+        java_common.JavaPluginInfo == JavaPluginInfo,
+        "java_common.JavaPluginInfo == JavaPluginInfo",
+    ).equals(True)
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -65,5 +81,6 @@ def java_common_tests(name):
             _test_compile_default_values,
             _test_compile_sourcepath,
             _test_compile_exports_no_sources,
+            _test_java_plugin_info,
         ],
     )
