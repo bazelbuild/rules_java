@@ -14,6 +14,7 @@ def _new_java_info_subject(java_info, meta):
         has_attr = lambda a: subjects.bool(getattr(java_info, a, None) != None, meta = self.meta.derive("{} != None".format(a))).equals(True),
         cc_link_params_info = lambda: cc_info_subject.new_from_java_info(java_info, meta),
         constraints = lambda: subjects.collection(java_common.get_constraints(java_info), self.meta.derive("constraints")),
+        annotation_processing = lambda: _new_annotation_processing_subject(self.actual, self.meta),
     )
     return public
 
@@ -66,6 +67,26 @@ def _new_java_info_plugins_subject(java_info, meta):
     )
     public = struct(
         processor_jars = lambda: subjects.depset_file(self.actual.processor_jars, meta = self.meta.derive("processor_jars")),
+    )
+    return public
+
+def _new_annotation_processing_subject(java_info, meta):
+    actual = java_info.annotation_processing
+    meta = meta.derive("annotation_processing")
+    self = struct(
+        actual = actual,
+        meta = meta,
+    )
+    public = struct(
+        is_enabled = lambda: subjects.bool(actual.enabled, meta = meta.derive("is_enabled")),
+        processor_classnames = lambda: subjects.collection(actual.processor_classnames, meta = meta.derive("processor_classnames")),
+        processor_classpath = lambda: subjects.depset_file(actual.processor_classpath, meta = meta.derive("processor_classpath")),
+        class_jar = lambda: subjects.file(actual.class_jar, meta = meta.derive("class_jar")),
+        source_jar = lambda: subjects.file(actual.source_jar, meta = meta.derive("source_jar")),
+        transitive_class_jars = lambda: subjects.depset_file(actual.transitive_class_jars, meta = meta.derive("transitive_class_jars")),
+        transitive_source_jars = lambda: subjects.depset_file(actual.transitive_source_jars, meta = meta.derive("transitive_source_jars")),
+        actual = actual,
+        self = self,
     )
     return public
 
