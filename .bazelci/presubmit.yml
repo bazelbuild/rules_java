@@ -1,6 +1,8 @@
 ---
 build_targets: &build_targets
   - "//..."
+  # can't build some analysis tests on older Bazel versions
+  - "-//java/test/..."
   - "@remote_java_tools//java_tools/..."
   # can't build @remote_java_tools_X repos for other platforms
   - "-//toolchains/..."
