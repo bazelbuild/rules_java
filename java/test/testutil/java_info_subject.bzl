@@ -30,8 +30,8 @@ def _new_java_compilation_args_subject(java_info, meta):
         compile_jars = java_info.compile_jars,
         transitive_compile_time_jars = java_info.transitive_compile_time_jars,
         full_compile_jars = java_info.full_compile_jars,
-        _transitive_full_compile_time_jars = java_info._transitive_full_compile_time_jars,
-        _compile_time_java_dependencies = java_info._compile_time_java_dependencies,
+        _transitive_full_compile_time_jars = getattr(java_info, "_transitive_full_compile_time_jars", None),  # not in Bazel 6
+        _compile_time_java_dependencies = getattr(java_info, "_compile_time_java_dependencies", None),  # not in Bazel 6
     ) if not is_binary else None
     self = struct(
         actual = actual,
@@ -40,6 +40,7 @@ def _new_java_compilation_args_subject(java_info, meta):
     return struct(
         equals = lambda other: _java_compilation_args_equals(self, other),
         equals_subject = lambda other: _java_compilation_args_equals(self, other.actual),
+        transitive_runtime_jars = lambda: subjects.depset_file(actual.transitive_runtime_jars, self.meta.derive("transitive_runtime_jars")),
         self = self,
         actual = actual,
     )
