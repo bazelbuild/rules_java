@@ -9,6 +9,7 @@ load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
 load("//java/test/testutil:rules/custom_library.bzl", "custom_library")
 load("//java/test/testutil:rules/custom_library_extended_compile_jdeps.bzl", "CompileJdepsInfo", "custom_library_extended_jdeps")
+load("//java/test/testutil:rules/custom_library_with_bootclasspath.bzl", "custom_bootclasspath", "custom_library_with_bootclasspath")
 load("//java/test/testutil:rules/custom_library_with_exports.bzl", "custom_library_with_exports")
 load("//java/test/testutil:rules/custom_library_with_sourcepaths.bzl", "custom_library_with_sourcepaths")
 
@@ -161,6 +162,41 @@ def _test_compile_extend_compile_time_jdeps_rule_outputs_impl(env, targets):
         "{}/Baz.jdeps".format(baz.label.package),
     ])
 
+def _test_compile_bootclasspath(name):
+    util.helper_target(
+        custom_bootclasspath,
+        name = name + "/bootclasspath",
+        srcs = [
+            "custom-system/lib/jrt-fs.jar",
+            "custom-system/lib/modules",
+            "custom-system/release",
+        ],
+    )
+    util.helper_target(
+        custom_library_with_bootclasspath,
+        name = name + "/custom",
+        srcs = ["Main.java"],
+        bootclasspath = name + "/bootclasspath",
+        sourcepath = [":B.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_bootclasspath_impl,
+        target = name + "/custom",
+        attr_values = {"tags": ["min_bazel_7"]},
+    )
+
+def _test_compile_bootclasspath_impl(env, target):
+    assert_that_javac = env.expect.that_target(target).action_generating(
+        target[JavaInfo].java_outputs[0].class_jar.short_path,
+    )
+
+    assert_that_javac.contains_flag_values([(
+        "--system",
+        "{}/custom-system".format(target.label.package),
+    )])
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -171,5 +207,6 @@ def java_common_tests(name):
             _test_java_plugin_info,
             _test_compile_extend_compile_time_jdeps,
             _test_compile_extend_compile_time_jdeps_rule_outputs,
+            _test_compile_bootclasspath,
         ],
     )
