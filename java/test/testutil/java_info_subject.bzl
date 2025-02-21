@@ -1,6 +1,7 @@
 """A custom @rules_testing subject for the JavaInfo provider"""
 
 load("@rules_testing//lib:truth.bzl", "subjects", "truth")
+load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 load(":cc_info_subject.bzl", "cc_info_subject")
 
@@ -12,6 +13,7 @@ def _new_java_info_subject(java_info, meta):
         is_binary = lambda: subjects.bool(getattr(java_info, "_is_binary", False), self.meta.derive("_is_binary")),
         has_attr = lambda a: subjects.bool(getattr(java_info, a, None) != None, meta = self.meta.derive("{} != None".format(a))).equals(True),
         cc_link_params_info = lambda: cc_info_subject.new_from_java_info(java_info, meta),
+        constraints = lambda: subjects.collection(java_common.get_constraints(java_info), self.meta.derive("constraints")),
     )
     return public
 
