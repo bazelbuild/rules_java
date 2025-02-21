@@ -4,8 +4,21 @@ load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
+load("//java/test/testutil:rules/custom_library.bzl", "custom_library")
 load("//java/test/testutil:rules/custom_library_with_exports.bzl", "custom_library_with_exports")
 load("//java/test/testutil:rules/custom_library_with_sourcepaths.bzl", "custom_library_with_sourcepaths")
+
+def _test_compile_default_values(name):
+    util.helper_target(custom_library, name = name + "/custom", srcs = ["Main.java"])
+
+    analysis_test(name = name, impl = _test_compile_default_values_impl, target = name + "/custom")
+
+def _test_compile_default_values_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+
+    assert_java_info.compilation_args().transitive_runtime_jars().contains_exactly([
+        "{}/lib{}.jar".format(target.label.package, target.label.name),
+    ])
 
 def _test_compile_sourcepath(name):
     util.helper_target(
@@ -49,6 +62,7 @@ def java_common_tests(name):
     test_suite(
         name = name,
         tests = [
+            _test_compile_default_values,
             _test_compile_sourcepath,
             _test_compile_exports_no_sources,
         ],
