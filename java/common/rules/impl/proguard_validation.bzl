@@ -43,6 +43,7 @@ def _validate_spec(ctx, spec_file):
         inputs = [spec_file],
         outputs = [validated_proguard_spec],
         toolchain = Label(semantics.JAVA_TOOLCHAIN_TYPE),
+        use_default_shell_env = True,
     )
 
     return validated_proguard_spec
