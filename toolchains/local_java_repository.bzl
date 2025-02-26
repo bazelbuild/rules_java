@@ -178,7 +178,7 @@ def _local_java_repository_impl(repository_ctx):
 
     java_home = _determine_java_home(repository_ctx)
 
-    local_java_runtime_name = repository_ctx.attr.runtime_name
+    local_java_runtime_name = repository_ctx.attr.runtime_name or repository_ctx.attr.name
 
     repository_ctx.file(
         "WORKSPACE",
@@ -311,11 +311,11 @@ If there is no JDK "virtual" targets are created, which fail only when actually 
 
 Args:
   name: A unique name for this rule.
+  runtime_name: The name of the JDK runtime.
   java_home: Location of the JDK imported.
   build_file: optionally BUILD file template
   build_file_content: optional BUILD file template as a string
   version: optionally java version
-  **kwargs: additional arguments for repository rule
 """
 local_java_repository = repository_rule(
     implementation = _local_java_repository_impl,
