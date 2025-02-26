@@ -317,7 +317,7 @@ Args:
   version: optionally java version
   **kwargs: additional arguments for repository rule
 """
-local_java_repository_rule = repository_rule(
+local_java_repository = repository_rule(
     implementation = _local_java_repository_impl,
     local = True,
     configure = True,
