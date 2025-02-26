@@ -286,7 +286,38 @@ def _create_auto_config_error_build_file(repository_ctx, *, local_java_runtime_n
         False,
     )
 
-_local_java_repository_rule = repository_rule(
+"""Defines runtime and compile toolchains for a local JDK.
+
+Register the toolchains defined by this macro as follows (where `<name>` is the value of the
+`name` parameter):
+* Runtime toolchains only (recommended)
+  ```
+  register_toolchains("@<name>//:runtime_toolchain_definition")
+  register_toolchains("@<name>//:bootstrap_runtime_toolchain_definition")
+  ```
+* Runtime and compilation toolchains:
+  ```
+  register_toolchains("@<name>//:all")
+  ```
+
+Toolchain resolution is constrained with --java_runtime_version flag
+having value of the "name" or "version" parameter.
+
+Java compile toolchains are created for --java_language_version flags values
+between 8 and version (inclusive). Java compile toolchains use the same
+(local) JDK for compilation.
+
+If there is no JDK "virtual" targets are created, which fail only when actually needed.
+
+Args:
+  name: A unique name for this rule.
+  java_home: Location of the JDK imported.
+  build_file: optionally BUILD file template
+  build_file_content: optional BUILD file template as a string
+  version: optionally java version
+  **kwargs: additional arguments for repository rule
+"""
+local_java_repository_rule = repository_rule(
     implementation = _local_java_repository_impl,
     local = True,
     configure = True,
@@ -299,37 +330,3 @@ _local_java_repository_rule = repository_rule(
         "version": attr.string(),
     },
 )
-
-def local_java_repository(name, java_home = "", version = "", build_file = None, build_file_content = None, **kwargs):
-    """Defines runtime and compile toolchains for a local JDK.
-
-    Register the toolchains defined by this macro as follows (where `<name>` is the value of the
-    `name` parameter):
-    * Runtime toolchains only (recommended)
-      ```
-      register_toolchains("@<name>//:runtime_toolchain_definition")
-      register_toolchains("@<name>//:bootstrap_runtime_toolchain_definition")
-      ```
-    * Runtime and compilation toolchains:
-      ```
-      register_toolchains("@<name>//:all")
-      ```
-
-    Toolchain resolution is constrained with --java_runtime_version flag
-    having value of the "name" or "version" parameter.
-
-    Java compile toolchains are created for --java_language_version flags values
-    between 8 and version (inclusive). Java compile toolchains use the same
-    (local) JDK for compilation.
-
-    If there is no JDK "virtual" targets are created, which fail only when actually needed.
-
-    Args:
-      name: A unique name for this rule.
-      java_home: Location of the JDK imported.
-      build_file: optionally BUILD file template
-      build_file_content: optional BUILD file template as a string
-      version: optionally java version
-      **kwargs: additional arguments for repository rule
-    """
-    _local_java_repository_rule(name = name, runtime_name = name, java_home = java_home, version = version, build_file = build_file, build_file_content = build_file_content, **kwargs)
