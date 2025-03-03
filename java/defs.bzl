@@ -19,6 +19,7 @@ load("//java:java_binary.bzl", _java_binary = "java_binary")
 load("//java:java_import.bzl", _java_import = "java_import")
 load("//java:java_library.bzl", _java_library = "java_library")
 load("//java:java_plugin.bzl", _java_plugin = "java_plugin")
+load("//java:java_single_jar.bzl", _java_single_jar = "java_single_jar")
 load("//java:java_test.bzl", _java_test = "java_test")
 load("//java/common:java_common.bzl", _java_common = "java_common")
 load("//java/common:java_info.bzl", _JavaInfo = "JavaInfo")
@@ -30,10 +31,11 @@ load("//java/toolchains:java_toolchain.bzl", _java_toolchain = "java_toolchain")
 # Language rules
 
 java_binary = _java_binary
-java_test = _java_test
+java_import = _java_import
 java_library = _java_library
 java_plugin = _java_plugin
-java_import = _java_import
+java_single_jar = _java_single_jar
+java_test = _java_test
 
 # Toolchain rules
 
