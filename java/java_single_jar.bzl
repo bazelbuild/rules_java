@@ -62,6 +62,7 @@ def _java_single_jar(ctx):
         progress_message = "Merging into %s" % ctx.outputs.jar.short_path,
         mnemonic = "JavaSingleJar",
         executable = ctx.executable._singlejar,
+        use_default_shell_env = True,
     )
 
     files = depset([ctx.outputs.jar])
