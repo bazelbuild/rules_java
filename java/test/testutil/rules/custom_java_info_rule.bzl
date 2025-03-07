@@ -3,6 +3,7 @@
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
+load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 
 def _impl(ctx):
@@ -10,6 +11,7 @@ def _impl(ctx):
     dp = [dep[JavaInfo] for dep in ctx.attr.dep]
     dp_runtime = [dep[JavaInfo] for dep in ctx.attr.dep_runtime]
     dp_exports = [dep[java_common.provider] for dep in ctx.attr.dep_exports]
+    dp_exported_plugins = [dep[JavaPluginInfo] for dep in ctx.attr.dep_exported_plugins]
     source_jar = java_common.pack_sources(
         ctx.actions,
         output_source_jar = ctx.actions.declare_file(ctx.outputs.output_jar.basename[:-4] + "-src.jar", sibling = ctx.outputs.output_jar),
@@ -34,6 +36,7 @@ def _impl(ctx):
             deps = dp,
             runtime_deps = dp_runtime,
             exports = dp_exports,
+            exported_plugins = dp_exported_plugins,
             native_libraries = dp_libs,
             neverlink = ctx.attr.neverlink,
         ),
@@ -48,6 +51,7 @@ custom_java_info_rule = rule(
         "dep": attr.label_list(),
         "dep_runtime": attr.label_list(),
         "dep_exports": attr.label_list(),
+        "dep_exported_plugins": attr.label_list(),
         "cc_dep": attr.label_list(),
         "use_ijar": attr.bool(default = False),
         "neverlink": attr.bool(default = False),
