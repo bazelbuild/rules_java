@@ -12,6 +12,7 @@ def _impl(ctx):
     source_jar = java_common.pack_sources(
         ctx.actions,
         output_source_jar = ctx.actions.declare_file(ctx.outputs.output_jar.basename[:-4] + "-src.jar", sibling = ctx.outputs.output_jar),
+        sources = ctx.files.sources,
         source_jars = ctx.files.source_jars,
         java_toolchain = semantics.find_java_toolchain(ctx),
     ) if ctx.attr.pack_sources else (
@@ -41,6 +42,7 @@ custom_java_info_rule = rule(
     attrs = {
         "output_jar": attr.output(mandatory = True),
         "source_jars": attr.label_list(allow_files = [".jar"]),
+        "sources": attr.label_list(allow_files = [".java"]),
         "dep": attr.label_list(),
         "dep_runtime": attr.label_list(),
         "cc_dep": attr.label_list(),
