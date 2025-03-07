@@ -49,6 +49,8 @@ def _impl(ctx):
             native_libraries = dp_libs,
             neverlink = ctx.attr.neverlink,
             jdeps = ctx.file.jdeps,
+            generated_class_jar = ctx.file.generated_class_jar,
+            generated_source_jar = ctx.file.generated_source_jar,
         ),
     ]
 
@@ -64,6 +66,8 @@ custom_java_info_rule = rule(
         "dep_exported_plugins": attr.label_list(),
         "cc_dep": attr.label_list(),
         "jdeps": attr.label(allow_single_file = True),
+        "generated_class_jar": attr.label(allow_single_file = True),
+        "generated_source_jar": attr.label(allow_single_file = True),
         "use_ijar": attr.bool(default = False),
         "neverlink": attr.bool(default = False),
         "pack_sources": attr.bool(default = False),

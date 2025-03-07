@@ -758,6 +758,28 @@ def _with_jdeps_test_impl(env, target):
     assert_outputs.source_output_jars().contains_exactly(["{package}/my_starlark_rule_src.jar"])
     assert_outputs.jdeps().contains_exactly(["{package}/my_jdeps.pb"])
 
+def _with_generated_jars_outputs_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        generated_class_jar = "generated_class.jar",
+        generated_source_jar = "generated_srcs.jar",
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_generated_jars_outputs_test_impl,
+        target = target_name,
+    )
+
+def _with_generated_jars_outputs_test_impl(env, target):
+    assert_outputs = java_info_subject.from_target(env, target).outputs()
+
+    assert_outputs.generated_class_jars().contains_exactly(["{package}/generated_class.jar"])
+    assert_outputs.generated_source_jars().contains_exactly(["{package}/generated_srcs.jar"])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -784,5 +806,6 @@ def java_info_tests(name):
             _with_plugins_test,
             _with_stamped_jar_test,
             _with_jdeps_test,
+            _with_generated_jars_outputs_test,
         ],
     )
