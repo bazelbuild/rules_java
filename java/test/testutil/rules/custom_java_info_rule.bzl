@@ -52,6 +52,7 @@ def _impl(ctx):
             compile_jdeps = ctx.file.compile_jdeps,
             generated_class_jar = ctx.file.generated_class_jar,
             generated_source_jar = ctx.file.generated_source_jar,
+            native_headers_jar = ctx.file.native_headers_jar,
         ),
     ]
 
@@ -70,6 +71,7 @@ custom_java_info_rule = rule(
         "compile_jdeps": attr.label(allow_single_file = True),
         "generated_class_jar": attr.label(allow_single_file = True),
         "generated_source_jar": attr.label(allow_single_file = True),
+        "native_headers_jar": attr.label(allow_single_file = True),
         "use_ijar": attr.bool(default = False),
         "neverlink": attr.bool(default = False),
         "pack_sources": attr.bool(default = False),

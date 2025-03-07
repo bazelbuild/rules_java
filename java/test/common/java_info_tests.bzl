@@ -822,6 +822,26 @@ def _with_compile_jdeps_test_impl(env, target):
         "{package}/compile.deps",
     ])
 
+def _with_native_headers_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        native_headers_jar = "native_headers.jar",
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_native_headers_test_impl,
+        target = target_name,
+    )
+
+def _with_native_headers_test_impl(env, target):
+    java_info_subject.from_target(env, target).outputs().native_headers().contains_exactly([
+        "{package}/native_headers.jar",
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -851,5 +871,6 @@ def java_info_tests(name):
             _with_generated_jars_outputs_test,
             _with_generated_jars_annotation_processing_test,
             _with_compile_jdeps_test,
+            _with_native_headers_test,
         ],
     )
