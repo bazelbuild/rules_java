@@ -102,6 +102,7 @@ def _new_java_info_plugins_subject(java_info, meta):
     )
     public = struct(
         processor_jars = lambda: subjects.depset_file(self.actual.processor_jars, meta = self.meta.derive("processor_jars")),
+        processor_classes = lambda: subjects.collection(self.actual.processor_classes, meta = self.meta.derive("processor_classes")),
     )
     return public
 

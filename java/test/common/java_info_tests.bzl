@@ -5,6 +5,7 @@ load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
+load("//java:java_plugin.bzl", "java_plugin")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
 load("//java/test/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 
@@ -641,6 +642,43 @@ def _with_transitive_deps_and_exports_test_impl(env, target):
         "{package}/lib{name}/my_java_lib_d-hjar.jar",
     ])
 
+def _with_plugins_via_exports_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        java_library,
+        name = target_name + "/plugin_dep",
+        srcs = ["ProcessorDep.java"],
+    )
+    util.helper_target(
+        java_plugin,
+        name = target_name + "/plugin",
+        srcs = ["AnnotationProcessor.java"],
+        processor_class = "com.google.process.stuff",
+        deps = [target_name + "/plugin_dep"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/export",
+        exported_plugins = [target_name + "/plugin"],
+    )
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        dep_exports = [target_name + "/export"],
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_plugins_via_exports_test_impl,
+        target = target_name,
+    )
+
+def _with_plugins_via_exports_test_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+
+    assert_java_info.plugins().processor_classes().contains_exactly(["com.google.process.stuff"])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -663,5 +701,6 @@ def java_info_tests(name):
             _with_exports_test,
             _with_transitive_exports_test,
             _with_transitive_deps_and_exports_test,
+            _with_plugins_via_exports_test,
         ],
     )
