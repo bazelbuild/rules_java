@@ -501,6 +501,68 @@ def _with_exports_test_impl(env, target):
         "{package}/lib{name}/my_java_lib_exports-hjar.jar",
     ])
 
+def _with_transitive_exports_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_c",
+        srcs = ["java/C.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_b",
+        srcs = ["java/B.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_a",
+        srcs = ["java/A.java"],
+        exports = [target_name + "/my_java_lib_b"],
+        deps = [
+            target_name + "/my_java_lib_b",
+            target_name + "/my_java_lib_c",
+        ],
+    )
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        dep_exports = [target_name + "/my_java_lib_a"],
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_transitive_exports_test_impl,
+        target = target_name,
+    )
+
+def _with_transitive_exports_test_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+
+    assert_compilation_args = assert_java_info.compilation_args()
+    assert_compilation_args.compile_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/my_java_lib_a-hjar.jar",
+        "{package}/lib{name}/my_java_lib_b-hjar.jar",
+    ])
+    assert_compilation_args.full_compile_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/my_java_lib_a.jar",
+        "{package}/lib{name}/my_java_lib_b.jar",
+    ])
+    assert_compilation_args.transitive_runtime_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/my_java_lib_a.jar",
+        "{package}/lib{name}/my_java_lib_b.jar",
+        "{package}/lib{name}/my_java_lib_c.jar",
+    ])
+    assert_compilation_args.transitive_compile_time_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/my_java_lib_a-hjar.jar",
+        "{package}/lib{name}/my_java_lib_b-hjar.jar",
+        "{package}/lib{name}/my_java_lib_c-hjar.jar",
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -521,5 +583,6 @@ def java_info_tests(name):
             _with_transitive_deps_source_jars_test,
             _with_transitive_runtime_deps_source_jars_test,
             _with_exports_test,
+            _with_transitive_exports_test,
         ],
     )
