@@ -173,6 +173,39 @@ def _with_native_libraries_test_impl(env, target):
 
     assert_native_libs.identifiers().contains_exactly_predicates([matching.str_endswith("my_cc_lib_direct")])
 
+def _with_deps_and_neverlink_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_direct",
+        srcs = ["java/A.java"],
+    )
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        dep = [target_name + "/my_java_lib_direct"],
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+        source_jars = ["my_starlark_rule_src.jar"],
+        neverlink = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_deps_and_neverlink_test_impl,
+        target = target_name,
+    )
+
+def _with_deps_and_neverlink_test_impl(env, target):
+    assert_compilation_args = java_info_subject.from_target(env, target).compilation_args()
+
+    assert_compilation_args.compile_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
+    assert_compilation_args.full_compile_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
+    assert_compilation_args.transitive_runtime_jars().contains_exactly([])
+    assert_compilation_args.transitive_compile_time_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/my_java_lib_direct-hjar.jar",
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -183,5 +216,6 @@ def java_info_tests(name):
             _with_deps_test,
             _with_runtime_deps_test,
             _with_native_libraries_test,
+            _with_deps_and_neverlink_test,
         ],
     )

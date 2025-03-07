@@ -25,6 +25,7 @@ def _impl(ctx):
             deps = dp,
             runtime_deps = dp_runtime,
             native_libraries = dp_libs,
+            neverlink = ctx.attr.neverlink,
         ),
     ]
 
@@ -37,6 +38,7 @@ custom_java_info_rule = rule(
         "dep_runtime": attr.label_list(),
         "cc_dep": attr.label_list(),
         "use_ijar": attr.bool(default = False),
+        "neverlink": attr.bool(default = False),
     },
     toolchains = [semantics.JAVA_TOOLCHAIN_TYPE],
 )
