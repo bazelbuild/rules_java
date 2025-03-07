@@ -43,6 +43,7 @@ def _new_rule_output_info_subject(java_info, meta):
         jars = lambda: _new_java_outputs_collection_subject(actual.jars, self.meta.derive("jars")),
         class_output_jars = lambda: subjects.depset_file(depset([o.class_jar for o in actual.jars]), self.meta.derive("class_output_jars")),
         source_output_jars = lambda: subjects.depset_file(source_jars_depset, self.meta.derive("source_output_jars")),
+        jdeps = lambda: subjects.depset_file(depset([o.jdeps for o in actual.jars]), self.meta.derive("jdeps")),
     )
     return public
 

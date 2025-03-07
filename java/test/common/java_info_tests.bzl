@@ -735,6 +735,29 @@ def _with_stamped_jar_test_impl(env, target):
     assert_compilation_args.transitive_runtime_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
     assert_compilation_args.transitive_compile_time_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib-stamped.jar"])
 
+def _with_jdeps_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        jdeps = "my_jdeps.pb",
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+        source_jars = ["my_starlark_rule_src.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_jdeps_test_impl,
+        target = target_name,
+    )
+
+def _with_jdeps_test_impl(env, target):
+    assert_outputs = java_info_subject.from_target(env, target).outputs()
+
+    assert_outputs.class_output_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
+    assert_outputs.source_output_jars().contains_exactly(["{package}/my_starlark_rule_src.jar"])
+    assert_outputs.jdeps().contains_exactly(["{package}/my_jdeps.pb"])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -760,5 +783,6 @@ def java_info_tests(name):
             _with_plugins_via_exports_test,
             _with_plugins_test,
             _with_stamped_jar_test,
+            _with_jdeps_test,
         ],
     )
