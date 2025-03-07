@@ -231,6 +231,32 @@ def _with_source_jars_test_impl(env, target):
         "{package}/my_starlark_rule_src.jar",
     ])
 
+def _with_packed_sourcejars_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+        source_jars = ["my_starlark_rule_src.jar"],
+        pack_sources = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_packed_sourcejars_test_impl,
+        target = target_name,
+    )
+
+def _with_packed_sourcejars_test_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+
+    assert_java_info.source_jars().contains_exactly_predicates([
+        matching.file_basename_equals("my_starlark_rule_lib-src.jar"),
+    ])
+    assert_java_info.transitive_source_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib-src.jar",
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -243,5 +269,6 @@ def java_info_tests(name):
             _with_native_libraries_test,
             _with_deps_and_neverlink_test,
             _with_source_jars_test,
+            _with_packed_sourcejars_test,
         ],
     )

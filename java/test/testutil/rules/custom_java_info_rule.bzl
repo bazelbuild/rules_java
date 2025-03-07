@@ -9,7 +9,14 @@ def _impl(ctx):
     ctx.actions.write(ctx.outputs.output_jar, "JavaInfo API Test", is_executable = False)
     dp = [dep[JavaInfo] for dep in ctx.attr.dep]
     dp_runtime = [dep[JavaInfo] for dep in ctx.attr.dep_runtime]
-    source_jar = ctx.files.source_jars[0] if ctx.files.source_jars else None
+    source_jar = java_common.pack_sources(
+        ctx.actions,
+        output_source_jar = ctx.actions.declare_file(ctx.outputs.output_jar.basename[:-4] + "-src.jar", sibling = ctx.outputs.output_jar),
+        source_jars = ctx.files.source_jars,
+        java_toolchain = semantics.find_java_toolchain(ctx),
+    ) if ctx.attr.pack_sources else (
+        ctx.files.source_jars[0] if ctx.files.source_jars else None
+    )
     dp_libs = [dep[CcInfo] for dep in ctx.attr.cc_dep]
     compile_jar = java_common.run_ijar(
         ctx.actions,
@@ -39,6 +46,7 @@ custom_java_info_rule = rule(
         "cc_dep": attr.label_list(),
         "use_ijar": attr.bool(default = False),
         "neverlink": attr.bool(default = False),
+        "pack_sources": attr.bool(default = False),
     },
     toolchains = [semantics.JAVA_TOOLCHAIN_TYPE],
 )
