@@ -15,6 +15,7 @@ def _new_java_info_subject(java_info, meta):
         cc_link_params_info = lambda: cc_info_subject.new_from_java_info(java_info, meta),
         constraints = lambda: subjects.collection(java_common.get_constraints(java_info), self.meta.derive("constraints")),
         annotation_processing = lambda: _new_annotation_processing_subject(self.actual, self.meta),
+        outputs = lambda: _new_rule_output_info_subject(self.actual, self.meta),
     )
     return public
 
@@ -25,6 +26,34 @@ def _java_info_subject_from_target(env, target):
             "package": target.label.package,
         },
     ))
+
+def _new_rule_output_info_subject(java_info, meta):
+    actual = java_info.outputs
+    self = struct(
+        actual = actual,
+        meta = meta.derive("outputs"),
+    )
+
+    # JavaOutputInfo.source_jars is a list before Bazel 7
+    source_jars_depset = depset([f for o in actual.jars for f in (o.source_jars.to_list() if hasattr(o.source_jars, "to_list") else o.source_jars)])
+    public = struct(
+        jars = lambda: _new_java_outputs_collection_subject(actual.jars, self.meta.derive("jars")),
+        class_output_jars = lambda: subjects.depset_file(depset([o.class_jar for o in actual.jars]), self.meta.derive("class_output_jars")),
+        source_output_jars = lambda: subjects.depset_file(source_jars_depset, self.meta.derive("source_output_jars")),
+    )
+    return public
+
+def _new_java_outputs_collection_subject(java_outputs, meta):
+    public = struct(
+        singleton = lambda: _new_java_outputs_subject(_get_singleton(java_outputs), meta.derive("[0]")),
+    )
+    return public
+
+def _new_java_outputs_subject(java_output, meta):
+    public = struct(
+        compile_jar = lambda: subjects.file(java_output.compile_jar, meta.derive("compile_jar")),
+    )
+    return public
 
 def _new_java_compilation_args_subject(java_info, meta):
     is_binary = getattr(java_info, "_is_binary", False)
@@ -92,6 +121,11 @@ def _new_annotation_processing_subject(java_info, meta):
         self = self,
     )
     return public
+
+def _get_singleton(seq):
+    if len(seq) != 1:
+        fail("expected singleton, got:", seq)
+    return seq[0]
 
 java_info_subject = struct(
     new = _new_java_info_subject,

@@ -52,11 +52,35 @@ def _with_output_jar_and_use_ijar_test_impl(env, target):
     assert_compilation_args.transitive_runtime_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
     assert_compilation_args.transitive_compile_time_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib-ijar.jar"])
 
+def _with_output_jar_and_use_ijar_outputs_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+        source_jars = ["my_starlark_rule_src.jar"],
+        use_ijar = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_output_jar_and_use_ijar_outputs_test_impl,
+        target = target_name,
+    )
+
+def _with_output_jar_and_use_ijar_outputs_test_impl(env, target):
+    assert_outputs = java_info_subject.from_target(env, target).outputs()
+
+    assert_outputs.source_output_jars().contains_exactly(["{package}/my_starlark_rule_src.jar"])
+    assert_outputs.class_output_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
+    assert_outputs.jars().singleton().compile_jar().short_path_equals("{package}/{name}/my_starlark_rule_lib-ijar.jar")
+
 def java_info_tests(name):
     test_suite(
         name = name,
         tests = [
             _with_output_jar_only_test,
             _with_output_jar_and_use_ijar_test,
+            _with_output_jar_and_use_ijar_outputs_test,
         ],
     )
