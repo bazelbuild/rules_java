@@ -1,6 +1,7 @@
 """Tests for java_common APIs"""
 
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
+load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java/common:java_common.bzl", "java_common")
@@ -232,6 +233,50 @@ def _test_compile_override_with_empty_bootclasspath_impl(env, target):
         "{}/custom-system".format(target.label.package),
     )])
 
+def _test_exposes_java_info_as_provider(name):
+    util.helper_target(
+        java_library,
+        name = name + "/dep",
+        srcs = ["Dep.java"],
+    )
+    analysis_test(
+        name = name,
+        impl = _test_exposes_java_info_as_provider_impl,
+        target = name + "/dep",
+    )
+
+def _test_exposes_java_info_as_provider_impl(env, target):
+    java_info = target[java_common.provider]
+    assert_java_info = java_info_subject.new(
+        java_info,
+        env.expect.meta.derive(
+            format_str_kwargs = {
+                "name": target.label.name,
+                "package": target.label.package,
+            },
+        ),
+    )
+
+    assert_java_info.compilation_args().transitive_runtime_jars().contains_exactly([
+        "{package}/lib{name}.jar",
+    ])
+    assert_java_info.compilation_args().transitive_compile_time_jars().contains_exactly([
+        "{package}/lib{name}-hjar.jar",
+    ])
+    assert_java_info.compilation_args().full_compile_jars().contains_exactly([
+        "{package}/lib{name}.jar",
+    ])
+    assert_java_info.source_jars().contains_exactly_predicates([
+        matching.file_basename_equals("dep-src.jar"),
+    ])
+
+    assert_output = assert_java_info.outputs().jars().singleton()
+    assert_output.class_jar().short_path_equals("{package}/lib{name}.jar")
+    assert_output.compile_jar().short_path_equals("{package}/lib{name}-hjar.jar")
+    assert_output.source_jars().contains_exactly(["{package}/lib{name}-src.jar"])
+    assert_output.jdeps().short_path_equals("{package}/lib{name}.jdeps")
+    assert_output.compile_jdeps().short_path_equals("{package}/lib{name}-hjar.jdeps")
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -244,5 +289,6 @@ def java_common_tests(name):
             _test_compile_extend_compile_time_jdeps_rule_outputs,
             _test_compile_bootclasspath,
             _test_compile_override_with_empty_bootclasspath,
+            _test_exposes_java_info_as_provider,
         ],
     )
