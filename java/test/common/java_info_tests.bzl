@@ -458,6 +458,49 @@ def _with_transitive_runtime_deps_source_jars_test_impl(env, target):
         "{package}/lib{name}/my_java_lib_transitive-src.jar",
     ])
 
+def _with_exports_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_exports",
+        srcs = ["java/A.java"],
+    )
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        dep_exports = [target_name + "/my_java_lib_exports"],
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_exports_test_impl,
+        target = target_name,
+    )
+
+def _with_exports_test_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+
+    assert_java_info.source_jars().contains_exactly([])
+
+    assert_compilation_args = assert_java_info.compilation_args()
+    assert_compilation_args.compile_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/my_java_lib_exports-hjar.jar",
+    ])
+    assert_compilation_args.full_compile_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/my_java_lib_exports.jar",
+    ])
+    assert_compilation_args.transitive_runtime_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/my_java_lib_exports.jar",
+    ])
+    assert_compilation_args.transitive_compile_time_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/my_java_lib_exports-hjar.jar",
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -477,5 +520,6 @@ def java_info_tests(name):
             _with_runtime_deps_source_jars_test,
             _with_transitive_deps_source_jars_test,
             _with_transitive_runtime_deps_source_jars_test,
+            _with_exports_test,
         ],
     )

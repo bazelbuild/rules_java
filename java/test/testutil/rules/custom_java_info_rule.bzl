@@ -9,6 +9,7 @@ def _impl(ctx):
     ctx.actions.write(ctx.outputs.output_jar, "JavaInfo API Test", is_executable = False)
     dp = [dep[JavaInfo] for dep in ctx.attr.dep]
     dp_runtime = [dep[JavaInfo] for dep in ctx.attr.dep_runtime]
+    dp_exports = [dep[java_common.provider] for dep in ctx.attr.dep_exports]
     source_jar = java_common.pack_sources(
         ctx.actions,
         output_source_jar = ctx.actions.declare_file(ctx.outputs.output_jar.basename[:-4] + "-src.jar", sibling = ctx.outputs.output_jar),
@@ -32,6 +33,7 @@ def _impl(ctx):
             source_jar = source_jar,
             deps = dp,
             runtime_deps = dp_runtime,
+            exports = dp_exports,
             native_libraries = dp_libs,
             neverlink = ctx.attr.neverlink,
         ),
@@ -45,6 +47,7 @@ custom_java_info_rule = rule(
         "sources": attr.label_list(allow_files = [".java"]),
         "dep": attr.label_list(),
         "dep_runtime": attr.label_list(),
+        "dep_exports": attr.label_list(),
         "cc_dep": attr.label_list(),
         "use_ijar": attr.bool(default = False),
         "neverlink": attr.bool(default = False),
