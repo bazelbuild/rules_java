@@ -20,7 +20,7 @@ def _new_cc_info_linking_context_subject(cc_info, meta):
     )
     public = struct(
         equals = lambda other: _cc_info_linking_context_equals(self.actual, other, self.meta),
-        libraries_to_link = lambda: _new_cc_info_libraries_to_link_subject(self.actual, self.meta),
+        libraries_to_link = lambda: _new_cc_info_libraries_to_link_subject(self.actual.libraries_to_link, self.meta.derive("libraries_to_link")),
         static_mode_params_for_dynamic_library_libs = lambda: _new_static_mode_params_for_dynamic_library_libs_subject(self.actual, self.meta),
     )
     return public
@@ -51,10 +51,12 @@ def _cc_info_linking_context_equals(actual, expected, meta):
         "actual: {}".format(actual),
     )
 
-def _new_cc_info_libraries_to_link_subject(linking_context, meta):
+def _new_cc_info_libraries_to_link_subject(libraries_to_link, meta):
+    if hasattr(libraries_to_link, "to_list"):
+        libraries_to_link = libraries_to_link.to_list()
     self = struct(
-        actual = linking_context.libraries_to_link,
-        meta = meta.derive("libraries_to_link"),
+        actual = libraries_to_link,
+        meta = meta,
     )
     public = struct(
         identifiers = lambda: _new_library_to_link_identifiers_subject(self.actual, self.meta),
@@ -68,9 +70,11 @@ def _new_library_to_link_identifiers_subject(libraries_to_link, meta):
     )
     public = struct(
         contains_exactly = lambda expected: self.contains_exactly([meta.format_str(e) for e in expected]),
+        contains_exactly_predicates = lambda expected: self.contains_exactly_predicates(expected),
     )
     return public
 
 cc_info_subject = struct(
     new_from_java_info = lambda java_info, meta: _new_cc_info_subject(java_info.cc_link_params_info, meta.derive("cc_link_params_info")),
+    libraries_to_link = _new_cc_info_libraries_to_link_subject,
 )

@@ -1,5 +1,6 @@
 """Helper rule for creating JavaInfo instances"""
 
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
@@ -9,6 +10,7 @@ def _impl(ctx):
     dp = [dep[JavaInfo] for dep in ctx.attr.dep]
     dp_runtime = [dep[JavaInfo] for dep in ctx.attr.dep_runtime]
     source_jar = ctx.files.source_jars[0] if ctx.files.source_jars else None
+    dp_libs = [dep[CcInfo] for dep in ctx.attr.cc_dep]
     compile_jar = java_common.run_ijar(
         ctx.actions,
         jar = ctx.outputs.output_jar,
@@ -22,6 +24,7 @@ def _impl(ctx):
             source_jar = source_jar,
             deps = dp,
             runtime_deps = dp_runtime,
+            native_libraries = dp_libs,
         ),
     ]
 
@@ -32,6 +35,7 @@ custom_java_info_rule = rule(
         "source_jars": attr.label_list(allow_files = [".jar"]),
         "dep": attr.label_list(),
         "dep_runtime": attr.label_list(),
+        "cc_dep": attr.label_list(),
         "use_ijar": attr.bool(default = False),
     },
     toolchains = [semantics.JAVA_TOOLCHAIN_TYPE],

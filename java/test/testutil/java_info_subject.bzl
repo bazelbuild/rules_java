@@ -13,6 +13,7 @@ def _new_java_info_subject(java_info, meta):
         is_binary = lambda: subjects.bool(getattr(java_info, "_is_binary", False), self.meta.derive("_is_binary")),
         has_attr = lambda a: subjects.bool(getattr(java_info, a, None) != None, meta = self.meta.derive("{} != None".format(a))).equals(True),
         cc_link_params_info = lambda: cc_info_subject.new_from_java_info(java_info, meta),
+        transitive_native_libraries = lambda: cc_info_subject.libraries_to_link(java_info.transitive_native_libraries, self.meta.derive("transitive_native_libraries")),
         constraints = lambda: subjects.collection(java_common.get_constraints(java_info), self.meta.derive("constraints")),
         annotation_processing = lambda: _new_annotation_processing_subject(self.actual, self.meta),
         outputs = lambda: _new_rule_output_info_subject(self.actual, self.meta),

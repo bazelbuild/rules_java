@@ -1,6 +1,8 @@
 """Tests for the JavaInfo provider"""
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
+load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
@@ -143,6 +145,34 @@ def _with_runtime_deps_test_impl(env, target):
     ])
     assert_compilation_args.transitive_compile_time_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
 
+def _with_native_libraries_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        cc_library,
+        name = target_name + "/my_cc_lib_direct",
+        srcs = ["cc/a.cc"],
+    )
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        cc_dep = [target_name + "/my_cc_lib_direct"],
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+        source_jars = ["my_starlark_rule_src.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_native_libraries_test_impl,
+        target = target_name,
+        # LibraryToLink.library_indentifier only available from Bazel 8
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _with_native_libraries_test_impl(env, target):
+    assert_native_libs = java_info_subject.from_target(env, target).transitive_native_libraries()
+
+    assert_native_libs.identifiers().contains_exactly_predicates([matching.str_endswith("my_cc_lib_direct")])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -152,5 +182,6 @@ def java_info_tests(name):
             _with_output_jar_and_use_ijar_outputs_test,
             _with_deps_test,
             _with_runtime_deps_test,
+            _with_native_libraries_test,
         ],
     )
