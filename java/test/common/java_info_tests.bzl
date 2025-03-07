@@ -842,6 +842,26 @@ def _with_native_headers_test_impl(env, target):
         "{package}/native_headers.jar",
     ])
 
+def _with_manifest_proto_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        manifest_proto = "manifest.proto",
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_manifest_proto_test_impl,
+        target = target_name,
+    )
+
+def _with_manifest_proto_test_impl(env, target):
+    java_info_subject.from_target(env, target).outputs().manifest_protos().contains_exactly([
+        "{package}/manifest.proto",
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -872,5 +892,6 @@ def java_info_tests(name):
             _with_generated_jars_annotation_processing_test,
             _with_compile_jdeps_test,
             _with_native_headers_test,
+            _with_manifest_proto_test,
         ],
     )

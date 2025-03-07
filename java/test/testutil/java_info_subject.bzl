@@ -48,6 +48,7 @@ def _new_rule_output_info_subject(java_info, meta):
         jdeps = lambda: subjects.depset_file(depset([o.jdeps for o in actual.jars]), self.meta.derive("jdeps")),
         compile_jdeps = lambda: subjects.depset_file(depset([o.compile_jdeps for o in actual.jars]), self.meta.derive("compile_jdeps")),
         native_headers = lambda: subjects.depset_file(depset([o.native_headers_jar for o in actual.jars]), self.meta.derive("native_headers")),
+        manifest_protos = lambda: subjects.depset_file(depset([o.manifest_proto for o in actual.jars]), self.meta.derive("manifest_protos")),
     )
     return public
 
