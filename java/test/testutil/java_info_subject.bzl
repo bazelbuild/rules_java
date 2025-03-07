@@ -3,6 +3,7 @@
 load("@rules_testing//lib:truth.bzl", "subjects", "truth")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
+load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load(":cc_info_subject.bzl", "cc_info_subject")
 
 def _new_java_info_subject(java_info, meta):
@@ -136,6 +137,21 @@ def _new_annotation_processing_subject(java_info, meta):
     )
     return public
 
+def _new_java_plugin_info_subject(java_plugin_info, meta):
+    self = struct(actual = java_plugin_info, meta = meta.derive("JavaPluginInfo"))
+    public = struct(
+        java_outputs = lambda: _new_java_outputs_collection_subject(self.actual.java_outputs, meta.derive("java_outputs")),
+    )
+    return public
+
+def _java_plugin_info_subject_from_target(env, target):
+    return _new_java_plugin_info_subject(target[JavaPluginInfo], meta = truth.expect(env).meta.derive(
+        format_str_kwargs = {
+            "name": target.label.name,
+            "package": target.label.package,
+        },
+    ))
+
 def _get_singleton(seq):
     if len(seq) != 1:
         fail("expected singleton, got:", seq)
@@ -144,4 +160,9 @@ def _get_singleton(seq):
 java_info_subject = struct(
     new = _new_java_info_subject,
     from_target = _java_info_subject_from_target,
+)
+
+java_plugin_info_subject = struct(
+    new = _new_java_plugin_info_subject,
+    from_target = _java_plugin_info_subject_from_target,
 )
