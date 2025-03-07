@@ -43,7 +43,10 @@ def _new_java_compilation_args_subject(java_info, meta):
     return struct(
         equals = lambda other: _java_compilation_args_equals(self, other),
         equals_subject = lambda other: _java_compilation_args_equals(self, other.actual),
+        compile_jars = lambda: subjects.depset_file(actual.compile_jars, self.meta.derive("compile_jars")),
+        full_compile_jars = lambda: subjects.depset_file(actual.full_compile_jars, self.meta.derive("full_compile_jars")),
         transitive_runtime_jars = lambda: subjects.depset_file(actual.transitive_runtime_jars, self.meta.derive("transitive_runtime_jars")),
+        transitive_compile_time_jars = lambda: subjects.depset_file(actual.transitive_compile_time_jars, self.meta.derive("transitive_compile_time_jars")),
         self = self,
         actual = actual,
     )
