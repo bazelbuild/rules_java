@@ -780,6 +780,28 @@ def _with_generated_jars_outputs_test_impl(env, target):
     assert_outputs.generated_class_jars().contains_exactly(["{package}/generated_class.jar"])
     assert_outputs.generated_source_jars().contains_exactly(["{package}/generated_srcs.jar"])
 
+def _with_generated_jars_annotation_processing_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        generated_class_jar = "generated_class.jar",
+        generated_source_jar = "generated_srcs.jar",
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_generated_jars_annotation_processing_test_impl,
+        target = target_name,
+    )
+
+def _with_generated_jars_annotation_processing_test_impl(env, target):
+    assert_annotation_processing = java_info_subject.from_target(env, target).annotation_processing()
+
+    assert_annotation_processing.class_jar().short_path_equals("{package}/generated_class.jar")
+    assert_annotation_processing.source_jar().short_path_equals("{package}/generated_srcs.jar")
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -807,5 +829,6 @@ def java_info_tests(name):
             _with_stamped_jar_test,
             _with_jdeps_test,
             _with_generated_jars_outputs_test,
+            _with_generated_jars_annotation_processing_test,
         ],
     )
