@@ -7,6 +7,8 @@ load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 
 def _impl(ctx):
+    if ctx.attr.use_ijar and ctx.attr.stamp_jar:
+        fail("only one of use_ijar or stamp_jar may be set")
     ctx.actions.write(ctx.outputs.output_jar, "JavaInfo API Test", is_executable = False)
     dp = [dep[JavaInfo] for dep in ctx.attr.dep]
     dp_runtime = [dep[JavaInfo] for dep in ctx.attr.dep_runtime]
@@ -26,7 +28,14 @@ def _impl(ctx):
         ctx.actions,
         jar = ctx.outputs.output_jar,
         java_toolchain = semantics.find_java_toolchain(ctx),
-    ) if ctx.attr.use_ijar else ctx.outputs.output_jar
+    ) if ctx.attr.use_ijar else (
+        java_common.stamp_jar(
+            ctx.actions,
+            jar = ctx.outputs.output_jar,
+            target_label = ctx.label,
+            java_toolchain = semantics.find_java_toolchain(ctx),
+        ) if ctx.attr.stamp_jar else ctx.outputs.output_jar
+    )
 
     return [
         JavaInfo(
@@ -56,6 +65,7 @@ custom_java_info_rule = rule(
         "use_ijar": attr.bool(default = False),
         "neverlink": attr.bool(default = False),
         "pack_sources": attr.bool(default = False),
+        "stamp_jar": attr.bool(default = False),
     },
     toolchains = [semantics.JAVA_TOOLCHAIN_TYPE],
 )

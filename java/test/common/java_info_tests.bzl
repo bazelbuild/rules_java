@@ -711,6 +711,30 @@ def _with_plugins_test_impl(env, target):
 
     assert_java_info.plugins().processor_classes().contains_exactly(["com.google.process.stuff"])
 
+def _with_stamped_jar_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+        source_jars = ["my_starlark_rule_src.jar"],
+        stamp_jar = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_stamped_jar_test_impl,
+        target = target_name,
+    )
+
+def _with_stamped_jar_test_impl(env, target):
+    assert_compilation_args = java_info_subject.from_target(env, target).compilation_args()
+
+    assert_compilation_args.full_compile_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
+    assert_compilation_args.compile_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib-stamped.jar"])
+    assert_compilation_args.transitive_runtime_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
+    assert_compilation_args.transitive_compile_time_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib-stamped.jar"])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -735,5 +759,6 @@ def java_info_tests(name):
             _with_transitive_deps_and_exports_test,
             _with_plugins_via_exports_test,
             _with_plugins_test,
+            _with_stamped_jar_test,
         ],
     )
