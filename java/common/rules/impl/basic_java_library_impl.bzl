@@ -156,6 +156,8 @@ def basic_java_library(
         _direct_source_jars = java_info.source_jars,
     )
 
+    validation_outputs = []
+
     if ctx.fragments.java.run_android_lint:
         generated_source_jars = [
             output.generated_source_jar
@@ -168,7 +170,13 @@ def basic_java_library(
             compilation_info,
         )
         if lint_output:
-            output_groups["_validation"] = [lint_output]
+            validation_outputs.append(depset([lint_output]))
+
+    if neverlink:
+        validation_outputs.append(java_info.compilation_info.runtime_classpath)
+
+    if validation_outputs:
+        output_groups["_validation"] = depset(transitive = validation_outputs)
 
     target["InstrumentedFilesInfo"] = coverage_common.instrumented_files_info(
         ctx,

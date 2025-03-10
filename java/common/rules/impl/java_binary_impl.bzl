@@ -251,7 +251,10 @@ def basic_java_binary(
     ])
 
     if validation_outputs:
-        output_groups["_validation"] = output_groups.get("_validation", []) + validation_outputs
+        output_groups["_validation"] = depset(
+            validation_outputs,
+            transitive = [output_groups.get("_validation", depset([]))],
+        )
 
     _filter_validation_output_group(ctx, output_groups)
 
