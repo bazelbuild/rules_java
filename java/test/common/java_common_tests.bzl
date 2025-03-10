@@ -277,6 +277,29 @@ def _test_exposes_java_info_as_provider_impl(env, target):
     assert_output.jdeps().short_path_equals("{package}/lib{name}.jdeps")
     assert_output.compile_jdeps().short_path_equals("{package}/lib{name}-hjar.jdeps")
 
+def _test_compile_exposes_outputs_provider(name):
+    util.helper_target(
+        custom_library,
+        name = name + "/dep",
+        srcs = ["Main.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_exposes_outputs_provider_impl,
+        target = name + "/dep",
+    )
+
+def _test_compile_exposes_outputs_provider_impl(env, target):
+    assert_output = java_info_subject.from_target(env, target).outputs().jars().singleton()
+
+    assert_output.class_jar().short_path_equals("{package}/lib{name}.jar")
+    assert_output.compile_jar().short_path_equals("{package}/lib{name}-hjar.jar")
+    assert_output.source_jars().contains_exactly(["{package}/lib{name}-src.jar"])
+    assert_output.jdeps().short_path_equals("{package}/lib{name}.jdeps")
+    assert_output.native_headers_jar().short_path_equals("{package}/lib{name}-native-header.jar")
+    assert_output.compile_jdeps().short_path_equals("{package}/lib{name}-hjar.jdeps")
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -290,5 +313,6 @@ def java_common_tests(name):
             _test_compile_bootclasspath,
             _test_compile_override_with_empty_bootclasspath,
             _test_exposes_java_info_as_provider,
+            _test_compile_exposes_outputs_provider,
         ],
     )

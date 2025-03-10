@@ -66,6 +66,7 @@ def _new_java_outputs_subject(java_output, meta):
         source_jars = lambda: subjects.depset_file(java_output.source_jars if hasattr(java_output.source_jars, "to_list") else depset(java_output.source_jars), meta.derive("source_jars")),
         jdeps = lambda: subjects.file(java_output.jdeps, meta.derive("jdeps")),
         compile_jdeps = lambda: subjects.file(java_output.compile_jdeps, meta.derive("compile_jdeps")),
+        native_headers_jar = lambda: subjects.file(java_output.native_headers_jar, meta.derive("native_headers_jar")),
     )
     return public
 
