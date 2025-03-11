@@ -22,6 +22,8 @@ build_targets_integration: &build_targets_integration
 test_targets: &test_targets
   - "//test/..."
   - "//java/test/..."
+  # linux-only tests
+  - "-//test:check_remote_jdk_configs_test"
   # TODO: re-enable docs after moving them out of https://bazel.build/reference/be/java
   - "-//test:docs_up_to_date_test"
 
@@ -38,146 +40,73 @@ flags_workspace_integration: &flags_workspace_integration
 
 buildifier: latest
 
+matrix:
+  all_platforms: ["ubuntu2004", "macos", "windows"]
+  integration_platforms: ["ubuntu2004", "macos"] # TODO: add windows batch setup script
+  bazel: ["7.4.0", "8.1.0", "last_green"] # Bazel 6 tested separately, needs different flags
+  modern_bazel: ["8.1.0", "last_green"] # Fully supported Bazel versions
+
 tasks:
 # Bazel 7.x
-  ubuntu2004_bazel7:
-    name: "Bazel 7.x"
-    bazel: "7.4.0"
-    platform: ubuntu2004
+  build_and_test_bazel7:
+    name: "Bazel 7.5.0"
+    bazel: "7.5.0"
+    platform: ${{ all_platforms }}
     build_targets: *build_targets
     test_targets: *test_targets
     test_flags:
       - "--test_tag_filters=-min_bazel_8"
-  ubuntu2004_integration_bazel7:
-    name: "Bazel 7.x Integration"
-    bazel: "7.4.0"
-    platform: ubuntu2004
-    working_directory: "test/repo"
-    shell_commands:
-      - sh setup.sh
-    build_targets: *build_targets_integration
-    test_targets: *test_target_integration
-  ubuntu2004_integration_workspace_bazel7:
-    name: "Bazel 7.x Integration (WORKSPACE)"
-    bazel: "7.4.0"
-    platform: ubuntu2004
-    working_directory: "test/repo"
-    shell_commands:
-      - sh setup.sh
-    build_targets: *build_targets_integration
-    build_flags: *flags_workspace_integration
-    test_targets: *test_target_integration
-    test_flags: *flags_workspace_integration
-  macos_bazel7:
-    name: "Bazel 7.x"
-    bazel: "7.4.0"
-    platform: macos
-    build_targets: *build_targets
-  windows_bazel7:
-    name: "Bazel 7.x"
-    bazel: "7.4.0"
-    platform: windows
-    build_targets: *build_targets
-# Bazel 8.x
-  ubuntu2004_bazel8:
-    name: "Bazel 8.x"
-    bazel: "8.1.0"
-    platform: ubuntu2004
+# Bazel 8+
+  build_and_test:
+    name: "Bazel {modern_bazel}"
+    bazel: ${{ modern_bazel }}
+    platform: ${{ all_platforms }}
     build_targets: *build_targets
     test_targets: *test_targets
-  ubuntu2004_integration_bazel8:
-    name: "Bazel 8.x Integration"
-    bazel: "8.1.0"
-    platform: ubuntu2004
-    working_directory: "test/repo"
-    shell_commands:
-      - sh setup.sh
-    build_targets: *build_targets_integration
-    test_targets: *test_target_integration
-  ubuntu2004_integration_workspace_bazel8:
-    name: "Bazel 8.x Integration (WORKSPACE)"
-    bazel: "8.1.0"
-    platform: ubuntu2004
-    working_directory: "test/repo"
-    shell_commands:
-      - sh setup.sh
-    build_targets: *build_targets_integration
-    build_flags: *flags_workspace_integration
-    test_targets: *test_target_integration
-    test_flags: *flags_workspace_integration
-  macos_bazel8:
-    name: "Bazel 8.x"
-    bazel: "8.1.0"
-    platform: macos
-    build_targets: *build_targets
-  windows_bazel8:
-    name: "Bazel 8.x"
-    bazel: "8.1.0"
-    platform: windows
-    build_targets: *build_targets
-# Bazel@HEAD
-  ubuntu2004_head:
-    name: "Bazel@HEAD"
-    bazel: last_green
-    platform: ubuntu2004
-    build_targets: *build_targets
-    test_targets: *test_targets
-  ubuntu2004_integration_head:
-    name: "Bazel@HEAD Integration"
-    bazel: last_green
-    platform: ubuntu2004
-    working_directory: "test/repo"
-    shell_commands:
-      - sh setup.sh
-    build_targets: *build_targets_integration
-    test_targets: *test_target_integration
-  ubuntu2004_integration_head_workspace:
-    name: "Bazel@HEAD Integration (WORKSPACE)"
-    bazel: "last_green"
-    platform: ubuntu2004
-    working_directory: "test/repo"
-    shell_commands:
-      - sh setup.sh
-    build_targets: *build_targets_integration
-    build_flags: *flags_workspace_integration
-    test_targets: *test_target_integration
-    test_flags: *flags_workspace_integration
-  macos_head:
-    name: "Bazel@HEAD"
-    bazel: last_green
-    platform: macos
-    build_targets: *build_targets
-  windows_head:
-    name: "Bazel@HEAD"
-    bazel: last_green
-    platform: windows
-    build_targets: *build_targets
-
 # Bazel 6.x
-  ubuntu2004_bazel6:
-    name: "Bazel 6.x"
-    bazel: 6.4.0
-    platform: ubuntu2004
+  build_and_test_bazel6:
+    name: "Bazel 6.5.0"
+    bazel: 6.5.0
+    platform: ${{ all_platforms }}
     build_targets: *build_targets_bazel6
     test_targets: *test_targets_bazel6
     test_flags:
       - "--test_tag_filters=-min_bazel_7,-min_bazel_8"
   ubuntu2004_integration_bazel6:
-    name: "Bazel 6.x Integration"
-    bazel: 6.4.0
+    name: "Integration w/ Bazel 6.5.0"
+    bazel: 6.5.0
     platform: ubuntu2004
     working_directory: "test/repo"
     shell_commands:
     - sh setup.sh
     build_targets: *build_targets_integration
     test_targets: *test_target_integration
-  macos_bazel6:
-    name: "Bazel 6.x"
-    bazel: 6.4.0
-    platform: macos
-    build_targets: *build_targets_bazel6
-  windows_bazel6:
-    name: "Bazel 6.x"
-    bazel: 6.4.0
-    platform: windows
-    build_targets: *build_targets_bazel6
+
+# Integration tests
+  integration_build_and_test:
+    name: "Integration w/ Bazel {bazel}"
+    bazel: ${{ bazel }}
+    platform: ${{ integration_platforms }}
+    working_directory: "test/repo"
+    shell_commands:
+    - sh setup.sh
+    build_targets: *build_targets_integration
+    test_targets: *test_target_integration
+  integration_build_and_test_workspace:
+    name: "Integration (WORKSPACE) w/ Bazel {bazel}"
+    bazel: ${{ bazel }}
+    platform: ${{ integration_platforms }}
+    working_directory: "test/repo"
+    shell_commands:
+    - sh setup.sh
+    build_targets: *build_targets_integration
+    build_flags: *flags_workspace_integration
+    test_targets: *test_target_integration
+    test_flags: *flags_workspace_integration
+# Linux-only tests
+  linux_only_tests:
+    name: "Extra tests w/ Bazel {bazel}"
+    bazel: ${{ bazel }}
+    platform: "ubuntu2004"
+    test_targets:
+      - "//test:check_remote_jdk_configs_test"
