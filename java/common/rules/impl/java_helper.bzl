@@ -366,6 +366,7 @@ def _create_single_jar(
         tools = [toolchain.single_jar],
         outputs = [output],
         arguments = [args],
+        use_default_shell_env = True,
     )
     return output
 

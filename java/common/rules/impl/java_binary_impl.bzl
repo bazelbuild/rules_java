@@ -364,6 +364,7 @@ def _create_one_version_check(ctx, inputs, is_test_rule_class):
         tools = [tool],
         outputs = [output],
         arguments = [args],
+        use_default_shell_env = True,
     )
 
     return output
