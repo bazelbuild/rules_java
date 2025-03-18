@@ -10,6 +10,7 @@ def _new_java_info_subject(java_info, meta):
     self = struct(actual = java_info, meta = meta.derive("JavaInfo"))
     public = struct(
         compilation_args = lambda: _new_java_compilation_args_subject(self.actual, self.meta),
+        compilation_info = lambda: _new_java_compilation_info_subject(self.actual, self.meta),
         plugins = lambda: _new_java_info_plugins_subject(self.actual, self.meta),
         is_binary = lambda: subjects.bool(getattr(java_info, "_is_binary", False), self.meta.derive("_is_binary")),
         has_attr = lambda a: subjects.bool(getattr(java_info, a, None) != None, meta = self.meta.derive("{} != None".format(a))).equals(True),
@@ -20,6 +21,8 @@ def _new_java_info_subject(java_info, meta):
         outputs = lambda: _new_rule_output_info_subject(self.actual, self.meta),
         source_jars = lambda: subjects.collection(java_info.source_jars, self.meta.derive("source_jars")),
         transitive_source_jars = lambda: subjects.depset_file(java_info.transitive_source_jars, self.meta.derive("transitive_source_jars")),
+        transitive_source_jars_list = lambda: subjects.collection(java_info.transitive_source_jars.to_list(), self.meta.derive("transitive_source_jars.to_list()")),
+        runtime_output_jars = lambda: subjects.depset_file(java_info.runtime_output_jars, self.meta.derive("runtime_output_jars")),
     )
     return public
 
@@ -30,6 +33,17 @@ def _java_info_subject_from_target(env, target):
             "package": target.label.package,
         },
     ))
+
+def _new_java_compilation_info_subject(java_info, meta):
+    self = struct(
+        actual = java_info.compilation_info,
+        meta = meta.derive("compilation_info"),
+    )
+    public = struct(
+        compilation_classpath = lambda: subjects.depset_file(self.actual.compilation_classpath, self.meta.derive("compilation_classpath")),
+        runtime_classpath_list = lambda: subjects.collection(self.actual.runtime_classpath.to_list(), self.meta.derive("runtime_classpath.to_list()")),
+    )
+    return public
 
 def _new_rule_output_info_subject(java_info, meta):
     actual = java_info.outputs
@@ -91,6 +105,7 @@ def _new_java_compilation_args_subject(java_info, meta):
         full_compile_jars = lambda: subjects.depset_file(actual.full_compile_jars, self.meta.derive("full_compile_jars")),
         transitive_runtime_jars = lambda: subjects.depset_file(actual.transitive_runtime_jars, self.meta.derive("transitive_runtime_jars")),
         transitive_compile_time_jars = lambda: subjects.depset_file(actual.transitive_compile_time_jars, self.meta.derive("transitive_compile_time_jars")),
+        transitive_runtime_jars_list = lambda: subjects.collection(actual.transitive_runtime_jars.to_list(), self.meta.derive("transitive_runtime_jars.to_list()")),
         self = self,
         actual = actual,
     )

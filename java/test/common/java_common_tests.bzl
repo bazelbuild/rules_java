@@ -300,6 +300,55 @@ def _test_compile_exposes_outputs_provider_impl(env, target):
     assert_output.native_headers_jar().short_path_equals("{package}/lib{name}-native-header.jar")
     assert_output.compile_jdeps().short_path_equals("{package}/lib{name}-hjar.jdeps")
 
+def _test_compile_sets_runtime_deps(name):
+    target_name = name + "/custom"
+    util.helper_target(
+        custom_library,
+        name = target_name,
+        srcs = ["Main.java"],
+        runtime_deps = [target_name + "/runtime"],
+        deps = [target_name + "/dep"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/dep",
+        srcs = ["Dep.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/runtime",
+        srcs = ["Runtime.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_sets_runtime_deps_impl,
+        target = target_name,
+    )
+
+def _test_compile_sets_runtime_deps_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+
+    assert_java_info.compilation_args().transitive_runtime_jars_list().contains_exactly_predicates([
+        matching.file_basename_equals("custom.jar"),
+        matching.file_basename_equals("dep.jar"),
+        matching.file_basename_equals("runtime.jar"),
+    ]).in_order()
+    assert_java_info.runtime_output_jars().contains_exactly(["{package}/lib{name}.jar"])
+    assert_java_info.compilation_info().compilation_classpath().contains_exactly([
+        "{package}/lib{name}/dep-hjar.jar",
+    ])
+    assert_java_info.compilation_info().runtime_classpath_list().contains_exactly_predicates([
+        matching.file_basename_equals("custom.jar"),
+        matching.file_basename_equals("runtime.jar"),
+        matching.file_basename_equals("dep.jar"),
+    ]).in_order()
+    assert_java_info.transitive_source_jars_list().contains_exactly_predicates([
+        matching.file_basename_equals("runtime-src.jar"),
+        matching.file_basename_equals("dep-src.jar"),
+        matching.file_basename_equals("custom-src.jar"),
+    ]).in_order()
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -314,5 +363,6 @@ def java_common_tests(name):
             _test_compile_override_with_empty_bootclasspath,
             _test_exposes_java_info_as_provider,
             _test_compile_exposes_outputs_provider,
+            _test_compile_sets_runtime_deps,
         ],
     )
