@@ -13,6 +13,7 @@ def _new_java_info_subject(java_info, meta):
         compilation_args = lambda: _new_java_compilation_args_subject(self.actual, self.meta),
         compilation_info = lambda: _new_java_compilation_info_subject(self.actual, self.meta),
         plugins = lambda: _new_java_plugin_data_subject(self.actual.plugins, self.meta.derive("plugins")),
+        api_generating_plugins = lambda: _new_java_plugin_data_subject(self.actual.api_generating_plugins, self.meta.derive("api_generating_plugins")),
         is_binary = lambda: subjects.bool(getattr(java_info, "_is_binary", False), self.meta.derive("_is_binary")),
         has_attr = lambda a: subjects.bool(getattr(java_info, a, None) != None, meta = self.meta.derive("{} != None".format(a))).equals(True),
         cc_link_params_info = lambda: cc_info_subject.new_from_java_info(java_info, meta),
