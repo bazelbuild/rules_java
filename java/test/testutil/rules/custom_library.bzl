@@ -2,6 +2,7 @@
 
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
+load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 
 def _custom_library_impl(ctx):
@@ -14,6 +15,8 @@ def _custom_library_impl(ctx):
         output = output_jar,
         deps = deps,
         runtime_deps = runtime_deps,
+        exports = [e[JavaInfo] for e in ctx.attr.exports],
+        plugins = [p[JavaPluginInfo] for p in ctx.attr.plugins],
         java_toolchain = semantics.find_java_toolchain(ctx),
     )
     return [DefaultInfo(files = depset([output_jar])), compilation_provider]
@@ -24,6 +27,8 @@ custom_library = rule(
         "srcs": attr.label_list(allow_files = [".java"]),
         "deps": attr.label_list(),
         "runtime_deps": attr.label_list(),
+        "exports": attr.label_list(),
+        "plugins": attr.label_list(),
     },
     toolchains = [semantics.JAVA_TOOLCHAIN_TYPE],
     fragments = ["java"],

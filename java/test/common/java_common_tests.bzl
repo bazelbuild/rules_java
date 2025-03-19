@@ -4,6 +4,7 @@ load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
+load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
@@ -349,6 +350,79 @@ def _test_compile_sets_runtime_deps_impl(env, target):
         matching.file_basename_equals("custom-src.jar"),
     ]).in_order()
 
+def _test_compile_exposes_annotation_processing_info(name):
+    _test_annotation_processing_info_is_starlark_accessible(name, custom_library)
+
+def _test_annotation_processing_info_is_starlark_accessible(name, to_be_processed_rule_class):
+    target_name = name + "/to_be_processed"
+    util.helper_target(
+        to_be_processed_rule_class,
+        name = target_name,
+        plugins = [target_name + "/plugin"],
+        srcs = ["ToBeProcessed.java"],
+        deps = [target_name + "/dep"],
+        exports = [target_name + "/export"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/plugin_dep",
+        srcs = ["Processordep.java"],
+    )
+    util.helper_target(
+        java_plugin,
+        name = target_name + "/plugin",
+        srcs = ["AnnotationProcessor.java"],
+        processor_class = "com.google.process.stuff",
+        deps = [target_name + "/plugin_dep"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/dep",
+        srcs = ["Dep.java"],
+        plugins = [target_name + "/plugin"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/export",
+        srcs = ["Export.java"],
+        plugins = [target_name + "/plugin"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_annotation_processing_info_is_starlark_accessible_impl,
+        target = target_name,
+    )
+
+def _test_annotation_processing_info_is_starlark_accessible_impl(env, target):
+    depj = target[JavaInfo]
+    result = struct(
+        enabled = depj.annotation_processing.enabled,
+        class_jar = depj.outputs.jars[0].generated_class_jar,
+        source_jar = depj.outputs.jars[0].generated_source_jar,
+        old_class_jar = depj.annotation_processing.class_jar,
+        old_source_jar = depj.annotation_processing.source_jar,
+        processor_classpath = depj.annotation_processing.processor_classpath,
+        processor_classnames = depj.annotation_processing.processor_classnames,
+        transitive_class_jars = depj.annotation_processing.transitive_class_jars,
+        transitive_source_jars = depj.annotation_processing.transitive_source_jars,
+    )
+
+    env.expect.that_bool(result.enabled).equals(True)
+    env.expect.that_file(result.class_jar).equals(result.old_class_jar)
+    env.expect.that_file(result.source_jar).equals(result.old_source_jar)
+    env.expect.that_collection(result.processor_classnames).contains_exactly([
+        "com.google.process.stuff",
+    ])
+    env.expect.that_collection(result.processor_classpath.to_list()).contains_exactly_predicates([
+        matching.file_basename_equals("plugin.jar"),
+        matching.file_basename_equals("plugin_dep.jar"),
+    ])
+    env.expect.that_collection(result.transitive_class_jars.to_list()).has_size(3)
+    env.expect.that_collection(result.transitive_class_jars.to_list()).contains(result.class_jar)
+    env.expect.that_collection(result.transitive_source_jars.to_list()).has_size(3)
+    env.expect.that_collection(result.transitive_source_jars.to_list()).contains(result.source_jar)
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -364,5 +438,6 @@ def java_common_tests(name):
             _test_exposes_java_info_as_provider,
             _test_compile_exposes_outputs_provider,
             _test_compile_sets_runtime_deps,
+            _test_compile_exposes_annotation_processing_info,
         ],
     )
