@@ -13,6 +13,7 @@ load("//java/test/testutil:rules/custom_library.bzl", "custom_library")
 load("//java/test/testutil:rules/custom_library_extended_compile_jdeps.bzl", "CompileJdepsInfo", "custom_library_extended_jdeps")
 load("//java/test/testutil:rules/custom_library_with_bootclasspath.bzl", "custom_bootclasspath", "custom_library_with_bootclasspath")
 load("//java/test/testutil:rules/custom_library_with_exports.bzl", "custom_library_with_exports")
+load("//java/test/testutil:rules/custom_library_with_named_outputs.bzl", "custom_library_with_named_outputs")
 load("//java/test/testutil:rules/custom_library_with_sourcepaths.bzl", "custom_library_with_sourcepaths")
 load("//java/test/testutil:rules/custom_library_with_wrong_plugins_type.bzl", "custom_library_with_wrong_plugins_type")
 
@@ -517,6 +518,39 @@ def _test_compile_transitive_source_jars_impl(env, target):
         "{package}/lib{name}-src.jar",
     ])
 
+def _test_compile_source_jar_name_derived_from_output_jar(name):
+    target_name = name + "/custom"
+    util.helper_target(
+        custom_library_with_named_outputs,
+        name = target_name,
+        srcs = ["Main.java"],
+        deps = [target_name + "/dep"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/dep",
+        srcs = ["Dep.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_source_jar_name_derived_from_output_jar_impl,
+        target = target_name,
+    )
+
+def _test_compile_source_jar_name_derived_from_output_jar_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+
+    assert_java_info.source_jars().contains_exactly_predicates([
+        matching.file_basename_equals("amazing-src.jar"),
+        matching.file_basename_equals("wonderful-src.jar"),
+    ])
+    assert_java_info.transitive_source_jars().contains_exactly([
+        "{package}/lib{name}/dep-src.jar",
+        "{package}/{name}/amazing-src.jar",
+        "{package}/{name}/wonderful-src.jar",
+    ])
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -537,5 +571,6 @@ def java_common_tests(name):
             _test_compile_requires_java_plugin_info,
             _test_compile_compilation_info,
             _test_compile_transitive_source_jars,
+            _test_compile_source_jar_name_derived_from_output_jar,
         ],
     )
