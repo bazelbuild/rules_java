@@ -11,6 +11,7 @@ load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
 load("//java/test/testutil:rules/custom_library.bzl", "custom_library")
 load("//java/test/testutil:rules/custom_library_extended_compile_jdeps.bzl", "CompileJdepsInfo", "custom_library_extended_jdeps")
+load("//java/test/testutil:rules/custom_library_with_additional_inputs.bzl", "custom_library_with_additional_inputs")
 load("//java/test/testutil:rules/custom_library_with_bootclasspath.bzl", "custom_bootclasspath", "custom_library_with_bootclasspath")
 load("//java/test/testutil:rules/custom_library_with_custom_output_source_jar.bzl", "custom_library_with_custom_output_source_jar")
 load("//java/test/testutil:rules/custom_library_with_exports.bzl", "custom_library_with_exports")
@@ -625,6 +626,32 @@ def _test_compile_custom_output_source_jar_impl(env, target):
     assert_output.jdeps().short_path_equals("{package}/lib{name}.jdeps")
     assert_output.compile_jdeps().short_path_equals("{package}/lib{name}-hjar.jdeps")
 
+def _test_compile_additional_inputs_and_outputs(name):
+    util.helper_target(
+        custom_library_with_additional_inputs,
+        name = name + "/custom",
+        srcs = ["myjar-src.jar"],
+        additional_inputs = ["additional_input.bin"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_additional_inputs_and_outputs_impl,
+        target = name + "/custom",
+    )
+
+def _test_compile_additional_inputs_and_outputs_impl(env, target):
+    assert_java_action = env.expect.that_target(target).action_generating(
+        "{package}/lib{name}.jar",
+    )
+
+    assert_java_action.inputs().contains_predicate(
+        matching.file_basename_equals("additional_input.bin"),
+    )
+    env.expect.that_depset_of_files(assert_java_action.actual.outputs).contains_predicate(
+        matching.file_basename_equals("custom_additional_output"),
+    )
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -649,5 +676,6 @@ def java_common_tests(name):
             _test_compile_with_only_one_source_jar,
             _test_compile_no_sources,
             _test_compile_custom_output_source_jar,
+            _test_compile_additional_inputs_and_outputs,
         ],
     )
