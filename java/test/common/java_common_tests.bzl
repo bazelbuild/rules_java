@@ -551,6 +551,31 @@ def _test_compile_source_jar_name_derived_from_output_jar_impl(env, target):
         "{package}/{name}/wonderful-src.jar",
     ])
 
+def _test_compile_with_only_one_source_jar(name):
+    util.helper_target(
+        custom_library,
+        name = name + "/custom",
+        source_jars = ["myjar-src.jar"],
+    )
+    analysis_test(
+        name = name,
+        impl = _test_compile_with_only_one_source_jar_impl,
+        target = name + "/custom",
+    )
+
+def _test_compile_with_only_one_source_jar_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+
+    assert_java_info.source_jars().contains_exactly_predicates([
+        matching.file_basename_equals("custom-src.jar"),
+    ])
+    assert_output = assert_java_info.java_outputs().singleton()
+    assert_output.class_jar().short_path_equals("{package}/lib{name}.jar")
+    assert_output.compile_jar().short_path_equals("{package}/lib{name}-hjar.jar")
+    assert_output.source_jars().contains_exactly(["{package}/lib{name}-src.jar"])
+    assert_output.jdeps().short_path_equals("{package}/lib{name}.jdeps")
+    assert_output.compile_jdeps().short_path_equals("{package}/lib{name}-hjar.jdeps")
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -572,5 +597,6 @@ def java_common_tests(name):
             _test_compile_compilation_info,
             _test_compile_transitive_source_jars,
             _test_compile_source_jar_name_derived_from_output_jar,
+            _test_compile_with_only_one_source_jar,
         ],
     )

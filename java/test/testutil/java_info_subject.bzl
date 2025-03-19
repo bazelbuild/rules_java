@@ -20,6 +20,7 @@ def _new_java_info_subject(java_info, meta):
         constraints = lambda: subjects.collection(java_common.get_constraints(java_info), self.meta.derive("constraints")),
         annotation_processing = lambda: _new_annotation_processing_subject(self.actual, self.meta),
         outputs = lambda: _new_rule_output_info_subject(self.actual, self.meta),
+        java_outputs = lambda: _new_java_outputs_collection_subject(self.actual.java_outputs, self.meta.derive("java_outputs")),
         source_jars = lambda: subjects.collection(java_info.source_jars, self.meta.derive("source_jars")),
         transitive_source_jars = lambda: subjects.depset_file(java_info.transitive_source_jars, self.meta.derive("transitive_source_jars")),
         transitive_source_jars_list = lambda: subjects.collection(java_info.transitive_source_jars.to_list(), self.meta.derive("transitive_source_jars.to_list()")),

@@ -12,6 +12,7 @@ def _custom_library_impl(ctx):
     compilation_provider = java_common.compile(
         ctx,
         source_files = ctx.files.srcs,
+        source_jars = ctx.files.source_jars,
         output = output_jar,
         deps = deps,
         runtime_deps = runtime_deps,
@@ -26,6 +27,7 @@ custom_library = rule(
     _custom_library_impl,
     attrs = {
         "srcs": attr.label_list(allow_files = [".java"]),
+        "source_jars": attr.label_list(allow_files = [".jar"]),
         "deps": attr.label_list(),
         "runtime_deps": attr.label_list(),
         "exports": attr.label_list(),
