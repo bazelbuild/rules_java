@@ -1,6 +1,7 @@
 """Custom @rules_testing subject for the JavaRuntimeInfo provider"""
 
 load("@rules_testing//lib:truth.bzl", "subjects", "truth")
+load("@rules_testing//lib:util.bzl", "TestingAspectInfo")
 load("//java/common:java_common.bzl", "java_common")
 
 def _new_java_runtime_info_subject(java_runtime_info, meta):
@@ -38,6 +39,7 @@ def _from_target(env, target):
             format_str_kwargs = {
                 "name": target.label.name,
                 "package": target.label.package,
+                "bindir": target[TestingAspectInfo].bin_path,
             },
         ),
     )
