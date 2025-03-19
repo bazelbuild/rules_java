@@ -18,6 +18,7 @@ def _impl(ctx):
         runtime_deps = [dep],
         processor_class = ctx.attr.processor_class,
         data = ctx.files.data,
+        generates_api = ctx.attr.generates_api,
     )]
 
 custom_plugin = rule(
@@ -26,5 +27,6 @@ custom_plugin = rule(
         "deps": attr.label_list(),
         "processor_class": attr.string(),
         "data": attr.label_list(allow_files = True),
+        "generates_api": attr.bool(default = False),
     },
 )

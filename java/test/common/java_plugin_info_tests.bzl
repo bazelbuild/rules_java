@@ -4,6 +4,7 @@ load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
+load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_plugin_info_subject")
 load("//java/test/testutil:rules/custom_plugin.bzl", "custom_plugin")
 
@@ -71,11 +72,45 @@ def _test_provider_contstructor_impl(env, target):
     assert_api_plugin_data.processor_jars().contains_exactly([])
     assert_api_plugin_data.processor_data().contains_exactly([])
 
+def _test_api_generating_provider_constructor(name):
+    target_name = name + "/plugin"
+    util.helper_target(
+        java_library,
+        name = target_name + "/plugin_dep1",
+        srcs = ["A.java"],
+        data = ["depfile1.dat"],
+    )
+    util.helper_target(
+        custom_plugin,
+        name = target_name,
+        data = ["pluginfile1.dat"],
+        processor_class = "com.google.process.stuff",
+        deps = [target_name + "/plugin_dep1"],
+        generates_api = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_api_generating_provider_constructor_impl,
+        target = target_name,
+    )
+
+def _test_api_generating_provider_constructor_impl(env, target):
+    assert_api_plugin_data = java_plugin_info_subject.from_target(env, target).api_generating_plugins()
+    assert_api_plugin_data.processor_classes().contains_exactly(["com.google.process.stuff"])
+    assert_api_plugin_data.processor_jars().contains_exactly([
+        "{package}/{name}/lib.jar",
+        "{package}/lib{name}/plugin_dep1.jar",
+    ])
+    assert_api_plugin_data.processor_data().contains_exactly(["{package}/pluginfile1.dat"])
+    assert_api_plugin_data.equals(target[JavaPluginInfo].plugins)
+
 def java_plugin_info_tests(name):
     test_suite(
         name = name,
         tests = [
             _test_exposes_java_outputs,
             _test_provider_contstructor,
+            _test_api_generating_provider_constructor,
         ],
     )
