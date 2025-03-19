@@ -141,6 +141,43 @@ def _test_without_processor_class_impl(env, target):
     assert_api_plugin_data.processor_jars().contains_exactly([])
     assert_api_plugin_data.processor_data().contains_exactly([])
 
+def _test_constructor_with_data_depset(name):
+    target_name = name + "/plugin"
+    util.helper_target(
+        java_library,
+        name = target_name + "/plugin_dep1",
+        srcs = ["A.java"],
+        data = ["depfile1.dat"],
+    )
+    util.helper_target(
+        custom_plugin,
+        name = target_name,
+        processor_class = "com.google.process.stuff",
+        data = ["pluginfile1.dat"],
+        deps = [target_name + "/plugin_dep1"],
+        data_as_depset = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_constructor_with_data_depset_impl,
+        target = target_name,
+    )
+
+def _test_constructor_with_data_depset_impl(env, target):
+    assert_plugin_data = java_plugin_info_subject.from_target(env, target).plugins()
+    assert_plugin_data.processor_classes().contains_exactly(["com.google.process.stuff"])
+    assert_plugin_data.processor_jars().contains_exactly([
+        "{package}/{name}/lib.jar",
+        "{package}/lib{name}/plugin_dep1.jar",
+    ])
+    assert_plugin_data.processor_data().contains_exactly(["{package}/pluginfile1.dat"])
+
+    assert_api_plugin_data = java_plugin_info_subject.from_target(env, target).api_generating_plugins()
+    assert_api_plugin_data.processor_classes().contains_exactly([])
+    assert_api_plugin_data.processor_jars().contains_exactly([])
+    assert_api_plugin_data.processor_data().contains_exactly([])
+
 def java_plugin_info_tests(name):
     test_suite(
         name = name,
@@ -149,5 +186,6 @@ def java_plugin_info_tests(name):
             _test_provider_contstructor,
             _test_api_generating_provider_constructor,
             _test_without_processor_class,
+            _test_constructor_with_data_depset,
         ],
     )

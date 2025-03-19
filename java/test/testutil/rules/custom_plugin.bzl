@@ -14,10 +14,11 @@ def _impl(ctx):
         compile_jar = None,
         deps = [d[JavaInfo] for d in ctx.attr.deps],
     )
+    data = depset(ctx.files.data) if ctx.attr.data_as_depset else ctx.files.data
     return [JavaPluginInfo(
         runtime_deps = [dep],
         processor_class = ctx.attr.processor_class,
-        data = ctx.files.data,
+        data = data,
         generates_api = ctx.attr.generates_api,
     )]
 
@@ -28,5 +29,6 @@ custom_plugin = rule(
         "processor_class": attr.string(),
         "data": attr.label_list(allow_files = True),
         "generates_api": attr.bool(default = False),
+        "data_as_depset": attr.bool(default = False),
     },
 )
