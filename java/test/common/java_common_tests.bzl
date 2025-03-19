@@ -14,6 +14,7 @@ load("//java/test/testutil:rules/custom_library_extended_compile_jdeps.bzl", "Co
 load("//java/test/testutil:rules/custom_library_with_bootclasspath.bzl", "custom_bootclasspath", "custom_library_with_bootclasspath")
 load("//java/test/testutil:rules/custom_library_with_exports.bzl", "custom_library_with_exports")
 load("//java/test/testutil:rules/custom_library_with_sourcepaths.bzl", "custom_library_with_sourcepaths")
+load("//java/test/testutil:rules/custom_library_with_wrong_plugins_type.bzl", "custom_library_with_wrong_plugins_type")
 
 def _test_compile_default_values(name):
     util.helper_target(custom_library, name = name + "/custom", srcs = ["Main.java"])
@@ -426,6 +427,32 @@ def _test_annotation_processing_info_is_starlark_accessible_impl(env, target):
     env.expect.that_collection(result.transitive_source_jars.to_list()).has_size(3)
     env.expect.that_collection(result.transitive_source_jars.to_list()).contains(result.source_jar)
 
+def _test_compile_requires_java_plugin_info(name):
+    target_name = name + "/to_be_processed"
+    util.helper_target(
+        java_library,
+        name = target_name + "/dep",
+        srcs = ["ProcessorDep.java"],
+    )
+    util.helper_target(
+        custom_library_with_wrong_plugins_type,
+        name = target_name,
+        srcs = ["ToBeProcessed.java"],
+        deps = [target_name + "/dep"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_requires_java_plugin_info_impl,
+        target = target_name,
+        expect_failure = True,
+    )
+
+def _test_compile_requires_java_plugin_info_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("at index 0 of plugins, got element of type JavaInfo, want JavaPluginInfo"),
+    )
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -443,5 +470,6 @@ def java_common_tests(name):
             _test_compile_sets_runtime_deps,
             _test_compile_exposes_annotation_processing_info,
             _test_java_library_exposes_annotation_processing_info,
+            _test_compile_requires_java_plugin_info,
         ],
     )
