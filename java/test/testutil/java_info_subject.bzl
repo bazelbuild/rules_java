@@ -4,6 +4,7 @@ load("@rules_testing//lib:truth.bzl", "subjects", "truth")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
+load("//java/common/rules/impl:java_helper.bzl", "helper")
 load(":cc_info_subject.bzl", "cc_info_subject")
 
 def _new_java_info_subject(java_info, meta):
@@ -41,7 +42,9 @@ def _new_java_compilation_info_subject(java_info, meta):
     )
     public = struct(
         compilation_classpath = lambda: subjects.depset_file(self.actual.compilation_classpath, self.meta.derive("compilation_classpath")),
+        runtime_classpath = lambda: subjects.depset_file(self.actual.runtime_classpath, self.meta.derive("runtime_classpath")),
         runtime_classpath_list = lambda: subjects.collection(self.actual.runtime_classpath.to_list(), self.meta.derive("runtime_classpath.to_list()")),
+        javac_options = lambda: subjects.collection(helper.tokenize_javacopts(opts = self.actual.javac_options), self.meta.derive("javac_options")),
     )
     return public
 

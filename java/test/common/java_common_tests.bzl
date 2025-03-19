@@ -453,6 +453,39 @@ def _test_compile_requires_java_plugin_info_impl(env, target):
         matching.str_matches("at index 0 of plugins, got element of type JavaInfo, want JavaPluginInfo"),
     )
 
+def _test_compile_compilation_info(name):
+    target_name = name + "/custom"
+    util.helper_target(
+        custom_library,
+        name = target_name,
+        srcs = ["Main.java"],
+        deps = [target_name + "/dep"],
+        javac_opts = ["-XDone -XDtwo"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/dep",
+        srcs = ["Dep.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_compilation_info_impl,
+        target = target_name,
+    )
+
+def _test_compile_compilation_info_impl(env, target):
+    assert_compilation_info = java_info_subject.from_target(env, target).compilation_info()
+
+    assert_compilation_info.compilation_classpath().contains_exactly([
+        "{package}/lib{name}/dep-hjar.jar",
+    ])
+    assert_compilation_info.runtime_classpath().contains_exactly([
+        "{package}/lib{name}/dep.jar",
+        "{package}/lib{name}.jar",
+    ])
+    assert_compilation_info.javac_options().contains("-XDone")
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -471,5 +504,6 @@ def java_common_tests(name):
             _test_compile_exposes_annotation_processing_info,
             _test_java_library_exposes_annotation_processing_info,
             _test_compile_requires_java_plugin_info,
+            _test_compile_compilation_info,
         ],
     )

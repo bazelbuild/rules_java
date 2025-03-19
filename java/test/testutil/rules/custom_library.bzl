@@ -17,6 +17,7 @@ def _custom_library_impl(ctx):
         runtime_deps = runtime_deps,
         exports = [e[JavaInfo] for e in ctx.attr.exports],
         plugins = [p[JavaPluginInfo] for p in ctx.attr.plugins],
+        javac_opts = ctx.attr.javac_opts,
         java_toolchain = semantics.find_java_toolchain(ctx),
     )
     return [DefaultInfo(files = depset([output_jar])), compilation_provider]
@@ -29,6 +30,7 @@ custom_library = rule(
         "runtime_deps": attr.label_list(),
         "exports": attr.label_list(),
         "plugins": attr.label_list(),
+        "javac_opts": attr.string_list(),
     },
     toolchains = [semantics.JAVA_TOOLCHAIN_TYPE],
     fragments = ["java"],

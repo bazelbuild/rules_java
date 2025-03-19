@@ -66,6 +66,12 @@ system property.
     },
 )
 
+def _tokenize_javacopts(opts):
+    result = []
+    for opt_str in opts:
+        cc_helper.tokenize(result, opt_str)
+    return result
+
 semantics = struct(
     JAVA_TOOLCHAIN_LABEL = "@bazel_tools//tools/jdk:current_java_toolchain",
     JAVA_TOOLCHAIN_TYPE = "@bazel_tools//tools/jdk:toolchain_type",
@@ -104,6 +110,6 @@ semantics = struct(
         for_attribute = lambda name: _DOCS.ATTRS.get(name, ""),
     ),
     minimize_cc_info = _minimize_cc_info,
-    tokenize_javacopts = cc_helper.tokenize,
+    tokenize_javacopts = _tokenize_javacopts,
     PLATFORMS_ROOT = "@platforms//",
 )
