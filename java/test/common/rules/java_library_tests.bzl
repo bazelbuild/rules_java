@@ -6,6 +6,7 @@ load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
+load("//java/test/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 load("//java/test/testutil:rules/wrap_java_info.bzl", "JavaInfoWrappingInfo", "java_info_wrapping_rule")
 
 def _test_exposes_plugins(name):
@@ -104,11 +105,60 @@ def _test_exposes_java_info_impl(env, targets):
         targets.r[JavaInfoWrappingInfo].p == targets.jl[JavaInfo],
     ).equals(True)
 
+def _test_java_info_propagation(name):
+    util.helper_target(
+        java_library,
+        name = name + "/jl",
+        srcs = ["java/A.java"],
+    )
+    util.helper_target(
+        java_info_forwarding_rule,
+        name = name + "/r",
+        dep = name + "/jl",
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/jl_top",
+        srcs = ["java/C.java"],
+        deps = [name + "/r"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_info_propagation_impl,
+        targets = {
+            "r": name + "/r",
+            "jl": name + "/jl",
+            "jl_top": name + "/jl_top",
+        },
+    )
+
+def _test_java_info_propagation_impl(env, targets):
+    env.expect.that_bool(targets.r[JavaInfo] == targets.jl[JavaInfo]).equals(True)
+    _assert_depsets_have_the_same_parent(
+        env,
+        targets.jl[JavaInfo].transitive_compile_time_jars,
+        targets.jl_top[JavaInfo].transitive_compile_time_jars,
+    )
+    _assert_depsets_have_the_same_parent(
+        env,
+        targets.jl[JavaInfo].transitive_runtime_jars,
+        targets.jl_top[JavaInfo].transitive_runtime_jars,
+    )
+
+def _assert_depsets_have_the_same_parent(env, depset1, depset2):
+    elements = depset1.to_list()
+    other_elements = depset2.to_list()
+
+    for e, other_e in zip(elements, other_elements):
+        env.expect.that_str(e.dirname).equals(other_e.dirname)
+
 def java_library_tests(name):
     test_suite(
         name = name,
         tests = [
             _test_exposes_plugins,
             _test_exposes_java_info,
+            _test_java_info_propagation,
         ],
     )
