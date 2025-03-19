@@ -353,6 +353,9 @@ def _test_compile_sets_runtime_deps_impl(env, target):
 def _test_compile_exposes_annotation_processing_info(name):
     _test_annotation_processing_info_is_starlark_accessible(name, custom_library)
 
+def _test_java_library_exposes_annotation_processing_info(name):
+    _test_annotation_processing_info_is_starlark_accessible(name, java_library)
+
 def _test_annotation_processing_info_is_starlark_accessible(name, to_be_processed_rule_class):
     target_name = name + "/to_be_processed"
     util.helper_target(
@@ -439,5 +442,6 @@ def java_common_tests(name):
             _test_compile_exposes_outputs_provider,
             _test_compile_sets_runtime_deps,
             _test_compile_exposes_annotation_processing_info,
+            _test_java_library_exposes_annotation_processing_info,
         ],
     )
