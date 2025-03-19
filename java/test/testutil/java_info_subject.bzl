@@ -132,6 +132,7 @@ def _new_java_plugin_data_subject(java_plugin_data, meta):
         processor_classes = lambda: subjects.collection(java_plugin_data.processor_classes, meta = meta.derive("processor_classes")),
         processor_data = lambda: subjects.depset_file(java_plugin_data.processor_data, meta = meta.derive("processor_data")),
         is_empty = lambda: _check_plugin_data_empty(java_plugin_data, meta.derive("is_empty()")),
+        equals = lambda other: subjects.bool(java_plugin_data == other, meta.derive("equals({})".format(other))).equals(True),
     )
     return public
 
