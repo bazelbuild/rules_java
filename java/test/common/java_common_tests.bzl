@@ -12,6 +12,7 @@ load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
 load("//java/test/testutil:rules/custom_library.bzl", "custom_library")
 load("//java/test/testutil:rules/custom_library_extended_compile_jdeps.bzl", "CompileJdepsInfo", "custom_library_extended_jdeps")
 load("//java/test/testutil:rules/custom_library_with_bootclasspath.bzl", "custom_bootclasspath", "custom_library_with_bootclasspath")
+load("//java/test/testutil:rules/custom_library_with_custom_output_source_jar.bzl", "custom_library_with_custom_output_source_jar")
 load("//java/test/testutil:rules/custom_library_with_exports.bzl", "custom_library_with_exports")
 load("//java/test/testutil:rules/custom_library_with_named_outputs.bzl", "custom_library_with_named_outputs")
 load("//java/test/testutil:rules/custom_library_with_sourcepaths.bzl", "custom_library_with_sourcepaths")
@@ -598,6 +599,32 @@ def _test_compile_no_sources_impl(env, target):
     assert_output.class_jar().short_path_equals("{package}/lib{name}.jar")
     assert_output.source_jars().contains_exactly(["{package}/lib{name}-src.jar"])
 
+def _test_compile_custom_output_source_jar(name):
+    util.helper_target(
+        custom_library_with_custom_output_source_jar,
+        name = name + "/custom",
+        srcs = ["myjar-src.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_custom_output_source_jar_impl,
+        target = name + "/custom",
+    )
+
+def _test_compile_custom_output_source_jar_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+
+    assert_java_info.source_jars().contains_exactly_predicates([
+        matching.file_basename_equals("custom-mysrc.jar"),
+    ])
+    assert_output = assert_java_info.java_outputs().singleton()
+    assert_output.class_jar().short_path_equals("{package}/lib{name}.jar")
+    assert_output.compile_jar().short_path_equals("{package}/lib{name}-hjar.jar")
+    assert_output.source_jars().contains_exactly(["{package}/lib{name}-mysrc.jar"])
+    assert_output.jdeps().short_path_equals("{package}/lib{name}.jdeps")
+    assert_output.compile_jdeps().short_path_equals("{package}/lib{name}-hjar.jdeps")
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -621,5 +648,6 @@ def java_common_tests(name):
             _test_compile_source_jar_name_derived_from_output_jar,
             _test_compile_with_only_one_source_jar,
             _test_compile_no_sources,
+            _test_compile_custom_output_source_jar,
         ],
     )
