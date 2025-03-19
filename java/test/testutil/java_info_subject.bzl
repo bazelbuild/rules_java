@@ -12,7 +12,7 @@ def _new_java_info_subject(java_info, meta):
     public = struct(
         compilation_args = lambda: _new_java_compilation_args_subject(self.actual, self.meta),
         compilation_info = lambda: _new_java_compilation_info_subject(self.actual, self.meta),
-        plugins = lambda: _new_java_info_plugins_subject(self.actual, self.meta),
+        plugins = lambda: _new_java_plugin_data_subject(self.actual.plugins, self.meta.derive("plugins")),
         is_binary = lambda: subjects.bool(getattr(java_info, "_is_binary", False), self.meta.derive("_is_binary")),
         has_attr = lambda a: subjects.bool(getattr(java_info, a, None) != None, meta = self.meta.derive("{} != None".format(a))).equals(True),
         cc_link_params_info = lambda: cc_info_subject.new_from_java_info(java_info, meta),
@@ -126,16 +126,23 @@ def _java_compilation_args_equals(self, other):
                 "actual: {}".format(this_attr),
             )
 
-def _new_java_info_plugins_subject(java_info, meta):
-    self = struct(
-        actual = java_info.plugins,
-        meta = meta.derive("plugins"),
-    )
+def _new_java_plugin_data_subject(java_plugin_data, meta):
     public = struct(
-        processor_jars = lambda: subjects.depset_file(self.actual.processor_jars, meta = self.meta.derive("processor_jars")),
-        processor_classes = lambda: subjects.collection(self.actual.processor_classes, meta = self.meta.derive("processor_classes")),
+        processor_jars = lambda: subjects.depset_file(java_plugin_data.processor_jars, meta = meta.derive("processor_jars")),
+        processor_classes = lambda: subjects.collection(java_plugin_data.processor_classes, meta = meta.derive("processor_classes")),
+        processor_data = lambda: subjects.depset_file(java_plugin_data.processor_data, meta = meta.derive("processor_data")),
+        is_empty = lambda: _check_plugin_data_empty(java_plugin_data, meta.derive("is_empty()")),
     )
     return public
+
+def _check_plugin_data_empty(plugin_data, meta):
+    for attr in ["processor_jars", "processor_classes", "processor_data"]:
+        value = getattr(plugin_data, attr)
+        if value:
+            meta.add_failure(
+                "expected: {} to be empty".format(attr),
+                "actual: {}".format(value),
+            )
 
 def _new_annotation_processing_subject(java_info, meta):
     actual = java_info.annotation_processing
@@ -160,7 +167,9 @@ def _new_annotation_processing_subject(java_info, meta):
 def _new_java_plugin_info_subject(java_plugin_info, meta):
     self = struct(actual = java_plugin_info, meta = meta.derive("JavaPluginInfo"))
     public = struct(
-        java_outputs = lambda: _new_java_outputs_collection_subject(self.actual.java_outputs, meta.derive("java_outputs")),
+        java_outputs = lambda: _new_java_outputs_collection_subject(self.actual.java_outputs, self.meta.derive("java_outputs")),
+        plugins = lambda: _new_java_plugin_data_subject(self.actual.plugins, self.meta.derive("plugins")),
+        api_generating_plugins = lambda: _new_java_plugin_data_subject(self.actual.api_generating_plugins, self.meta.derive("api_generating_plugins")),
     )
     return public
 
