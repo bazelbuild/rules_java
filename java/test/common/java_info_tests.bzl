@@ -7,6 +7,7 @@ load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
+load("//java/test/testutil:rules/bad_java_info_rules.bzl", "bad_deps", "bad_exports", "bad_libs", "bad_runtime_deps")
 load("//java/test/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 
 def _with_output_jar_only_test(name):
@@ -862,6 +863,38 @@ def _with_manifest_proto_test_impl(env, target):
         "{package}/manifest.proto",
     ])
 
+def _sequence_parameters_are_type_checked_test(name):
+    util.helper_target(bad_deps, name = name + "/bad_deps")
+    util.helper_target(bad_runtime_deps, name = name + "/bad_runtime_deps")
+    util.helper_target(bad_exports, name = name + "/bad_exports")
+    util.helper_target(bad_libs, name = name + "/bad_libs")
+
+    analysis_test(
+        name = name,
+        impl = _sequence_parameters_are_type_checked_test_impl,
+        targets = {
+            "deps": name + "/bad_deps",
+            "runtime_deps": name + "/bad_runtime_deps",
+            "exports": name + "/bad_exports",
+            "libs": name + "/bad_libs",
+        },
+        expect_failure = True,
+    )
+
+def _sequence_parameters_are_type_checked_test_impl(env, targets):
+    env.expect.that_target(targets.deps).failures().contains_predicate(
+        matching.str_matches("at index 0 of deps, got element of type File, want JavaInfo"),
+    )
+    env.expect.that_target(targets.runtime_deps).failures().contains_predicate(
+        matching.str_matches("at index 0 of runtime_deps, got element of type File, want JavaInfo"),
+    )
+    env.expect.that_target(targets.exports).failures().contains_predicate(
+        matching.str_matches("at index 0 of exports, got element of type File, want JavaInfo"),
+    )
+    env.expect.that_target(targets.libs).failures().contains_predicate(
+        matching.str_matches("at index 0 of native_libraries, got element of type File, want CcInfo"),
+    )
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -893,5 +926,6 @@ def java_info_tests(name):
             _with_compile_jdeps_test,
             _with_native_headers_test,
             _with_manifest_proto_test,
+            _sequence_parameters_are_type_checked_test,
         ],
     )
