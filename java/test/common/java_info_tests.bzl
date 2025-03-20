@@ -943,6 +943,30 @@ def _compile_jar_set_to_none_test(name):
 def _compile_jar_set_to_none_test_impl(env, target):
     env.expect.that_depset_of_files(target[JavaInfo].compile_jars).contains_exactly([])
 
+def _sources_jars_exposed_test(name):
+    util.helper_target(
+        java_library,
+        name = name + "/my_java_lib_b",
+        srcs = ["java/B.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/my_java_lib_a",
+        srcs = ["java/A.java"],
+        deps = [name + "/my_java_lib_b"],
+    )
+    analysis_test(
+        name = name,
+        impl = _sources_jars_exposed_test_impl,
+        target = name + "/my_java_lib_a",
+    )
+
+def _sources_jars_exposed_test_impl(env, target):
+    source_jars = target[JavaInfo].source_jars
+    env.expect.that_collection(source_jars).contains_exactly_predicates([
+        matching.file_basename_equals("my_java_lib_a-src.jar"),
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -978,5 +1002,6 @@ def java_info_tests(name):
             _sequence_parameters_are_type_checked_test,
             _compile_jar_not_set_test,
             _compile_jar_set_to_none_test,
+            _sources_jars_exposed_test,
         ],
     )
