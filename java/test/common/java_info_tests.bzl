@@ -10,6 +10,7 @@ load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
 load("//java/test/testutil:rules/bad_java_info_rules.bzl", "bad_deps", "bad_exports", "bad_libs", "bad_runtime_deps", "compile_jar_not_set", "compile_jar_set_to_none")
 load("//java/test/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
+load("//java/test/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 
 def _with_output_jar_only_test(name):
     target_name = name + "/my_starlark_rule"
@@ -967,6 +968,44 @@ def _sources_jars_exposed_test_impl(env, target):
         matching.file_basename_equals("my_java_lib_a-src.jar"),
     ])
 
+def _transitive_source_jars_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_c",
+        srcs = ["java/C.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_b",
+        srcs = ["java/B.java"],
+        deps = [target_name + "/my_java_lib_c"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_a",
+        srcs = ["java/A.java"],
+        deps = [target_name + "/my_java_lib_b"],
+    )
+    util.helper_target(
+        java_info_forwarding_rule,
+        name = target_name,
+        dep = target_name + "/my_java_lib_a",
+    )
+    analysis_test(
+        name = name,
+        impl = _transitive_source_jars_test_impl,
+        target = target_name,
+    )
+
+def _transitive_source_jars_test_impl(env, target):
+    assert_transitive_source_jars = java_info_subject.from_target(env, target).transitive_source_jars()
+    assert_transitive_source_jars.contains_exactly([
+        "{package}/lib{name}/my_java_lib_a-src.jar",
+        "{package}/lib{name}/my_java_lib_b-src.jar",
+        "{package}/lib{name}/my_java_lib_c-src.jar",
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -1003,5 +1042,6 @@ def java_info_tests(name):
             _compile_jar_not_set_test,
             _compile_jar_set_to_none_test,
             _sources_jars_exposed_test,
+            _transitive_source_jars_test,
         ],
     )
