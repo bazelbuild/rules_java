@@ -1044,6 +1044,44 @@ def transitive_compile_time_jars_impl(env, target):
         "{package}/lib{name}/my_java_lib_c-hjar.jar",
     ])
 
+def _transitive_runtime_jars_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_c",
+        srcs = ["java/C.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_b",
+        srcs = ["java/B.java"],
+        deps = [target_name + "/my_java_lib_c"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/my_java_lib_a",
+        srcs = ["java/A.java"],
+        deps = [target_name + "/my_java_lib_b"],
+    )
+    util.helper_target(
+        java_info_forwarding_rule,
+        name = target_name,
+        dep = target_name + "/my_java_lib_a",
+    )
+    analysis_test(
+        name = name,
+        impl = transitive_runtime_jars_impl,
+        target = target_name,
+    )
+
+def transitive_runtime_jars_impl(env, target):
+    assert_transitive_runtime_jars = java_info_subject.from_target(env, target).compilation_args().transitive_runtime_jars()
+    assert_transitive_runtime_jars.contains_exactly([
+        "{package}/lib{name}/my_java_lib_a.jar",
+        "{package}/lib{name}/my_java_lib_b.jar",
+        "{package}/lib{name}/my_java_lib_c.jar",
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -1082,5 +1120,6 @@ def java_info_tests(name):
             _sources_jars_exposed_test,
             _transitive_source_jars_test,
             _transitive_compile_time_jars_test,
+            _transitive_runtime_jars_test,
         ],
     )
