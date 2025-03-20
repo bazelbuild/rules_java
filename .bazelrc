@@ -8,3 +8,8 @@ common --tool_java_runtime_version=remotejdk_8
 
 # Hide Java 8 deprecation warnings.
 common --javacopt=-Xlint:-options
+
+# Some tests relies on dynamic libs that are not interface libs
+# the latter are always enabled on Windows: https://github.com/bazelbuild/bazel/blob/1f5414408467171581b6142e93f67fe730d722cf/src/main/java/com/google/devtools/build/lib/rules/cpp/CcModule.java#L2430
+# we can't use a transition because toolchain deps exceed the default --analysis_testing_deps_limit.
+test --nointerface_shared_objects
