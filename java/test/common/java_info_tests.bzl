@@ -6,6 +6,7 @@ load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
+load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
 load("//java/test/testutil:rules/bad_java_info_rules.bzl", "bad_deps", "bad_exports", "bad_libs", "bad_runtime_deps")
 load("//java/test/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
@@ -895,6 +896,26 @@ def _sequence_parameters_are_type_checked_test_impl(env, targets):
         matching.str_matches("at index 0 of native_libraries, got element of type File, want CcInfo"),
     )
 
+def _with_compile_jar_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        output_jar = target_name + "/output.jar",
+        compile_jar = "compile.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_compile_jar_test_impl,
+        target = target_name,
+    )
+
+def _with_compile_jar_test_impl(env, target):
+    env.expect.that_depset_of_files(target[JavaInfo].compile_jars).contains_predicate(
+        matching.file_basename_equals("compile.jar"),
+    )
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -926,6 +947,7 @@ def java_info_tests(name):
             _with_compile_jdeps_test,
             _with_native_headers_test,
             _with_manifest_proto_test,
+            _with_compile_jar_test,
             _sequence_parameters_are_type_checked_test,
         ],
     )

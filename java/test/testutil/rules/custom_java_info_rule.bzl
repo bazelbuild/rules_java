@@ -7,6 +7,8 @@ load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 
 def _impl(ctx):
+    if ctx.attr.compile_jar and (ctx.attr.use_ijar or ctx.attr.stamp_jar):
+        fail("Cannot set use_ijar/stamp_jar if compile_jar is set")
     if ctx.attr.use_ijar and ctx.attr.stamp_jar:
         fail("only one of use_ijar or stamp_jar may be set")
     ctx.actions.write(ctx.outputs.output_jar, "JavaInfo API Test", is_executable = False)
@@ -24,18 +26,23 @@ def _impl(ctx):
         ctx.files.source_jars[0] if ctx.files.source_jars else None
     )
     dp_libs = [dep[CcInfo] for dep in ctx.attr.cc_dep]
-    compile_jar = java_common.run_ijar(
-        ctx.actions,
-        jar = ctx.outputs.output_jar,
-        java_toolchain = semantics.find_java_toolchain(ctx),
-    ) if ctx.attr.use_ijar else (
-        java_common.stamp_jar(
+    if ctx.attr.compile_jar:
+        compile_jar = ctx.file.compile_jar
+    elif ctx.attr.use_ijar:
+        compile_jar = java_common.run_ijar(
+            ctx.actions,
+            jar = ctx.outputs.output_jar,
+            java_toolchain = semantics.find_java_toolchain(ctx),
+        )
+    elif ctx.attr.stamp_jar:
+        compile_jar = java_common.stamp_jar(
             ctx.actions,
             jar = ctx.outputs.output_jar,
             target_label = ctx.label,
             java_toolchain = semantics.find_java_toolchain(ctx),
-        ) if ctx.attr.stamp_jar else ctx.outputs.output_jar
-    )
+        )
+    else:
+        compile_jar = ctx.outputs.output_jar
 
     return [
         JavaInfo(
@@ -78,6 +85,7 @@ custom_java_info_rule = rule(
         "neverlink": attr.bool(default = False),
         "pack_sources": attr.bool(default = False),
         "stamp_jar": attr.bool(default = False),
+        "compile_jar": attr.label(allow_single_file = True),
     },
     toolchains = [semantics.JAVA_TOOLCHAIN_TYPE],
 )
