@@ -27,8 +27,13 @@ def _compile_jar_not_set_impl(ctx):
     f = _make_file(ctx)
     return JavaInfo(output_jar = f)
 
+def _compile_jar_set_to_none_impl(ctx):
+    f = _make_file(ctx)
+    return JavaInfo(output_jar = f, compile_jar = None)
+
 bad_deps = rule(_deps_impl)
 bad_runtime_deps = rule(_runtime_deps_impl)
 bad_exports = rule(_exports_impl)
 bad_libs = rule(_nativelibs_impl)
 compile_jar_not_set = rule(_compile_jar_not_set_impl)
+compile_jar_set_to_none = rule(_compile_jar_set_to_none_impl)

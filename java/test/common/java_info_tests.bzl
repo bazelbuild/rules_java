@@ -8,7 +8,7 @@ load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
-load("//java/test/testutil:rules/bad_java_info_rules.bzl", "bad_deps", "bad_exports", "bad_libs", "bad_runtime_deps", "compile_jar_not_set")
+load("//java/test/testutil:rules/bad_java_info_rules.bzl", "bad_deps", "bad_exports", "bad_libs", "bad_runtime_deps", "compile_jar_not_set", "compile_jar_set_to_none")
 load("//java/test/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 
 def _with_output_jar_only_test(name):
@@ -931,6 +931,18 @@ def _compile_jar_not_set_test_impl(env, target):
         matching.str_matches("missing 1 required positional argument: compile_jar"),
     )
 
+def _compile_jar_set_to_none_test(name):
+    util.helper_target(compile_jar_set_to_none, name = name + "/compilejar_none")
+
+    analysis_test(
+        name = name,
+        impl = _compile_jar_set_to_none_test_impl,
+        target = name + "/compilejar_none",
+    )
+
+def _compile_jar_set_to_none_test_impl(env, target):
+    env.expect.that_depset_of_files(target[JavaInfo].compile_jars).contains_exactly([])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -965,5 +977,6 @@ def java_info_tests(name):
             _with_compile_jar_test,
             _sequence_parameters_are_type_checked_test,
             _compile_jar_not_set_test,
+            _compile_jar_set_to_none_test,
         ],
     )
