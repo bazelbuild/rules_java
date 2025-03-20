@@ -1,5 +1,6 @@
 """Tests for the java_library rule"""
 
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
@@ -7,6 +8,7 @@ load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
+load("//java/test/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 load("//java/test/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 load("//java/test/testutil:rules/wrap_java_info.bzl", "JavaInfoWrappingInfo", "java_info_wrapping_rule")
 
@@ -228,6 +230,53 @@ def _test_java_library_attributes_impl(env, targets):
         matching.file_basename_equals("jl_bottom_for_exports.jar"),
     )
 
+def _test_propagates_direct_native_libraries(name):
+    target_name = name + "/jl_top"
+    util.helper_target(
+        cc_library,
+        name = target_name + "/native",
+        srcs = ["cc/x.cc"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/jl",
+        srcs = ["java/A.java"],
+        deps = [target_name + "/native"],
+    )
+    util.helper_target(
+        cc_library,
+        name = target_name + "/ccl",
+        srcs = ["cc/x.cc"],
+    )
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name + "/r",
+        output_jar = target_name + "-out.jar",
+        cc_dep = [target_name + "/ccl"],
+        dep = [target_name + "/jl"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name,
+        srcs = ["java/C.java"],
+        deps = [target_name + "/r"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_propagates_direct_native_libraries_impl,
+        target = target_name,
+        # LibraryToLink.library_indentifier only available from Bazel 8
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_propagates_direct_native_libraries_impl(env, target):
+    assert_transitive_native_libraries = java_info_subject.from_target(env, target).transitive_native_libraries()
+    assert_transitive_native_libraries.identifiers().contains_exactly_predicates([
+        matching.str_endswith("native"),
+        matching.str_endswith("ccl"),
+    ]).in_order()
+
 def java_library_tests(name):
     test_suite(
         name = name,
@@ -236,5 +285,6 @@ def java_library_tests(name):
             _test_exposes_java_info,
             _test_java_info_propagation,
             _test_java_library_attributes,
+            _test_propagates_direct_native_libraries,
         ],
     )
