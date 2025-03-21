@@ -55,9 +55,9 @@ stardoc_repositories()
 
 http_archive(
     name = "rules_testing",
-    sha256 = "28c2d174471b587bf0df1fd3a10313f22c8906caf4050f8b46ec4648a79f90c3",
-    strip_prefix = "rules_testing-0.7.0",
-    url = "https://github.com/bazelbuild/rules_testing/releases/download/v0.7.0/rules_testing-v0.7.0.tar.gz",
+    sha256 = "49677ab1226f6d852a14b966e1e5de973fbbee8bc190e6bf0e895c5f267f95d4",
+    strip_prefix = "rules_testing-3909cc0b0e41141bdfe2862a7950ef9f9372d6f8",
+    urls = ["https://github.com/bazelbuild/rules_testing/archive/3909cc0b0e41141bdfe2862a7950ef9f9372d6f8.tar.gz"],
 )
 
 load("//test:repositories.bzl", "test_repositories")
