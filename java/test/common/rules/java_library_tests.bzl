@@ -1,5 +1,6 @@
 """Tests for the java_library rule"""
 
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
@@ -277,6 +278,39 @@ def _test_propagates_direct_native_libraries_impl(env, target):
         matching.str_endswith("ccl"),
     ]).in_order()
 
+def _test_exposes_native_library_info(name):
+    target_name = name + "/jl"
+    util.helper_target(
+        cc_library,
+        name = target_name + "/mynativedep_lib",
+        srcs = ["cc/x.cc"],
+    )
+    util.helper_target(
+        cc_binary,
+        name = target_name + "/mynativedep_bin",
+        srcs = ["cc/x.cc"],
+        linkshared = 1,
+    )
+    util.helper_target(
+        java_library,
+        name = target_name,
+        srcs = ["java/A.java"],
+        deps = select({
+            "@platforms//os:windows": [target_name + "/mynativedep_lib"],
+            "//conditions:default": [target_name + "/mynativedep_bin"],
+        }),
+    )
+    analysis_test(
+        name = name,
+        impl = _test_exposes_native_library_info_impl,
+        target = target_name,
+    )
+
+def _test_exposes_native_library_info_impl(env, target):
+    assert_lib = java_info_subject.from_target(env, target).transitive_native_libraries().singleton()
+
+    assert_lib.dynamic_library().basename().contains("mynativedep")
+
 def java_library_tests(name):
     test_suite(
         name = name,
@@ -286,5 +320,6 @@ def java_library_tests(name):
             _test_java_info_propagation,
             _test_java_library_attributes,
             _test_propagates_direct_native_libraries,
+            _test_exposes_native_library_info,
         ],
     )

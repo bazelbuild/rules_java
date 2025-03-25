@@ -60,6 +60,13 @@ def _new_cc_info_libraries_to_link_subject(libraries_to_link, meta):
     )
     public = struct(
         identifiers = lambda: _new_library_to_link_identifiers_subject(self.actual, self.meta),
+        singleton = lambda: _new_library_to_link_subject(_get_singleton(self.actual), self.meta.derive("[0]")),
+    )
+    return public
+
+def _new_library_to_link_subject(library_to_link, meta):
+    public = struct(
+        dynamic_library = lambda: subjects.file(library_to_link.dynamic_library, meta.derive("dynamic_library")),
     )
     return public
 
@@ -73,6 +80,11 @@ def _new_library_to_link_identifiers_subject(libraries_to_link, meta):
         contains_exactly_predicates = lambda expected: self.contains_exactly_predicates(expected),
     )
     return public
+
+def _get_singleton(seq):
+    if len(seq) != 1:
+        fail("expected singleton, got:", seq)
+    return seq[0]
 
 cc_info_subject = struct(
     new_from_java_info = lambda java_info, meta: _new_cc_info_subject(java_info.cc_link_params_info, meta.derive("cc_link_params_info")),
