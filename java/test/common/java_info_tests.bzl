@@ -1224,6 +1224,26 @@ def _annotation_processing_test_impl(env, target):
     assert_info.class_jar().short_path_equals("{package}/lib{name}-gen.jar")
     assert_info.source_jar().short_path_equals("{package}/lib{name}-gensrc.jar")
 
+def _compilation_info_test(name):
+    target_name = name + "/my_java_lib_a"
+    util.helper_target(
+        java_library,
+        name = target_name,
+        srcs = ["java/A.java"],
+        javacopts = ["opt1"],
+    )
+    analysis_test(
+        name = name,
+        impl = _compilation_info_test_impl,
+        target = target_name,
+    )
+
+def _compilation_info_test_impl(env, target):
+    assert_info = java_info_subject.from_target(env, target).compilation_info()
+
+    assert_info.runtime_classpath().contains_exactly(["{package}/lib{name}.jar"])
+    assert_info.javac_options().contains("opt1")
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -1266,5 +1286,6 @@ def java_info_tests(name):
             _transitive_native_libraries_test,
             _native_libraries_propagation_test,
             _annotation_processing_test,
+            _compilation_info_test,
         ],
     )
