@@ -1142,6 +1142,67 @@ def _transitive_native_libraries_test_impl(env, target):
         matching.str_endswith("my_cc_lib_c.so"),
     ])
 
+def _native_libraries_propagation_test(name):
+    target_name = name + "/custom"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        sources = ["A.java"],
+        dep_exports = [target_name + "/lib_exports"],
+        dep_runtime = [target_name + "/lib_runtime_deps"],
+        dep = [target_name + "/lib_deps"],
+        output_jar = target_name + ".out",
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_deps",
+        srcs = ["B.java"],
+        deps = [target_name + "/native_deps1.so"],
+    )
+    util.helper_target(
+        cc_library,
+        name = target_name + "/native_deps1.so",
+        srcs = ["a.cc"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_runtime_deps",
+        srcs = ["C.java"],
+        deps = [target_name + "/native_rdeps1.so"],
+    )
+    util.helper_target(
+        cc_library,
+        name = target_name + "/native_rdeps1.so",
+        srcs = ["c.cc"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_exports",
+        srcs = ["D.java"],
+        deps = [target_name + "/native_exports1.so"],
+    )
+    util.helper_target(
+        cc_library,
+        name = target_name + "/native_exports1.so",
+        srcs = ["e.cc"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _native_libraries_propagation_test_impl,
+        target = target_name,
+        # LibraryToLink.library_identifier only available from Bazel 8
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _native_libraries_propagation_test_impl(env, target):
+    assert_transitive_native_libraries = java_info_subject.from_target(env, target).transitive_native_libraries()
+    assert_transitive_native_libraries.identifiers().contains_exactly_predicates([
+        matching.str_endswith("native_rdeps1.so"),
+        matching.str_endswith("native_exports1.so"),
+        matching.str_endswith("native_deps1.so"),
+    ]).in_order()
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -1182,5 +1243,6 @@ def java_info_tests(name):
             _transitive_compile_time_jars_test,
             _transitive_runtime_jars_test,
             _transitive_native_libraries_test,
+            _native_libraries_propagation_test,
         ],
     )
