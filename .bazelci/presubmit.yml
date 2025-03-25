@@ -18,7 +18,7 @@ build_targets_bzlmod: &build_targets_bzlmod
 test_targets: &test_targets
   - "//test/..."
 
-buildifier: latest
+buildifier: 7.3.1
 
 tasks:
 # TODO: add config for 8.0.0 once released
