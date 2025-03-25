@@ -1203,6 +1203,27 @@ def _native_libraries_propagation_test_impl(env, target):
         matching.str_endswith("native_deps1.so"),
     ]).in_order()
 
+def _annotation_processing_test(name):
+    target_name = name + "/my_java_lib_a"
+    util.helper_target(
+        java_library,
+        name = target_name,
+        srcs = ["java/A.java"],
+        javacopts = ["-processor com.google.process.Processor"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _annotation_processing_test_impl,
+        target = target_name,
+    )
+
+def _annotation_processing_test_impl(env, target):
+    assert_info = java_info_subject.from_target(env, target).annotation_processing()
+
+    assert_info.class_jar().short_path_equals("{package}/lib{name}-gen.jar")
+    assert_info.source_jar().short_path_equals("{package}/lib{name}-gensrc.jar")
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -1244,5 +1265,6 @@ def java_info_tests(name):
             _transitive_runtime_jars_test,
             _transitive_native_libraries_test,
             _native_libraries_propagation_test,
+            _annotation_processing_test,
         ],
     )
