@@ -3,11 +3,13 @@
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
+load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
+load("//java/test/testutil:artifact_closure.bzl", "artifact_closure")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
 load("//java/test/testutil:rules/custom_library.bzl", "custom_library")
 load("//java/test/testutil:rules/custom_library_extended_compile_jdeps.bzl", "CompileJdepsInfo", "custom_library_extended_jdeps")
@@ -652,6 +654,56 @@ def _test_compile_additional_inputs_and_outputs_impl(env, target):
         matching.file_basename_equals("custom_additional_output"),
     )
 
+def _test_compile_neverlink(name):
+    target_name = name + "/plugin"
+    util.helper_target(
+        java_binary,
+        name = target_name,
+        srcs = ["Plugin.java"],
+        main_class = "plugin.start",
+        deps = [target_name + "/somedep"],
+    )
+    util.helper_target(
+        custom_library,
+        name = target_name + "/somedep",
+        srcs = ["Dependency.java"],
+        deps = [target_name + "/eclipse"],
+    )
+    util.helper_target(
+        custom_library,
+        name = target_name + "/eclipse",
+        srcs = ["EclipseDependency.java"],
+        neverlink = 1,
+    )
+    analysis_test(
+        name = name,
+        impl = _test_compile_neverlink_impl,
+        target = target_name,
+        extra_target_under_test_aspects = [artifact_closure.aspect],
+    )
+
+def _test_compile_neverlink_impl(env, target):
+    java_source_basenames = [
+        f.basename
+        for f in artifact_closure.of_target(target)
+        if f.extension == "java"
+    ]
+    env.expect.that_collection(java_source_basenames).contains_exactly([
+        "Plugin.java",
+        "Dependency.java",
+        "EclipseDependency.java",
+    ])
+    jars_in_runfiles = [
+        f.basename
+        for f in target[DefaultInfo].default_runfiles.files.to_list()
+        if f.extension == "jar" and
+           f.short_path.startswith(target.label.package)  # exclude toolchain
+    ]
+    env.expect.that_collection(jars_in_runfiles).contains_exactly([
+        "plugin.jar",
+        "somedep.jar",
+    ]).in_order()
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -677,5 +729,6 @@ def java_common_tests(name):
             _test_compile_no_sources,
             _test_compile_custom_output_source_jar,
             _test_compile_additional_inputs_and_outputs,
+            _test_compile_neverlink,
         ],
     )
