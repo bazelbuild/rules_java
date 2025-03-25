@@ -82,7 +82,7 @@ _RELEASE_CONFIGS = {
         "adoptium": {
             "release": "21.0.4+7",
             "platforms": {
-                "linux": ["ppc", "s390x"],
+                "linux": ["ppc", "riscv64", "s390x"],
             },
         },
     },
