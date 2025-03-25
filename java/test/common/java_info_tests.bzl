@@ -1230,7 +1230,7 @@ def _compilation_info_test(name):
         java_library,
         name = target_name,
         srcs = ["java/A.java"],
-        javacopts = ["opt1"],
+        javacopts = ["opt1", "opt2"],
     )
     analysis_test(
         name = name,
@@ -1242,7 +1242,7 @@ def _compilation_info_test_impl(env, target):
     assert_info = java_info_subject.from_target(env, target).compilation_info()
 
     assert_info.runtime_classpath().contains_exactly(["{package}/lib{name}.jar"])
-    assert_info.javac_options().contains("opt1")
+    assert_info.javac_options().contains_at_least(["opt1", "opt2"]).in_order()
 
 def java_info_tests(name):
     test_suite(
