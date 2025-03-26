@@ -5,8 +5,8 @@ def print_rel_notes(*, name, version, archive):
         name = name,
         outs = [name + ".txt"],
         cmd = """
-              last_rel=$$(curl -s https://api.github.com/repos/bazelbuild/rules_java/releases/latest  | grep 'tag_name' | cut -d: -f2 | tr -cd '[:alnum:].')
-              changelog=$$(/usr/bin/git log tags/$$last_rel..origin/master --format=oneline --)
+              last_rel=$$(git describe --tags --abbrev=0)
+              changelog=$$(/usr/bin/git log tags/$$last_rel..HEAD --format=oneline --invert-grep --grep 'ignore-relnotes' --)
               sha=$$(/usr/bin/sha256sum $(SRCS) | cut -d ' '  -f1)
               cat > $@ <<EOF
 **Changes since $$last_rel**
