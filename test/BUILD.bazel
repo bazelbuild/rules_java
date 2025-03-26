@@ -31,6 +31,7 @@ sh_test(
         for configs in REMOTE_JDK_CONFIGS.values()
         for config in configs
     ],
+    tags = ["manual"],  # explicitly tested only on Linux
 )
 
 sh_test(
@@ -45,6 +46,17 @@ sh_test(
         ])
         for name, config in JAVA_TOOLS_CONFIG["artifacts"].items()
     ],
+)
+
+sh_test(
+    name = "check_release_notes_test",
+    srcs = ["check_release_notes_test.sh"],
+    args = [
+        "$(location //distro:relnotes.txt)",
+        module_version(),
+    ],
+    data = ["//distro:relnotes.txt"],
+    tags = ["manual"],  # explicitly tested only on Linux
 )
 
 diff_test(

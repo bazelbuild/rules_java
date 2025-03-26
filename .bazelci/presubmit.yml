@@ -22,8 +22,6 @@ build_targets_integration: &build_targets_integration
 test_targets: &test_targets
   - "//test/..."
   - "//java/test/..."
-  # linux-only tests
-  - "-//test:check_remote_jdk_configs_test"
   # TODO: re-enable docs after moving them out of https://bazel.build/reference/be/java
   - "-//test:docs_up_to_date_test"
 
@@ -108,5 +106,10 @@ tasks:
     name: "Extra tests w/ Bazel {bazel}"
     bazel: ${{ bazel }}
     platform: "ubuntu2004"
+    shell_commands:
+      - "git config user.name 'fake-user-for-testing'"
+      - "git tag -a 'fake-tag-for-testing' -m 'ignore'"
+      - "git commit --allow-empty -m 'Fake commit message for testing'"
     test_targets:
       - "//test:check_remote_jdk_configs_test"
+      - "//test:check_release_notes_test"

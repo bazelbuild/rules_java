@@ -48,4 +48,5 @@ EOF
               """.format(ARCHIVE = archive, VERSION = version),
         srcs = [archive],
         tags = ["local", "manual"],
+        visibility = ["//test:__pkg__"],
     )
