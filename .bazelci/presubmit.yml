@@ -107,6 +107,7 @@ tasks:
     bazel: ${{ bazel }}
     platform: "ubuntu2004"
     shell_commands:
+      - "git init"
       - "git config user.name 'fake-user-for-testing'"
       - "git tag -a 'fake-tag-for-testing' -m 'ignore'"
       - "git commit --allow-empty -m 'Fake commit message for testing'"
