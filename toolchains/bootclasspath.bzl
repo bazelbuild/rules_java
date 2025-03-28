@@ -135,6 +135,7 @@ def _bootclasspath_impl(ctx):
         arguments = [args],
         env = env,
         execution_requirements = _SUPPORTS_PATH_MAPPING,
+        use_default_shell_env = True,
     )
 
     bootclasspath = ctx.outputs.output_jar
@@ -202,6 +203,7 @@ Rerun with --toolchain_resolution_debug='@bazel_tools//tools/jdk:bootstrap_runti
         arguments = [args],
         env = env,
         execution_requirements = _SUPPORTS_PATH_MAPPING,
+        use_default_shell_env = True,
     )
     return [
         DefaultInfo(files = depset([bootclasspath])),
