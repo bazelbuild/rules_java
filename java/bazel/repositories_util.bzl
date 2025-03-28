@@ -44,7 +44,7 @@ _RELEASE_CONFIGS = {
         "adoptium": {
             "release": "11.0.26+4",
             "platforms": {
-                "linux": ["ppc", "s390x"],
+                "linux": ["ppc64le", "s390x"],
             },
         },
         "microsoft": {
@@ -66,7 +66,7 @@ _RELEASE_CONFIGS = {
         "adoptium": {
             "release": "17.0.14+7",
             "platforms": {
-                "linux": ["ppc", "s390x"],
+                "linux": ["ppc64le", "s390x"],
             },
         },
     },
@@ -82,7 +82,7 @@ _RELEASE_CONFIGS = {
         "adoptium": {
             "release": "21.0.6+7",
             "platforms": {
-                "linux": ["ppc", "riscv64", "s390x"],
+                "linux": ["ppc64le", "riscv64", "s390x"],
             },
         },
     },
@@ -97,8 +97,6 @@ def _name_for_remote_jdk(version, os, cpu):
     os_part = "win" if (os == "windows" and version != "8") else os
     if cpu == "x86_64":
         suffix = ""
-    elif cpu == "ppc":
-        suffix = "_ppc64le"
     else:
         suffix = "_" + cpu
     return prefix + version + "_" + os_part + suffix
@@ -126,8 +124,6 @@ def _zulu_remote_jdk_repo(os, cpu, release):
 def _adoptium_linux_remote_jdk_repo(version, cpu, release):
     os = "linux"
     arch = cpu
-    if cpu == "ppc":
-        arch = "ppc64le"
     archive_name = "OpenJDK" + version + "U-jdk_" + arch + "_" + os + "_hotspot_" + release.replace("+", "_") + ".tar.gz"
     primary_url = "github.com/adoptium/temurin" + version + "-binaries/releases/download/jdk-" + release + "/" + archive_name
     urls = [
