@@ -1244,6 +1244,24 @@ def _compilation_info_test_impl(env, target):
     assert_info.runtime_classpath().contains_exactly(["{package}/lib{name}.jar"])
     assert_info.javac_options().contains_at_least(["opt1", "opt2"]).in_order()
 
+def _output_source_jars_returns_depset_test(name):
+    target_name = name + "/lib"
+    util.helper_target(
+        java_library,
+        name = target_name,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _output_source_jars_returns_depset_test_impl,
+        target = target_name,
+        attr_values = {"tags": ["min_bazel_7"]},  # changed in Bazel 7
+    )
+
+def _output_source_jars_returns_depset_test_impl(env, target):
+    source_jars = target[JavaInfo].java_outputs[0].source_jars
+    env.expect.that_str(type(source_jars)).equals(type(depset()))
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -1287,5 +1305,6 @@ def java_info_tests(name):
             _native_libraries_propagation_test,
             _annotation_processing_test,
             _compilation_info_test,
+            _output_source_jars_returns_depset_test,
         ],
     )
