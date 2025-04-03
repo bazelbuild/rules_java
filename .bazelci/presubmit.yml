@@ -2,7 +2,7 @@
 build_targets: &build_targets
   - "//..."
   # can't build some analysis tests on older Bazel versions
-  - "-//java/test/..."
+  - "-//test/java/..."
   - "@remote_java_tools//java_tools/..."
   # can't build @remote_java_tools_X repos for other platforms
   - "-//toolchains/..."
@@ -21,13 +21,12 @@ build_targets_integration: &build_targets_integration
 
 test_targets: &test_targets
   - "//test/..."
-  - "//java/test/..."
   # TODO: re-enable docs after moving them out of https://bazel.build/reference/be/java
   - "-//test:docs_up_to_date_test"
 
 test_targets_bazel6: &test_targets_bazel6
-  - "//java/test/..."
-  - "-//java/test/private/..."
+  - "//test/java/..."
+  - "-//test/java/private/..."
 
 test_target_integration: &test_target_integration
   - "//:MyTest"
