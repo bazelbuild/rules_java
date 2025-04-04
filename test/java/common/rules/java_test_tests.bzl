@@ -7,7 +7,7 @@ load("@rules_testing//lib:truth.bzl", "matching", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_test.bzl", "java_test")
-load("//java/test/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
+load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 
 def _test_java_test_propagates_direct_native_libraries(name):
     util.helper_target(

@@ -9,9 +9,9 @@ load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
-load("//java/test/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
-load("//java/test/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
-load("//java/test/testutil:rules/wrap_java_info.bzl", "JavaInfoWrappingInfo", "java_info_wrapping_rule")
+load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
+load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
+load("//test/java/testutil:rules/wrap_java_info.bzl", "JavaInfoWrappingInfo", "java_info_wrapping_rule")
 
 def _test_exposes_plugins(name):
     target_name = name + "/library"

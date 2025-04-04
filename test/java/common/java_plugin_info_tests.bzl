@@ -6,7 +6,7 @@ load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_plugin_info_subject")
-load("//java/test/testutil:rules/custom_plugin.bzl", "custom_plugin")
+load("//test/java/testutil:rules/custom_plugin.bzl", "custom_plugin")
 
 def _test_exposes_java_outputs(name):
     util.helper_target(

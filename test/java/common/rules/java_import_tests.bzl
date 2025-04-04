@@ -6,7 +6,7 @@ load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_import.bzl", "java_import")
 load("//java:java_library.bzl", "java_library")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
-load("//java/test/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
+load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 
 def _test_java_import_attributes(name):
     target_name = name + "/import"

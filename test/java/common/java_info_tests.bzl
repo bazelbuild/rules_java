@@ -8,9 +8,9 @@ load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/test/testutil:java_info_subject.bzl", "java_info_subject")
-load("//java/test/testutil:rules/bad_java_info_rules.bzl", "bad_deps", "bad_exports", "bad_libs", "bad_runtime_deps", "compile_jar_not_set", "compile_jar_set_to_none")
-load("//java/test/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
-load("//java/test/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
+load("//test/java/testutil:rules/bad_java_info_rules.bzl", "bad_deps", "bad_exports", "bad_libs", "bad_runtime_deps", "compile_jar_not_set", "compile_jar_set_to_none")
+load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
+load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 
 def _with_output_jar_only_test(name):
     target_name = name + "/my_starlark_rule"

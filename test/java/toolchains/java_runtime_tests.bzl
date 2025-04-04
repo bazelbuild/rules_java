@@ -4,8 +4,8 @@ load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/test/testutil:java_runtime_info_subject.bzl", "java_runtime_info_subject")
-load("//java/test/testutil:rules/forward_java_runtime_info.bzl", "java_runtime_info_forwarding_rule")
 load("//java/toolchains:java_runtime.bzl", "java_runtime")
+load("//test/java/testutil:rules/forward_java_runtime_info.bzl", "java_runtime_info_forwarding_rule")
 load("//toolchains:java_toolchain_alias.bzl", "java_runtime_alias")
 
 def _test_with_absolute_java_home(name):
