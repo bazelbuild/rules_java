@@ -1,6 +1,7 @@
 """A custom @rules_testing subject for the CcInfo provider"""
 
 load("@rules_testing//lib:truth.bzl", "subjects")
+load("//java:testutil.bzl", "testutil")
 
 def _new_cc_info_subject(cc_info, meta):
     self = struct(
@@ -9,7 +10,7 @@ def _new_cc_info_subject(cc_info, meta):
     )
     public = struct(
         linking_context = lambda: _new_cc_info_linking_context_subject(self.actual, self.meta),
-        native_libraries = lambda: subjects.collection(self.actual.transitive_native_libraries(), self.meta.derive("transitive_native_libraries()")),
+        native_libraries = lambda: subjects.collection(testutil.cc_info_transitive_native_libraries(self.actual), self.meta.derive("transitive_native_libraries()")),
     )
     return public
 
@@ -72,7 +73,7 @@ def _new_library_to_link_subject(library_to_link, meta):
 
 def _new_library_to_link_identifiers_subject(libraries_to_link, meta):
     self = subjects.collection(
-        [lib.library_identifier() for lib in libraries_to_link],
+        [testutil.cc_library_to_link_identifier(lib) for lib in libraries_to_link],
         meta = meta.derive("library_identifier()"),
     )
     public = struct(

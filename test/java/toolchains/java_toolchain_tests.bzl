@@ -2,9 +2,9 @@
 
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
-load("//java/test/testutil:java_toolchain_info_subject.bzl", "java_toolchain_info_subject")
 load("//java/toolchains:java_runtime.bzl", "java_runtime")
 load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
+load("//test/java/testutil:java_toolchain_info_subject.bzl", "java_toolchain_info_subject")
 
 def _declare_java_toolchain(*, name, **kwargs):
     if "java_runtime" not in kwargs:
