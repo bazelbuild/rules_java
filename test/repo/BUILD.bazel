@@ -1,5 +1,5 @@
 load("@rules_java//java:defs.bzl", "java_binary", "java_library", "java_test")  # copybara-use-repo-external-label
-load("@rules_java//toolchains:default_java_toolchain.bzl", "default_java_toolchain")  # copybara-use-repo-external-label
+load("@rules_java//toolchains:default_java_toolchain.bzl", "NONPREBUILT_TOOLCHAIN_CONFIGURATION", "default_java_toolchain")  # copybara-use-repo-external-label
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
 java_library(
@@ -50,4 +50,5 @@ sh_test(
 default_java_toolchain(
     name = "my_funky_toolchain",
     bootclasspath = ["@bazel_tools//tools/jdk:platformclasspath"],
+    configuration = NONPREBUILT_TOOLCHAIN_CONFIGURATION,
 )
