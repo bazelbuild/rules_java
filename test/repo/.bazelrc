@@ -1,3 +1,7 @@
 build:bzlmod --experimental_enable_bzlmod
 
 common --incompatible_disallow_empty_glob
+
+# Enable modern C++ features, for compiling java_tools from source
+build --cxxopt=-std=c++17
+build --host_cxxopt=-std=c++17

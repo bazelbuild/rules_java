@@ -3,7 +3,11 @@ build_targets: &build_targets
   - "//..."
   # can't build some analysis tests on older Bazel versions
   - "-//test/java/..."
-  - "@remote_java_tools//java_tools/..."
+  # build java_tools from source
+  - "@remote_java_tools//:ijar_cc_binary"
+  - "@remote_java_tools//:one_version_cc_bin"
+  - "@remote_java_tools//:proguard"
+  - "@remote_java_tools//:singlejar_cc_bin"
   # can't build @remote_java_tools_X repos for other platforms
   - "-//toolchains/..."
   # TODO: re-enable docs after moving them out of https://bazel.build/reference/be/java
@@ -12,7 +16,11 @@ build_targets: &build_targets
 
 build_targets_bazel6: &build_targets_bazel6
   - "//:all"
-  - "@remote_java_tools//java_tools/..."
+  # build java_tools from source
+  - "@remote_java_tools//:ijar_cc_binary"
+  - "@remote_java_tools//:one_version_cc_bin"
+  - "@remote_java_tools//:proguard"
+  - "@remote_java_tools//:singlejar_cc_bin"
   - "//examples/..."
 
 build_targets_integration: &build_targets_integration
