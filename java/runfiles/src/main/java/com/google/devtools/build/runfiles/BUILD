@@ -1,5 +1,7 @@
 load("//java:defs.bzl", "java_library", "java_plugin")
 
+package(default_applicable_licenses = ["@rules_java//:license"])
+
 java_library(
     name = "runfiles",
     srcs = [

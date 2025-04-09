@@ -199,6 +199,17 @@ def absl_repo():
         urls = ["https://github.com/abseil/abseil-cpp/archive/refs/tags/20240722.0.tar.gz"],
     )
 
+def rules_license_repo():
+    maybe(
+        http_archive,
+        name = "rules_license",
+        sha256 = "26d4021f6898e23b82ef953078389dd49ac2b5618ac564ade4ef87cced147b38",
+        urls = [
+            "https://mirror.bazel.build/github.com/bazelbuild/rules_license/releases/download/1.0.0/rules_license-1.0.0.tar.gz",
+            "https://github.com/bazelbuild/rules_license/releases/download/1.0.0/rules_license-1.0.0.tar.gz",
+        ],
+    )
+
 def rules_java_dependencies():
     """An utility method to load non-toolchain dependencies of rules_java.
 
@@ -211,3 +222,4 @@ def rules_java_dependencies():
     platforms_repo()
     zlib_repo()
     absl_repo()
+    rules_license_repo()

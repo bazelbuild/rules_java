@@ -2,6 +2,8 @@ load("@rules_java//java:defs.bzl", "java_binary", "java_library", "java_test")  
 load("@rules_java//toolchains:default_java_toolchain.bzl", "NONPREBUILT_TOOLCHAIN_CONFIGURATION", "default_java_toolchain")  # copybara-use-repo-external-label
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 
+package(default_applicable_licenses = ["@rules_java//:license"])
+
 java_library(
     name = "lib",
     srcs = ["src/Main.java"],

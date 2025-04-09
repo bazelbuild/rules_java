@@ -1,3 +1,7 @@
+load("@rules_license//rules:license.bzl", "license")
+
+package(default_applicable_licenses = ["@rules_java//:license"])
+
 licenses(["notice"])
 
 exports_files([
@@ -17,4 +21,9 @@ filegroup(
         "//toolchains:srcs",
     ],
     visibility = ["//visibility:public"],
+)
+
+license(
+    name = "license",
+    package_name = "rules_java",
 )

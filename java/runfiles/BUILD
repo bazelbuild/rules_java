@@ -1,3 +1,5 @@
+package(default_applicable_licenses = ["@rules_java//:license"])
+
 alias(
     name = "runfiles",
     actual = "//java/runfiles/src/main/java/com/google/devtools/build/runfiles",

@@ -1,4 +1,7 @@
-package(default_visibility = ["//visibility:public"])
+package(
+    default_applicable_licenses = ["@rules_java//:license"],
+    default_visibility = ["//visibility:public"],
+)
 
 # Toolchain type provided by proto_lang_toolchain rule and used by java_proto_library
 toolchain_type(name = "toolchain_type")

@@ -22,7 +22,10 @@ load(
 )
 load(":utf8_environment.bzl", "utf8_environment")
 
-package(default_visibility = ["//visibility:public"])
+package(
+    default_applicable_licenses = ["@rules_java//:license"],
+    default_visibility = ["//visibility:public"],
+)
 
 licenses(["notice"])
 

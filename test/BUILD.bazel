@@ -17,6 +17,8 @@ load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//java:repositories.bzl", "JAVA_TOOLS_CONFIG", "REMOTE_JDK_CONFIGS")
 load(":check_remotejdk_configs_match.bzl", "validate_configs")
 
+package(default_applicable_licenses = ["@rules_java//:license"])
+
 sh_test(
     name = "check_remote_jdk_configs_test",
     srcs = ["check_remote_jdk_configs.sh"],

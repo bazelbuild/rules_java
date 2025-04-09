@@ -13,4 +13,6 @@
 # limitations under the License.
 load(":android_support_tests.bzl", "android_support_tests")
 
+package(default_applicable_licenses = ["@rules_java//:license"])
+
 android_support_tests(name = "android_support_tests")
