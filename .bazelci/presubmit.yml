@@ -46,8 +46,8 @@ flags_workspace_integration: &flags_workspace_integration
 buildifier: latest
 
 matrix:
-  all_platforms: ["ubuntu2004", "macos", "windows"]
-  integration_platforms: ["ubuntu2004", "macos"] # TODO: add windows batch setup script
+  all_platforms: ["ubuntu2004", "macos", "macos_arm64", "windows"]
+  integration_platforms: ["ubuntu2004", "macos", "macos_arm64"] # TODO: add windows batch setup script
   bazel: ["7.4.0", "8.1.0", "last_green"] # Bazel 6 tested separately, needs different flags
   modern_bazel: ["8.1.0", "last_green"] # Fully supported Bazel versions
 
