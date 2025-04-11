@@ -23,7 +23,10 @@ load("@rules_java//java:http_jar.bzl", "http_jar")
 
 http_jar(
     name = "my_jar",
-    urls = ["file:///tmp/my_jar.jar"],
+    urls = [
+        "file:///tmp/my_jar.jar",
+        "file:///C:/b/my_jar.jar",
+    ],
 )
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")

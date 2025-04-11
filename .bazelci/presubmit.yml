@@ -47,7 +47,7 @@ buildifier: latest
 
 matrix:
   all_platforms: ["ubuntu2004", "macos", "macos_arm64", "windows"]
-  integration_platforms: ["ubuntu2004", "macos", "macos_arm64"] # TODO: add windows batch setup script
+  integration_platforms: ["ubuntu2004", "macos", "macos_arm64", "windows"]
   bazel: ["7.4.0", "8.1.0", "last_green"] # Bazel 6 tested separately, needs different flags
   modern_bazel: ["8.1.0", "last_green"] # Fully supported Bazel versions
 
@@ -80,10 +80,12 @@ tasks:
   ubuntu2004_integration_bazel6:
     name: "Integration w/ Bazel 6.5.0"
     bazel: 6.5.0
-    platform: ubuntu2004
+    platform: ${{ integration_platforms }}
     working_directory: "test/repo"
     shell_commands:
     - sh setup.sh
+    batch_commands:
+    - setup.bat
     build_targets: *build_targets_integration
     test_targets: *test_target_integration
 
@@ -95,6 +97,8 @@ tasks:
     working_directory: "test/repo"
     shell_commands:
     - sh setup.sh
+    batch_commands:
+    - setup.bat
     build_targets: *build_targets_integration
     test_targets: *test_target_integration
   integration_build_and_test_workspace:
@@ -104,6 +108,8 @@ tasks:
     working_directory: "test/repo"
     shell_commands:
     - sh setup.sh
+    batch_commands:
+    - setup.bat
     build_targets: *build_targets_integration
     build_flags: *flags_workspace_integration
     test_targets: *test_target_integration
