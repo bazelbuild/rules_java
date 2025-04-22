@@ -236,7 +236,9 @@ def _create_stub(ctx, java_attrs, launcher, executable, jvm_flags, main_class, c
         "%classpath%",
         classpath,
         map_each = lambda file: _format_classpath_entry(runfiles_enabled, workspace_prefix, file),
-        join_with = ctx.configuration.host_path_separator,
+        # At the moment, this condition is always false since the dedicated
+        # Windows launcher is used above when targeting Windows.
+        join_with = ";" if helper.is_target_platform_windows(ctx) else ":",
         format_joined = "\"%s\"",
         allow_closure = True,
     )
