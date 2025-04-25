@@ -247,7 +247,7 @@ The feature version of the Java runtime. I.e., the integer returned by
             """,
         ),
         # buildifier: disable=attr-licenses
-        "output_licenses": attr.license() if hasattr(attr, "license") else attr.string_list(),
+        "output_licenses": attr.string_list(),
         "_windows_constraints": attr.label_list(
             default = [paths.join(semantics.PLATFORMS_ROOT, "os:windows")],
         ),

@@ -119,6 +119,6 @@ Corresponds to javac's --system flag.
 """,
         ),
         # buildifier: disable=attr-licenses
-        "output_licenses": attr.license() if hasattr(attr, "license") else attr.string_list(),
+        "output_licenses": attr.string_list(),
     },
 )

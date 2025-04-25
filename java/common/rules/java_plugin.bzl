@@ -46,7 +46,7 @@ from the annotation processor path using
 java.util.ServiceLoader</a>.)
        """),
         # buildifier: disable=attr-licenses
-        "output_licenses": attr.license() if hasattr(attr, "license") else attr.string_list(),
+        "output_licenses": attr.string_list(),
     },
     remove_attrs = ["runtime_deps", "exports", "exported_plugins"],
 )
