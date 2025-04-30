@@ -14,7 +14,7 @@
 """ProguardSpecInfo provider"""
 
 def _proguard_spec_info_init(specs):
-    # The constructor supports positional parameter, i.e ProguardSpecInfo([file])
+    # The constructor supports positional parameter, i.e. ProguardSpecInfo([file])
     return {"specs": specs}
 
 ProguardSpecInfo, _ = provider(
