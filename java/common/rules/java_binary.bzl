@@ -348,8 +348,6 @@ The Java class to be loaded by the test runner.<br/>
   <code>junit.framework.TestCase</code> or it needs to have a public
   static <code>suite()</code> method that returns a
   <code>junit.framework.Test</code> (or a subclass of <code>Test</code>).
-  For JUnit4, the class needs to be annotated with
-  <code>org.junit.runner.RunWith</code>.
 </p>
 <p>
   This attribute allows several <code>java_test</code> rules to
