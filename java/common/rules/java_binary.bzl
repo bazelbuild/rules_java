@@ -19,7 +19,6 @@ load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/private:java_common.bzl", "java_common")
 load("//java/private:java_info.bzl", "JavaInfo", "JavaPluginInfo")
-load("//java/private:native.bzl", "get_internal_java_common")
 load(":basic_java_library.bzl", "BASIC_JAVA_LIBRARY_IMPLICIT_ATTRS")
 load(":rule_util.bzl", "merge_attrs")
 
@@ -323,7 +322,7 @@ binaries and not libraries, due to the danger of namespace conflicts.
             default = [paths.join(_PLATFORMS_ROOT, "os:windows")],
         ),
         "_build_info_translator": attr.label(default = semantics.BUILD_INFO_TRANSLATOR_LABEL),
-    } | ({} if get_internal_java_common().incompatible_disable_non_executable_java_binary() else {"create_executable": attr.bool(default = True, doc = "Deprecated, use <code>java_single_jar</code> instead.")}),
+    } | ({} if semantics.INCOMPATIBLE_DISABLE_NON_EXECUTABLE_JAVA_BINARY else {"create_executable": attr.bool(default = True, doc = "Deprecated, use <code>java_single_jar</code> instead.")}),
 )
 
 BASE_TEST_ATTRIBUTES = {

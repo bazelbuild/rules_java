@@ -112,4 +112,5 @@ semantics = struct(
     minimize_cc_info = _minimize_cc_info,
     tokenize_javacopts = _tokenize_javacopts,
     PLATFORMS_ROOT = "@platforms//",
+    INCOMPATIBLE_DISABLE_NON_EXECUTABLE_JAVA_BINARY = False,  # Flip when java_single_jar is feature complete
 )
