@@ -86,14 +86,14 @@ java_test(
         BASE_BINARY_ATTRS,
         {
             "_lcov_merger": attr.label(
-                cfg = "exec",
+                cfg = config.exec(exec_group = "test"),
                 default = configuration_field(
                     fragment = "coverage",
                     name = "output_generator",
                 ),
             ),
             "_collect_cc_coverage": attr.label(
-                cfg = "exec",
+                cfg = config.exec(exec_group = "test"),
                 allow_single_file = True,
                 default = "@bazel_tools//tools/test:collect_cc_coverage",
             ),
