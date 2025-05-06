@@ -45,13 +45,19 @@ java_package_configuration = _java_package_configuration
 # Deprecated: don't use java proto libraries from here
 def java_proto_library(**kwargs):
     if "deprecation" not in kwargs:
-        _java_proto_library(deprecation = "Use java_proto_library from com_google_protobuf", **kwargs)
+        _java_proto_library(
+            deprecation = "Use java_proto_library from @com_google_protobuf//bazel:java_proto_library.bzl",
+            **kwargs
+        )
     else:
         _java_proto_library(**kwargs)
 
 def java_lite_proto_library(**kwargs):
     if "deprecation" not in kwargs:
-        _java_lite_proto_library(deprecation = "Use java_lite_proto_library from com_google_protobuf", **kwargs)
+        _java_lite_proto_library(
+            deprecation = "Use java_lite_proto_library from @com_google_protobuf//bazel:java_lite_proto_library.bzl",
+            **kwargs
+        )
     else:
         _java_lite_proto_library(**kwargs)
 
