@@ -72,11 +72,43 @@ def _test_simple_impl(env, target):
         "{package}/library.jar",
     ])
 
+def _test_with_java_library(name):
+    target_name = name + "/javalib"
+    util.helper_target(
+        java_library,
+        name = target_name,
+        srcs = ["Other.java"],
+        deps = [target_name + "/libraryjar"],
+    )
+    util.helper_target(
+        java_import,
+        name = target_name + "/libraryjar",
+        jars = ["library.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_with_java_library_impl,
+        target = target_name,
+    )
+
+def _test_with_java_library_impl(env, target):
+    assert_compliation_info = java_info_subject.from_target(env, target).compilation_info()
+
+    assert_compliation_info.compilation_classpath().contains_exactly([
+        "{package}/_ijar/{name}/libraryjar/{package}/library-ijar.jar",
+    ])
+    assert_compliation_info.runtime_classpath().contains_exactly([
+        "{package}/lib{name}.jar",
+        "{package}/library.jar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
         tests = [
             _test_java_import_attributes,
             _test_simple,
+            _test_with_java_library,
         ],
     )
