@@ -103,6 +103,74 @@ def _test_with_java_library_impl(env, target):
         "{package}/library.jar",
     ])
 
+def _test_deps(name):
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["Main.java"],
+        deps = [name + "/import-jar"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/import-jar",
+        jars = ["import.jar"],
+        exports = [name + "/exportjar"],
+        deps = [name + "/depjar"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/depjar",
+        jars = ["depjar.jar"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/exportjar",
+        jars = ["exportjar.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_deps_impl,
+        targets = {
+            "importjar": name + "/import-jar",
+            "lib": name + "/lib",
+        },
+    )
+
+def _test_deps_impl(env, targets):
+    env.expect.that_target(targets.importjar).default_outputs().contains_exactly([
+        "{package}/import.jar",
+    ])
+
+    assert_import_compilation_args = java_info_subject.from_target(env, targets.importjar).compilation_args()
+    assert_import_compilation_args.transitive_compile_time_jars().contains_exactly([
+        "{package}/_ijar/test_deps/import-jar/{package}/import-ijar.jar",
+        "{package}/_ijar/test_deps/exportjar/{package}/exportjar-ijar.jar",
+        "{package}/_ijar/test_deps/depjar/{package}/depjar-ijar.jar",
+    ])
+    assert_import_compilation_args.transitive_runtime_jars().contains_exactly([
+        "{package}/import.jar",
+        "{package}/exportjar.jar",
+        "{package}/depjar.jar",
+    ])
+    assert_import_compilation_args.compile_jars().contains_exactly([
+        "{package}/_ijar/test_deps/import-jar/{package}/import-ijar.jar",
+        "{package}/_ijar/test_deps/exportjar/{package}/exportjar-ijar.jar",
+    ])
+
+    assert_lib_compilation_info = java_info_subject.from_target(env, targets.lib).compilation_info()
+    assert_lib_compilation_info.compilation_classpath().contains_exactly([
+        "{package}/_ijar/test_deps/import-jar/{package}/import-ijar.jar",
+        "{package}/_ijar/test_deps/exportjar/{package}/exportjar-ijar.jar",
+        "{package}/_ijar/test_deps/depjar/{package}/depjar-ijar.jar",
+    ])
+    assert_lib_compilation_info.runtime_classpath().contains_exactly([
+        "{package}/lib{name}.jar",
+        "{package}/import.jar",
+        "{package}/exportjar.jar",
+        "{package}/depjar.jar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -110,5 +178,6 @@ def java_import_tests(name):
             _test_java_import_attributes,
             _test_simple,
             _test_with_java_library,
+            _test_deps,
         ],
     )
