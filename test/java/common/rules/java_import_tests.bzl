@@ -194,6 +194,29 @@ def _test_commandline_contains_target_label_impl(env, target):
         ("--target_label", "//{package}:{name}"),
     ])
 
+# Regression test for b/5868388.
+def _test_java_library_allows_import_in_deps(name):
+    util.helper_target(
+        java_import,
+        name = name + "/libraryjar",
+        jars = ["library.jar"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/javalib",
+        srcs = ["Other.java"],
+        exports = [name + "/libraryjar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_library_allows_import_in_deps_impl,
+        target = name + "/javalib",
+    )
+
+def _test_java_library_allows_import_in_deps_impl(_env, _target):
+    pass  # no errors
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -203,5 +226,6 @@ def java_import_tests(name):
             _test_with_java_library,
             _test_deps,
             _test_commandline_contains_target_label,
+            _test_java_library_allows_import_in_deps,
         ],
     )
