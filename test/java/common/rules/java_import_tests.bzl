@@ -53,10 +53,30 @@ def _test_java_import_attributes_impl(env, target):
         matching.file_basename_equals("jl_bottom_for_runtime_deps.jar"),
     ])
 
+def _test_simple(name):
+    target_name = name + "/libraryjar"
+    util.helper_target(
+        java_import,
+        name = target_name,
+        jars = ["library.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_simple_impl,
+        target = target_name,
+    )
+
+def _test_simple_impl(env, target):
+    env.expect.that_target(target).default_outputs().contains_exactly([
+        "{package}/library.jar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
         tests = [
             _test_java_import_attributes,
+            _test_simple,
         ],
     )
