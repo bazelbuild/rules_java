@@ -5,6 +5,7 @@ load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_import.bzl", "java_import")
 load("//java:java_library.bzl", "java_library")
+load("//java/common:java_info.bzl", "JavaInfo")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 
@@ -171,6 +172,28 @@ def _test_deps_impl(env, targets):
         "{package}/depjar.jar",
     ])
 
+# Regression test for b/262751943.
+def _test_commandline_contains_target_label(name):
+    util.helper_target(
+        java_import,
+        name = name + "/java_imp",
+        jars = ["import.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_commandline_contains_target_label_impl,
+        target = name + "/java_imp",
+    )
+
+def _test_commandline_contains_target_label_impl(env, target):
+    compiled_artifact = target[JavaInfo].compile_jars.to_list()[0].short_path
+    assert_action = env.expect.that_target(target).action_generating(compiled_artifact)
+
+    assert_action.contains_flag_values([
+        ("--target_label", "//{package}:{name}"),
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -179,5 +202,6 @@ def java_import_tests(name):
             _test_simple,
             _test_with_java_library,
             _test_deps,
+            _test_commandline_contains_target_label,
         ],
     )
