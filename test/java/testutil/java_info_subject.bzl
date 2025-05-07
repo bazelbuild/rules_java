@@ -111,6 +111,7 @@ def _new_java_compilation_args_subject(java_info, meta):
         transitive_runtime_jars = lambda: subjects.depset_file(actual.transitive_runtime_jars, self.meta.derive("transitive_runtime_jars")),
         transitive_compile_time_jars = lambda: subjects.depset_file(actual.transitive_compile_time_jars, self.meta.derive("transitive_compile_time_jars")),
         transitive_runtime_jars_list = lambda: subjects.collection(actual.transitive_runtime_jars.to_list(), self.meta.derive("transitive_runtime_jars.to_list()")),
+        compile_time_java_dependencies = lambda: subjects.depset_file(actual._compile_time_java_dependencies, self.meta.derive("_compile_time_java_dependencies")),
         self = self,
         actual = actual,
     )

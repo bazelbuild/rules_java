@@ -71,6 +71,45 @@ def _test_compile_exports_no_sources_impl(env, target):
         ["{package}/libjl.jar"],
     )
 
+def _test_compile_exports_with_sources(name):
+    target_name = name + "/custom"
+    util.helper_target(
+        custom_library_with_exports,
+        name = target_name,
+        srcs = ["Main.java"],
+        exports = [target_name + "/dep"],
+        output_name = "amazing",
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/dep",
+        srcs = ["Dep.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_exports_with_sources_impl,
+        target = target_name,
+        # Bazel 6 JavaInfo doesn't expose compile_time_java_dependencies
+        attr_values = {"tags": ["min_bazel_7"]},
+    )
+
+def _test_compile_exports_with_sources_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+
+    assert_java_info.transitive_source_jars().contains_exactly([
+        "{package}/{name}/amazing-src.jar",
+        "{package}/lib{name}/dep-src.jar",
+    ])
+    assert_java_info.compilation_args().compile_jars().contains_exactly([
+        "{package}/{name}/amazing-hjar.jar",
+        "{package}/lib{name}/dep-hjar.jar",
+    ])
+    assert_java_info.compilation_args().compile_time_java_dependencies().contains_exactly([
+        "{package}/{name}/amazing-hjar.jdeps",
+        "{package}/lib{name}/dep-hjar.jdeps",
+    ])
+
 def _test_java_plugin_info(name):
     util.helper_target(native.filegroup, name = name + "/dummy")
     analysis_test(
@@ -711,6 +750,7 @@ def java_common_tests(name):
             _test_compile_default_values,
             _test_compile_sourcepath,
             _test_compile_exports_no_sources,
+            _test_compile_exports_with_sources,
             _test_java_plugin_info,
             _test_compile_extend_compile_time_jdeps,
             _test_compile_extend_compile_time_jdeps_rule_outputs,
