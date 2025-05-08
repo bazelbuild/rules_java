@@ -883,6 +883,36 @@ def _test_transitive_proguard_specs_are_exported_impl(env, target):
         "runtime_dep.pro_valid",
     ])
 
+def _test_src_jars_output_groups(name):
+    target_name = name + "/a"
+    util.helper_target(
+        java_import,
+        name = target_name,
+        jars = ["jar_a.jar"],
+        srcjar = "src_jar_a.jar",
+        deps = [target_name + "/b"],
+    )
+    util.helper_target(
+        java_import,
+        name = target_name + "/b",
+        jars = ["jar_b.jar"],
+        srcjar = "src_jar_b.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_src_jars_output_groups_impl,
+        target = target_name,
+    )
+
+def _test_src_jars_output_groups_impl(env, target):
+    env.expect.that_target(target).output_group("_source_jars").contains_exactly([
+        "{package}/src_jar_a.jar",
+    ])
+    env.expect.that_target(target).output_group("_direct_source_jars").contains_exactly([
+        "{package}/src_jar_a.jar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -915,5 +945,6 @@ def java_import_tests(name):
             _test_transitive_proguard_specs_are_validated,
             _test_proguard_specs_are_validated,
             _test_transitive_proguard_specs_are_exported,
+            _test_src_jars_output_groups,
         ],
     )
