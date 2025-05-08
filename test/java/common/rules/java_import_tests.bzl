@@ -493,6 +493,25 @@ def _test_disallows_files_in_exports_impl(env, target):
         matching.str_matches("source file * is misplaced here (expected no files)"),
     )
 
+def _test_disallows_arbitrary_files(name):
+    util.helper_target(
+        java_import,
+        name = name + "/rule",
+        jars = ["not-a-jar.txt"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_disallows_arbitrary_files_impl,
+        target = name + "/rule",
+        expect_failure = True,
+    )
+
+def _test_disallows_arbitrary_files_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("does not produce any java_import jars files (expected .jar)"),
+    )
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -512,5 +531,6 @@ def java_import_tests(name):
             _test_permits_empty_jars_with_flag,
             _test_disallows_empty_jars,
             _test_disallows_files_in_exports,
+            _test_disallows_arbitrary_files,
         ],
     )
