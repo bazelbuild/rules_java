@@ -597,6 +597,35 @@ def _test_disallows_exports_with_flag_impl(env, target):
         matching.str_matches("java_import.exports is no longer supported; use java_import.deps instead"),
     )
 
+def _test_ijar_can_be_disabled(name):
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["A.java"],
+        deps = [name + "/b"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/b",
+        jars = ["b.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_ijar_can_be_disabled_impl,
+        target = name + "/a",
+        config_settings = {
+            "//command_line_option:use_ijars": False,
+        },
+    )
+
+def _test_ijar_can_be_disabled_impl(env, target):
+    assert_jars = java_info_subject.from_target(env, target).compilation_args().transitive_compile_time_jars()
+    assert_jars.contains_exactly([
+        "{package}/lib{name}-hjar.jar",
+        "{package}/b.jar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -620,5 +649,6 @@ def java_import_tests(name):
             _test_disallows_arbitrary_files_from_genrule,
             _test_disallows_java_rules_in_jars,
             _test_disallows_exports_with_flag,
+            _test_ijar_can_be_disabled,
         ],
     )
