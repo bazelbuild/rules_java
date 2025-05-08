@@ -509,7 +509,32 @@ def _test_disallows_arbitrary_files(name):
 
 def _test_disallows_arbitrary_files_impl(env, target):
     env.expect.that_target(target).failures().contains_predicate(
-        matching.str_matches("does not produce any java_import jars files (expected .jar)"),
+        matching.str_matches("file '*:not-a-jar.txt' is misplaced here (expected .jar)"),
+    )
+
+def _test_disallows_arbitrary_files_from_genrule(name):
+    util.helper_target(
+        native.genrule,
+        name = name + "/gen",
+        outs = ["not-a-jar.txt"],
+        cmd = "",
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/rule",
+        jars = [name + "/gen"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_disallows_arbitrary_files_from_genrule_impl,
+        target = name + "/rule",
+        expect_failure = True,
+    )
+
+def _test_disallows_arbitrary_files_from_genrule_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("'*/gen' does not produce any java_import jars files (expected .jar)"),
     )
 
 def java_import_tests(name):
@@ -532,5 +557,6 @@ def java_import_tests(name):
             _test_disallows_empty_jars,
             _test_disallows_files_in_exports,
             _test_disallows_arbitrary_files,
+            _test_disallows_arbitrary_files_from_genrule,
         ],
     )
