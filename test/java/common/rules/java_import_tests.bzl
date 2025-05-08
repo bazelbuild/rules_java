@@ -12,6 +12,7 @@ load("//java/common:proguard_spec_info.bzl", "ProguardSpecInfo")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
+load("//test/java/testutil:rules/custom_library.bzl", "custom_library")
 load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 
 def _test_java_import_attributes(name):
@@ -913,6 +914,40 @@ def _test_src_jars_output_groups_impl(env, target):
         "{package}/src_jar_a.jar",
     ])
 
+def _test_with_custom_library(name):
+    target_name = name + "/javalib"
+    util.helper_target(
+        java_library,
+        name = target_name,
+        srcs = ["MyClass.java"],
+        deps = [target_name + "/foo"],
+    )
+    util.helper_target(
+        java_import,
+        name = target_name + "/foo",
+        jars = ["foo.jar"],
+        runtime_deps = [target_name + "/javacustomlib"],
+    )
+    util.helper_target(
+        custom_library,
+        name = target_name + "/javacustomlib",
+        srcs = ["Other.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_with_custom_library_impl,
+        target = target_name,
+    )
+
+def _test_with_custom_library_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.compilation_info().runtime_classpath_list().contains_exactly_predicates([
+        matching.file_basename_equals("javalib.jar"),
+        matching.file_basename_equals("foo.jar"),
+        matching.file_basename_equals("javacustomlib.jar"),
+    ]).in_order()
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -946,5 +981,6 @@ def java_import_tests(name):
             _test_proguard_specs_are_validated,
             _test_transitive_proguard_specs_are_exported,
             _test_src_jars_output_groups,
+            _test_with_custom_library,
         ],
     )

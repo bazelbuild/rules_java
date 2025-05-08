@@ -57,7 +57,7 @@ def _new_java_compilation_info_subject(java_info, meta):
     public = struct(
         compilation_classpath = lambda: subjects.depset_file(self.actual.compilation_classpath, self.meta.derive("compilation_classpath")),
         runtime_classpath = lambda: subjects.depset_file(self.actual.runtime_classpath, self.meta.derive("runtime_classpath")),
-        runtime_classpath_list = lambda: subjects.collection(self.actual.runtime_classpath.to_list(), self.meta.derive("runtime_classpath.to_list()")),
+        runtime_classpath_list = lambda: subjects.collection(self.actual.runtime_classpath.to_list(), self.meta.derive("runtime_classpath.to_list()"), format = True),
         javac_options = lambda: subjects.collection(helper.tokenize_javacopts(opts = self.actual.javac_options), self.meta.derive("javac_options")),
     )
     return public
