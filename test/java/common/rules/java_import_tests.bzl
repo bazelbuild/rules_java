@@ -401,6 +401,26 @@ def _test_exposes_java_provider_impl(env, target):
         "{package}/library.jar",
     ])
 
+def _test_jars_allowed_in_srcjar(name):
+    util.helper_target(
+        java_import,
+        name = name + "/library",
+        jars = ["somelib.jar"],
+        srcjar = "somelib-src.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_jars_allowed_in_srcjar_impl,
+        target = name + "/library",
+    )
+
+def _test_jars_allowed_in_srcjar_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.outputs().source_output_jars().contains_exactly([
+        "{package}/somelib-src.jar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -416,5 +436,6 @@ def java_import_tests(name):
             _test_from_genrule,
             _test_transitive_dependencies,
             _test_exposes_java_provider,
+            _test_jars_allowed_in_srcjar,
         ],
     )
