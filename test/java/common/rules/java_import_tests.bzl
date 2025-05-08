@@ -269,6 +269,26 @@ def _test_module_flags_impl(env, targets):
     assert_lib_module_flags.add_exports().contains_exactly(["java.base/java.lang"])
     assert_lib_module_flags.add_opens().contains_exactly(["java.base/java.util"])
 
+def _test_src_jars(name):
+    util.helper_target(
+        java_import,
+        name = name + "/libraryjar_with_srcjar",
+        jars = ["import.jar"],
+        srcjar = "library.srcjar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_src_jars_impl,
+        target = name + "/libraryjar_with_srcjar",
+    )
+
+def _test_src_jars_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.outputs().source_output_jars().contains_exactly([
+        "{package}/library.srcjar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -280,5 +300,6 @@ def java_import_tests(name):
             _test_commandline_contains_target_label,
             _test_java_library_allows_import_in_deps,
             _test_module_flags,
+            _test_src_jars,
         ],
     )
