@@ -626,6 +626,33 @@ def _test_ijar_can_be_disabled_impl(env, target):
         "{package}/b.jar",
     ])
 
+def _test_duplicate_jars_through_filegroup(name):
+    util.helper_target(
+        native.filegroup,
+        name = name + "/jars",
+        srcs = ["a.jar"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/ji-with-dupe-through-fg",
+        jars = ["a.jar", name + "/jars"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_duplicate_jars_through_filegroup_impl,
+        target = name + "/ji-with-dupe-through-fg",
+        expect_failure = True,
+    )
+
+def _test_duplicate_jars_through_filegroup_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.any(
+            matching.str_matches("in jars attribute of java_import rule */ji-with-dupe-through-fg: a.jar is a duplicate"),
+            matching.str_matches("a.jar is a duplicate"),  # Bazel 6
+        ),
+    )
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -650,5 +677,6 @@ def java_import_tests(name):
             _test_disallows_java_rules_in_jars,
             _test_disallows_exports_with_flag,
             _test_ijar_can_be_disabled,
+            _test_duplicate_jars_through_filegroup,
         ],
     )
