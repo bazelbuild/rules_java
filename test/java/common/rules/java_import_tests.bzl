@@ -727,6 +727,34 @@ def _test_exports_runfile_collection_impl(env, target):
         matching.str_matches("/foo.txt"),
     ])
 
+def _test_transitive_source_jars(name):
+    target_name = name + "/a"
+    util.helper_target(
+        java_import,
+        name = target_name,
+        jars = ["dummy.jar"],
+        srcjar = "dummy-src.jar",
+        exports = [target_name + "/b"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/b",
+        srcs = ["B.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_transitive_source_jars_impl,
+        target = target_name,
+    )
+
+def _test_transitive_source_jars_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.transitive_source_jars().contains_exactly([
+        "{package}/dummy-src.jar",
+        "{package}/lib{name}/b-src.jar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -754,5 +782,6 @@ def java_import_tests(name):
             _test_duplicate_jars_through_filegroup,
             _test_runtime_deps_are_not_on_classpath,
             _test_exports_runfile_collection,
+            _test_transitive_source_jars,
         ],
     )
