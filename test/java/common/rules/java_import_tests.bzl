@@ -9,6 +9,7 @@ load("//java:java_library.bzl", "java_library")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
+load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
 load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 
 def _test_java_import_attributes(name):
@@ -339,6 +340,48 @@ def _test_from_genrule_impl(env, targets):
     jar = targets.lib[JavaInfo].transitive_runtime_jars.to_list()[0].short_path
     env.expect.that_target(targets.gen).action_generating(jar).mnemonic().equals("Genrule")
 
+# Regression test for b/13936397: don't flatten transitive dependencies into direct deps.
+def _test_transitive_dependencies(name):
+    target_name = name + "/javalib2"
+    util.helper_target(
+        java_import,
+        name = target_name + "/libraryjar",
+        jars = ["library.jar"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib",
+        srcs = ["Lib.java"],
+        deps = [target_name + "/libraryjar"],
+    )
+    util.helper_target(
+        java_import,
+        name = target_name + "/library2-jar",
+        jars = ["library2.jar"],
+        exports = [target_name + "/lib"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name,
+        srcs = ["Other.java"],
+        deps = [target_name + "/library2-jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_transitive_dependencies_impl,
+        target = target_name,
+    )
+
+def _test_transitive_dependencies_impl(env, target):
+    assert_javac_action = javac_action_subject.of(env, target, "{package}/lib{name}.jar")
+
+    # Direct jars should NOT include libraryjar-ijar.jar
+    assert_javac_action.direct_dependencies().contains_exactly([
+        "{bin_path}/{package}/_ijar/{name}/library2-jar/{package}/library2-ijar.jar",
+        "{bin_path}/{package}/lib{name}/lib-hjar.jar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -352,5 +395,6 @@ def java_import_tests(name):
             _test_module_flags,
             _test_src_jars,
             _test_from_genrule,
+            _test_transitive_dependencies,
         ],
     )
