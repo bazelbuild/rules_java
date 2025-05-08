@@ -653,6 +653,44 @@ def _test_duplicate_jars_through_filegroup_impl(env, target):
         ),
     )
 
+def _test_runtime_deps_are_not_on_classpath(name):
+    target_name = name + "/depends_on_runtimedep"
+    util.helper_target(
+        java_import,
+        name = target_name + "/import_dep",
+        jars = ["import_compile.jar"],
+        runtime_deps = ["import_runtime.jar"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/library_dep",
+        srcs = ["library_compile.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name,
+        srcs = ["dummy.java"],
+        deps = [
+            target_name + "/import_dep",
+            target_name + "/library_dep",
+        ],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_runtime_deps_are_not_on_classpath_impl,
+        target = name + "/depends_on_runtimedep",
+    )
+
+def _test_runtime_deps_are_not_on_classpath_impl(env, target):
+    assert_javac = javac_action_subject.of(env, target, "{package}/lib{name}.jar")
+
+    # Direct jars should NOT include import_runtime.jar
+    assert_javac.direct_dependencies().contains_exactly([
+        "{bin_path}/{package}/_ijar/{name}/import_dep/{package}/import_compile-ijar.jar",
+        "{bin_path}/{package}/lib{name}/library_dep-hjar.jar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -678,5 +716,6 @@ def java_import_tests(name):
             _test_disallows_exports_with_flag,
             _test_ijar_can_be_disabled,
             _test_duplicate_jars_through_filegroup,
+            _test_runtime_deps_are_not_on_classpath,
         ],
     )
