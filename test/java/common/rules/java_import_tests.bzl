@@ -564,6 +564,39 @@ def _test_disallows_java_rules_in_jars_impl(env, target):
         ),
     )
 
+def _test_disallows_exports_with_flag(name):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        # exit early because this test case would be a loading phase error otherwise
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_library,
+        name = name + "/dep",
+        srcs = ["Dep.java"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/rule",
+        jars = ["dummy.jar"],
+        exports = [name + "/dep"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_disallows_exports_with_flag_impl,
+        target = name + "/rule",
+        expect_failure = True,
+        config_settings = {
+            "//command_line_option:incompatible_disallow_java_import_exports": True,
+        },
+    )
+
+def _test_disallows_exports_with_flag_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("java_import.exports is no longer supported; use java_import.deps instead"),
+    )
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -586,5 +619,6 @@ def java_import_tests(name):
             _test_disallows_arbitrary_files,
             _test_disallows_arbitrary_files_from_genrule,
             _test_disallows_java_rules_in_jars,
+            _test_disallows_exports_with_flag,
         ],
     )
