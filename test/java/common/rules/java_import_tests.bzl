@@ -537,6 +537,33 @@ def _test_disallows_arbitrary_files_from_genrule_impl(env, target):
         matching.str_matches("'*/gen' does not produce any java_import jars files (expected .jar)"),
     )
 
+def _test_disallows_java_rules_in_jars(name):
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["JavaLib.java"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/rule",
+        jars = [name + "/lib"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_disallows_java_rules_in_jars_impl,
+        target = name + "/rule",
+        expect_failure = True,
+    )
+
+def _test_disallows_java_rules_in_jars_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.any(
+            matching.str_matches("'jars' attribute cannot contain labels of Java targets"),
+            matching.str_matches("should not refer to Java rules"),  # Bazel 6
+        ),
+    )
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -558,5 +585,6 @@ def java_import_tests(name):
             _test_disallows_files_in_exports,
             _test_disallows_arbitrary_files,
             _test_disallows_arbitrary_files_from_genrule,
+            _test_disallows_java_rules_in_jars,
         ],
     )
