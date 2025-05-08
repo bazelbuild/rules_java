@@ -26,6 +26,7 @@ def _new_java_info_subject(java_info, meta):
         transitive_source_jars = lambda: subjects.depset_file(java_info.transitive_source_jars, self.meta.derive("transitive_source_jars")),
         transitive_source_jars_list = lambda: subjects.collection(java_info.transitive_source_jars.to_list(), self.meta.derive("transitive_source_jars.to_list()")),
         runtime_output_jars = lambda: subjects.depset_file(java_info.runtime_output_jars, self.meta.derive("runtime_output_jars")),
+        module_flags = lambda: _new_java_module_flags_subject(self.actual, self.meta),
     )
     return public
 
@@ -36,6 +37,17 @@ def _java_info_subject_from_target(env, target):
             "package": target.label.package,
         },
     ))
+
+def _new_java_module_flags_subject(java_info, meta):
+    self = struct(
+        actual = java_info.module_flags_info,
+        meta = meta.derive("module_flags_info"),
+    )
+    public = struct(
+        add_exports = lambda: subjects.collection(self.actual.add_exports.to_list(), self.meta.derive("add_exports")),
+        add_opens = lambda: subjects.collection(self.actual.add_opens.to_list(), self.meta.derive("add_opens")),
+    )
+    return public
 
 def _new_java_compilation_info_subject(java_info, meta):
     self = struct(

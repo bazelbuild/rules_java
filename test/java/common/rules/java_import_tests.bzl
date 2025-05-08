@@ -1,11 +1,13 @@
 """Tests for the java_import rule"""
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_import.bzl", "java_import")
 load("//java:java_library.bzl", "java_library")
 load("//java/common:java_info.bzl", "JavaInfo")
+load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 
@@ -217,6 +219,56 @@ def _test_java_library_allows_import_in_deps(name):
 def _test_java_library_allows_import_in_deps_impl(_env, _target):
     pass  # no errors
 
+def _test_module_flags(name):
+    if not bazel_features.java.java_info_constructor_module_flags:
+        # exit early because this test case would be a loading phase error otherwise
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["Main.java"],
+        deps = [name + "/import-jar"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/import-jar",
+        jars = ["import.jar"],
+        exports = [name + "/exportjar"],
+        deps = [name + "/depjar"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/depjar",
+        add_exports = ["java.base/java.lang"],
+        jars = ["depjar.jar"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/exportjar",
+        add_opens = ["java.base/java.util"],
+        jars = ["exportjar.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_module_flags_impl,
+        targets = {
+            "importjar": name + "/import-jar",
+            "lib": name + "/lib",
+        },
+    )
+
+def _test_module_flags_impl(env, targets):
+    assert_import_module_flags = java_info_subject.from_target(env, targets.importjar).module_flags()
+    assert_import_module_flags.add_exports().contains_exactly(["java.base/java.lang"])
+    assert_import_module_flags.add_opens().contains_exactly(["java.base/java.util"])
+
+    assert_lib_module_flags = java_info_subject.from_target(env, targets.lib).module_flags()
+    assert_lib_module_flags.add_exports().contains_exactly(["java.base/java.lang"])
+    assert_lib_module_flags.add_opens().contains_exactly(["java.base/java.util"])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -227,5 +279,6 @@ def java_import_tests(name):
             _test_deps,
             _test_commandline_contains_target_label,
             _test_java_library_allows_import_in_deps,
+            _test_module_flags,
         ],
     )
