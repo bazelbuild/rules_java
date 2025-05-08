@@ -815,6 +815,31 @@ def _test_transitive_proguard_specs_are_validated_impl(env, targets):
         "{package}/transitive.pro",
     )
 
+def _test_proguard_specs_are_validated(name):
+    target_name = name + "/lib"
+    util.helper_target(
+        java_import,
+        name = target_name,
+        constraints = ["android"],
+        jars = ["Lib.jar"],
+        proguard_specs = ["lib.pro"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_proguard_specs_are_validated_impl,
+        target = target_name,
+    )
+
+def _test_proguard_specs_are_validated_impl(env, target):
+    proguard_out = "{package}/validated_proguard/{name}/{package}/lib.pro_valid"
+    env.expect.that_target(target).output_group(
+        "_hidden_top_level_INTERNAL_",
+    ).contains(proguard_out)
+    env.expect.that_target(target).action_named("ValidateProguard").inputs().contains(
+        "{package}/lib.pro",
+    )
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -845,5 +870,6 @@ def java_import_tests(name):
             _test_transitive_source_jars,
             _test_neverlink_is_populated,
             _test_transitive_proguard_specs_are_validated,
+            _test_proguard_specs_are_validated,
         ],
     )
