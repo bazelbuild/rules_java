@@ -289,6 +289,56 @@ def _test_src_jars_impl(env, target):
         "{package}/library.srcjar",
     ])
 
+def _test_from_genrule(name):
+    target_name = name + "/library-jar"
+    util.helper_target(
+        native.genrule,
+        name = target_name + "/generated_jar",
+        outs = [target_name + "/generated.jar"],
+        cmd = "",
+    )
+    util.helper_target(
+        native.genrule,
+        name = target_name + "/generated_src_jar",
+        outs = [target_name + "/generated.srcjar"],
+        cmd = "",
+    )
+    util.helper_target(
+        java_import,
+        name = target_name + "/libraryjar",
+        jars = ["library.jar"],
+    )
+    util.helper_target(
+        java_import,
+        name = target_name,
+        jars = [target_name + "/generated_jar"],
+        srcjar = target_name + "/generated.srcjar",
+        exports = [target_name + "/libraryjar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_from_genrule_impl,
+        targets = {
+            "lib": target_name,
+            "gen": target_name + "/generated_jar",
+        },
+    )
+
+def _test_from_genrule_impl(env, targets):
+    assert_compilation_args = java_info_subject.from_target(env, targets.lib).compilation_args()
+    assert_compilation_args.transitive_compile_time_jars().contains_exactly([
+        "{package}/_ijar/{name}/{package}/{name}/generated-ijar.jar",
+        "{package}/_ijar/{name}/libraryjar/{package}/library-ijar.jar",
+    ])
+    assert_compilation_args.transitive_runtime_jars().contains_exactly([
+        "{package}/library.jar",
+        "{package}/{name}/generated.jar",
+    ])
+
+    jar = targets.lib[JavaInfo].transitive_runtime_jars.to_list()[0].short_path
+    env.expect.that_target(targets.gen).action_generating(jar).mnemonic().equals("Genrule")
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -301,5 +351,6 @@ def java_import_tests(name):
             _test_java_library_allows_import_in_deps,
             _test_module_flags,
             _test_src_jars,
+            _test_from_genrule,
         ],
     )
