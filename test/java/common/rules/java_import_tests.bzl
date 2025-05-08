@@ -780,6 +780,41 @@ def _test_neverlink_is_populated(name):
 def _test_neverlink_is_populated_impl(env, target):
     env.expect.that_bool(target[JavaInfo]._neverlink).equals(True)
 
+def _test_transitive_proguard_specs_are_validated(name):
+    target_name = name + "/lib"
+    util.helper_target(
+        java_import,
+        name = target_name + "/transitive",
+        constraints = ["android"],
+        jars = ["Transitive.jar"],
+        proguard_specs = ["transitive.pro"],
+    )
+    util.helper_target(
+        java_import,
+        name = target_name,
+        constraints = ["android"],
+        jars = ["Lib.jar"],
+        exports = [target_name + "/transitive"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_transitive_proguard_specs_are_validated_impl,
+        targets = {
+            "lib": target_name,
+            "dep": target_name + "/transitive",
+        },
+    )
+
+def _test_transitive_proguard_specs_are_validated_impl(env, targets):
+    proguard_out = "{package}/validated_proguard/{name}/transitive/{package}/transitive.pro_valid"
+    env.expect.that_target(targets.lib).output_group(
+        "_hidden_top_level_INTERNAL_",
+    ).contains(proguard_out)
+    env.expect.that_target(targets.dep).action_named("ValidateProguard").inputs().contains(
+        "{package}/transitive.pro",
+    )
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -809,5 +844,6 @@ def java_import_tests(name):
             _test_exports_runfile_collection,
             _test_transitive_source_jars,
             _test_neverlink_is_populated,
+            _test_transitive_proguard_specs_are_validated,
         ],
     )
