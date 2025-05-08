@@ -8,6 +8,7 @@ load("//java:java_binary.bzl", "java_binary")
 load("//java:java_import.bzl", "java_import")
 load("//java:java_library.bzl", "java_library")
 load("//java/common:java_info.bzl", "JavaInfo")
+load("//java/common:proguard_spec_info.bzl", "ProguardSpecInfo")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
@@ -840,6 +841,48 @@ def _test_proguard_specs_are_validated_impl(env, target):
         "{package}/lib.pro",
     )
 
+def _test_transitive_proguard_specs_are_exported(name):
+    target_name = name + "/lib"
+    util.helper_target(
+        java_import,
+        name = target_name + "/export",
+        constraints = ["android"],
+        jars = ["Export.jar"],
+        proguard_specs = ["export.pro"],
+    )
+    util.helper_target(
+        java_import,
+        name = target_name + "/runtime_dep",
+        constraints = ["android"],
+        jars = ["RuntimeDep.jar"],
+        proguard_specs = ["runtime_dep.pro"],
+    )
+    util.helper_target(
+        java_import,
+        name = target_name,
+        constraints = ["android"],
+        jars = ["Lib.jar"],
+        proguard_specs = ["lib.pro"],
+        exports = [target_name + "/export"],
+        runtime_deps = [target_name + "/runtime_dep"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_transitive_proguard_specs_are_exported_impl,
+        target = target_name,
+        # Before Bazel 8, native rules use the native ProguardSpecProvider
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_transitive_proguard_specs_are_exported_impl(env, target):
+    spec_basenames = [f.basename for f in target[ProguardSpecInfo].specs.to_list()]
+    env.expect.that_collection(spec_basenames).contains_exactly([
+        "lib.pro_valid",
+        "export.pro_valid",
+        "runtime_dep.pro_valid",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -871,5 +914,6 @@ def java_import_tests(name):
             _test_neverlink_is_populated,
             _test_transitive_proguard_specs_are_validated,
             _test_proguard_specs_are_validated,
+            _test_transitive_proguard_specs_are_exported,
         ],
     )
