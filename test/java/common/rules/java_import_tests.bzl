@@ -4,6 +4,7 @@ load("@bazel_features//:features.bzl", "bazel_features")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
+load("//java:java_binary.bzl", "java_binary")
 load("//java:java_import.bzl", "java_import")
 load("//java:java_library.bzl", "java_library")
 load("//java/common:java_info.bzl", "JavaInfo")
@@ -691,6 +692,41 @@ def _test_runtime_deps_are_not_on_classpath_impl(env, target):
         "{bin_path}/{package}/lib{name}/library_dep-hjar.jar",
     ])
 
+def _test_exports_runfile_collection(name):
+    target_name = name + "/tool"
+    util.helper_target(
+        java_import,
+        name = target_name + "/other_lib",
+        data = ["foo.txt"],
+        jars = ["other.jar"],
+    )
+    util.helper_target(
+        java_import,
+        name = target_name + "/lib",
+        jars = ["lib.jar"],
+        exports = [target_name + "/other_lib"],
+    )
+    util.helper_target(
+        java_binary,
+        name = target_name,
+        data = [target_name + "/lib"],
+        main_class = "com.google.exports.Launcher",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_exports_runfile_collection_impl,
+        target = target_name,
+    )
+
+def _test_exports_runfile_collection_impl(env, target):
+    assert_runfiles = env.expect.that_target(target).runfiles()
+    assert_runfiles.contains_at_least_predicates([
+        matching.str_matches("/lib.jar"),
+        matching.str_matches("/other.jar"),
+        matching.str_matches("/foo.txt"),
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -717,5 +753,6 @@ def java_import_tests(name):
             _test_ijar_can_be_disabled,
             _test_duplicate_jars_through_filegroup,
             _test_runtime_deps_are_not_on_classpath,
+            _test_exports_runfile_collection,
         ],
     )
