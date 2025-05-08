@@ -472,6 +472,27 @@ def _test_disallows_empty_jars_impl(env, target):
         matching.str_matches("empty java_import.jars is no longer supported"),
     )
 
+def _test_disallows_files_in_exports(name):
+    util.helper_target(
+        java_import,
+        name = name + "/rule",
+        jars = ["good.jar"],
+        # we can't create scratch files, so just use one that we know has a label
+        exports = ["BUILD"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_disallows_files_in_exports_impl,
+        target = name + "/rule",
+        expect_failure = True,
+    )
+
+def _test_disallows_files_in_exports_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("source file * is misplaced here (expected no files)"),
+    )
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -490,5 +511,6 @@ def java_import_tests(name):
             _test_jars_allowed_in_srcjar,
             _test_permits_empty_jars_with_flag,
             _test_disallows_empty_jars,
+            _test_disallows_files_in_exports,
         ],
     )
