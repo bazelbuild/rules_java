@@ -382,6 +382,25 @@ def _test_transitive_dependencies_impl(env, target):
         "{bin_path}/{package}/lib{name}/lib-hjar.jar",
     ])
 
+def _test_exposes_java_provider(name):
+    util.helper_target(
+        java_import,
+        name = name + "/libraryjar",
+        jars = ["library.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_exposes_java_provider_impl,
+        target = name + "/libraryjar",
+    )
+
+def _test_exposes_java_provider_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.compilation_args().transitive_runtime_jars().contains_exactly([
+        "{package}/library.jar",
+    ])
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -396,5 +415,6 @@ def java_import_tests(name):
             _test_src_jars,
             _test_from_genrule,
             _test_transitive_dependencies,
+            _test_exposes_java_provider,
         ],
     )
