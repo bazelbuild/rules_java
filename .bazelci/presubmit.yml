@@ -48,14 +48,14 @@ buildifier: latest
 matrix:
   all_platforms: ["ubuntu2004", "macos", "macos_arm64", "windows"]
   integration_platforms: ["ubuntu2004", "macos", "macos_arm64", "windows"]
-  bazel: ["7.4.0", "8.1.0", "last_green"] # Bazel 6 tested separately, needs different flags
-  modern_bazel: ["8.1.0", "last_green"] # Fully supported Bazel versions
+  bazel: ["7.6.1", "8.2.1", "last_green"] # Bazel 6 tested separately, needs different flags
+  modern_bazel: ["8.2.1", "last_green"] # Fully supported Bazel versions
 
 tasks:
 # Bazel 7.x
   build_and_test_bazel7:
-    name: "Bazel 7.5.0"
-    bazel: "7.5.0"
+    name: "Bazel 7.6.1"
+    bazel: "7.6.1"
     platform: ${{ all_platforms }}
     build_targets: *build_targets
     test_targets: *test_targets
