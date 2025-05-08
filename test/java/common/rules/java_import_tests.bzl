@@ -755,6 +755,31 @@ def _test_transitive_source_jars_impl(env, target):
         "{package}/lib{name}/b-src.jar",
     ])
 
+def _test_neverlink_is_populated(name):
+    target_name = name + "/jar"
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib",
+    )
+    util.helper_target(
+        java_import,
+        name = target_name,
+        jars = ["dummy.jar"],
+        neverlink = 1,
+        exports = [target_name + "/lib"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_neverlink_is_populated_impl,
+        target = target_name,
+        # in Bazel 6, JavaInfo._neverlink isn't exposed to Starlark
+        attr_values = {"tags": ["min_bazel_7"]},
+    )
+
+def _test_neverlink_is_populated_impl(env, target):
+    env.expect.that_bool(target[JavaInfo]._neverlink).equals(True)
+
 def java_import_tests(name):
     test_suite(
         name = name,
@@ -783,5 +808,6 @@ def java_import_tests(name):
             _test_runtime_deps_are_not_on_classpath,
             _test_exports_runfile_collection,
             _test_transitive_source_jars,
+            _test_neverlink_is_populated,
         ],
     )
