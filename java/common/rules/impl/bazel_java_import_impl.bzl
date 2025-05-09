@@ -71,14 +71,8 @@ def _check_export_error(ctx, exports):
         fail("java_import.exports is no longer supported; use java_import.deps instead")
 
 def _check_empty_jars_error(ctx, jars):
-    # TODO(kotlaja): Remove temporary incompatible flag [disallow_java_import_empty_jars] once migration is done.
-    if len(jars) > 0:
-        return  # jars is non empty
-    if not ctx.fragments.java.disallow_java_import_empty_jars():
-        return  # check disabled by flag
-    if hasattr(ctx.attr, "_allowlist_java_import_empty_jars") and getattr(ctx.attr, "_allowlist_java_import_empty_jars")[PackageSpecificationInfo].contains(ctx.label):
-        return  # allowlisted
-    fail("empty java_import.jars is no longer supported " + ctx.label.package)
+    if len(jars) == 0:
+        fail("empty java_import.jars is not supported " + ctx.label.package)
 
 def _create_java_info_with_dummy_output_file(ctx, srcjar, all_deps, exports, runtime_deps_list, neverlink, cc_info_list, add_exports, add_opens):
     dummy_jar = ctx.actions.declare_file(ctx.label.name + "_dummy.jar")

@@ -424,30 +424,6 @@ def _test_jars_allowed_in_srcjar_impl(env, target):
         "{package}/somelib-src.jar",
     ])
 
-def _test_permits_empty_jars_with_flag(name):
-    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
-        # exit early because this test case would be a loading phase error otherwise
-        always_passes(name)
-        return
-
-    util.helper_target(
-        java_import,
-        name = name + "/rule",
-        jars = [],
-    )
-
-    analysis_test(
-        name = name,
-        impl = _test_permits_empty_jars_with_flag_impl,
-        target = name + "/rule",
-        config_settings = {
-            "//command_line_option:incompatible_disallow_java_import_empty_jars": False,
-        },
-    )
-
-def _test_permits_empty_jars_with_flag_impl(_env, _target):
-    pass
-
 def _test_disallows_empty_jars(name):
     if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
         # exit early because this test case would be a loading phase error otherwise
@@ -472,7 +448,7 @@ def _test_disallows_empty_jars(name):
 
 def _test_disallows_empty_jars_impl(env, target):
     env.expect.that_target(target).failures().contains_predicate(
-        matching.str_matches("empty java_import.jars is no longer supported"),
+        matching.str_matches("empty java_import.jars is not supported"),
     )
 
 def _test_disallows_files_in_exports(name):
@@ -964,7 +940,6 @@ def java_import_tests(name):
             _test_transitive_dependencies,
             _test_exposes_java_provider,
             _test_jars_allowed_in_srcjar,
-            _test_permits_empty_jars_with_flag,
             _test_disallows_empty_jars,
             _test_disallows_files_in_exports,
             _test_disallows_arbitrary_files,
