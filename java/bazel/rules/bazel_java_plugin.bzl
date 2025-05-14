@@ -134,10 +134,10 @@ java_plugin = rule(
       <li><code><var>libname</var>.jar</code>: A Java archive.</li>
     </ul>
 
-<p>
-  Arguments are identical to <a href="#java_library"><code>java_library</code></a>, except
-  for the addition of the <code>processor_class</code> argument.
-</p>
+<p>Arguments are a subset of (and with identical semantics to) those of
+<a href="${link java_library}">java_library()</a>,
+except for the addition of the <code>processor_class</code> and
+<code>generates_api</code> arguments.</p>
     """,
     attrs = merge_attrs(
         JAVA_PLUGIN_ATTRS,
