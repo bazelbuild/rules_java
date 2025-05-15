@@ -177,7 +177,7 @@ def compile(
     has_sources = source_files or source_jars
     has_resources = resources or resource_jars
 
-    is_strict_mode = strict_deps != "OFF"
+    is_strict_mode = strict_deps.upper() != "OFF"
     classpath_mode = ctx.fragments.java.reduce_java_classpath()
 
     direct_jars = depset()
