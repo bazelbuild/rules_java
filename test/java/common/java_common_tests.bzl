@@ -19,6 +19,7 @@ load("//test/java/testutil:rules/custom_library_with_custom_output_source_jar.bz
 load("//test/java/testutil:rules/custom_library_with_exports.bzl", "custom_library_with_exports")
 load("//test/java/testutil:rules/custom_library_with_named_outputs.bzl", "custom_library_with_named_outputs")
 load("//test/java/testutil:rules/custom_library_with_sourcepaths.bzl", "custom_library_with_sourcepaths")
+load("//test/java/testutil:rules/custom_library_with_strict_deps.bzl", "custom_library_with_strict_deps")
 load("//test/java/testutil:rules/custom_library_with_wrong_plugins_type.bzl", "custom_library_with_wrong_plugins_type")
 
 def _test_compile_default_values(name):
@@ -743,6 +744,56 @@ def _test_compile_neverlink_impl(env, target):
         "somedep.jar",
     ]).in_order()
 
+def _test_compile_strict_deps_case_sensitivity(name):
+    util.helper_target(
+        custom_library_with_strict_deps,
+        name = name + "/enabled",
+        strict_deps = "error",
+    )
+    util.helper_target(
+        custom_library_with_strict_deps,
+        name = name + "/disabled",
+        strict_deps = "off",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_strict_deps_case_sensitivity_impl,
+        targets = {
+            "enabled": name + "/enabled",
+            "disabled": name + "/disabled",
+        },
+    )
+
+def _test_compile_strict_deps_case_sensitivity_impl(env, targets):
+    env.expect.that_target(targets.enabled).action_named("Javac").contains_flag_values(
+        [("--strict_java_deps", "ERROR")],
+    )
+    env.expect.that_target(targets.disabled).action_named("Javac").not_contains_arg(
+        "--strict_java_deps",
+    )
+
+def _test_compile_strict_deps_enum(name):
+    util.helper_target(
+        custom_library_with_strict_deps,
+        name = name + "/custom",
+        strict_deps = "foo",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_strict_deps_enum_impl,
+        target = name + "/custom",
+        expect_failure = True,
+        # This is a crash in earlier Bazel versions (i.e. native rules)
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_compile_strict_deps_enum_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("invalid value for strict_deps: FOO"),
+    )
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -770,5 +821,7 @@ def java_common_tests(name):
             _test_compile_custom_output_source_jar,
             _test_compile_additional_inputs_and_outputs,
             _test_compile_neverlink,
+            _test_compile_strict_deps_case_sensitivity,
+            _test_compile_strict_deps_enum,
         ],
     )

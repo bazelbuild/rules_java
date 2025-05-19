@@ -29,6 +29,14 @@ load(":native.bzl", "get_internal_java_common")
 
 # copybara: default multiline visibility
 
+_STRICT_DEPS_VALUES = [
+    "OFF",  # Silently allow referencing transitive dependencies.
+    "WARN",  # Warn about transitive dependencies being used directly.
+    "ERROR",  # Fail the build when transitive dependencies are used directly.
+    "STRICT",  # Transition to strict by default.
+    "DEFAULT",  # When no flag value is specified on the command line.
+]
+
 def compile(
         ctx,
         output,
@@ -117,6 +125,11 @@ def compile(
     get_internal_java_common().check_provider_instances([java_toolchain], "java_toolchain", JavaToolchainInfo)
     get_internal_java_common().check_provider_instances(plugins, "plugins", JavaPluginInfo)
 
+    # normalize and validate strict_deps
+    strict_deps = (strict_deps or "default").upper()
+    if strict_deps not in _STRICT_DEPS_VALUES:
+        fail("Got an invalid value for strict_deps:", strict_deps, "must be one of:", _STRICT_DEPS_VALUES)
+
     plugin_info = merge_plugin_info_without_outputs(plugins + deps)
 
     all_javac_opts = []  # [depset[str]]
@@ -177,7 +190,7 @@ def compile(
     has_sources = source_files or source_jars
     has_resources = resources or resource_jars
 
-    is_strict_mode = strict_deps.upper() != "OFF"
+    is_strict_mode = strict_deps != "OFF"
     classpath_mode = ctx.fragments.java.reduce_java_classpath()
 
     direct_jars = depset()
