@@ -7,14 +7,7 @@ module(
 
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "rules_cc", version = "0.0.15")
-bazel_dep(name = "bazel_features", version = "1.28.0")
-archive_override(
-    module_name = "bazel_features",
-    integrity = "sha256-SOPLvKDy+RN7GHKN8eFjQ+58Wx4Isj+vcXoUluBqxLo=",
-    strip_prefix = "bazel_features-59915eb2ca215c7b2266c83c49bb7522a5b6737f",
-    urls = ["https://github.com/bazel-contrib/bazel_features/archive/59915eb2ca215c7b2266c83c49bb7522a5b6737f.zip"],
-)
-
+bazel_dep(name = "bazel_features", version = "1.30.0")
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
 bazel_dep(name = "protobuf", version = "27.0", repo_name = "com_google_protobuf")
 bazel_dep(name = "zlib", version = "1.3.1.bcr.5")

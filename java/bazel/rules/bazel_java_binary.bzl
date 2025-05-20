@@ -13,6 +13,7 @@
 # limitations under the License.
 """Bazel java_binary rule"""
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "use_cc_toolchain")
 load("//java/common:java_semantics.bzl", "semantics")
@@ -202,6 +203,14 @@ def _get_executable(ctx):
 
     return ctx.actions.declare_file(executable_name)
 
+_LAUNCHER_MAKER_TOOLCHAIN_TYPE = "@bazel_tools//tools/launcher:launcher_maker_toolchain_type"
+_LAUNCHER_MAKER_TOOLCHAIN = config_common.toolchain_type(_LAUNCHER_MAKER_TOOLCHAIN_TYPE, mandatory = True)
+
+def _find_launcher_maker(ctx):
+    if bazel_features.rules._has_launcher_maker_toolchain:
+        return ctx.toolchains[_LAUNCHER_MAKER_TOOLCHAIN_TYPE].binary
+    return ctx.executable._windows_launcher_maker
+
 def _create_stub(ctx, java_attrs, launcher, executable, jvm_flags, main_class, coverage_main_class):
     java_runtime_toolchain = semantics.find_java_runtime_toolchain(ctx)
     java_executable = helper.get_java_executable(ctx, java_runtime_toolchain, launcher)
@@ -282,7 +291,7 @@ def _create_windows_exe_launcher(ctx, java_executable, classpath, main_class, jv
     # TODO(b/295221112): Change to use the "launcher" attribute (only windows use a fixed _launcher attribute)
     launcher_artifact = ctx.executable._launcher
     ctx.actions.run(
-        executable = ctx.executable._windows_launcher_maker,
+        executable = _find_launcher_maker(ctx),
         inputs = [launcher_artifact],
         outputs = [executable],
         arguments = [launcher_artifact.path, launch_info, executable.path],
@@ -308,6 +317,8 @@ def make_binary_rule(implementation, *, doc, attrs, executable = False, test = F
         provides = [JavaInfo],
         toolchains = [semantics.JAVA_TOOLCHAIN] + use_cc_toolchain() + (
             [semantics.JAVA_RUNTIME_TOOLCHAIN] if executable or test else []
+        ) + (
+            [_LAUNCHER_MAKER_TOOLCHAIN] if bazel_features.rules._has_launcher_maker_toolchain else []
         ),
         # TODO(hvd): replace with filegroups?
         outputs = {
@@ -340,16 +351,18 @@ logic as the Java package of source files. For example, a source file at
         ),
         "_test_support": attr.label(default = _compute_test_support),
         "_launcher": attr.label(
-            cfg = "exec",
+            cfg = "target",
             executable = True,
             default = "@bazel_tools//tools/launcher:launcher",
         ),
+    },
+    {
         "_windows_launcher_maker": attr.label(
             default = "@bazel_tools//tools/launcher:launcher_maker",
             cfg = "exec",
             executable = True,
         ),
-    },
+    } if not bazel_features.rules._has_launcher_maker_toolchain else {},
 )
 
 def make_java_binary(executable):

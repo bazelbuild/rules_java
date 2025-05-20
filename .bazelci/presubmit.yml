@@ -60,7 +60,7 @@ tasks:
     build_targets: *build_targets
     test_targets: *test_targets
     test_flags:
-      - "--test_tag_filters=-min_bazel_8"
+      - "--test_tag_filters=-min_bazel_8,-min_bazel_9"
 # Bazel 8+
   build_and_test:
     name: "Bazel {modern_bazel}"
@@ -76,7 +76,7 @@ tasks:
     build_targets: *build_targets_bazel6
     test_targets: *test_targets_bazel6
     test_flags:
-      - "--test_tag_filters=-min_bazel_7,-min_bazel_8"
+      - "--test_tag_filters=-min_bazel_7,-min_bazel_8,-min_bazel_9"
   ubuntu2004_integration_bazel6:
     name: "Integration w/ Bazel 6.5.0"
     bazel: 6.5.0
