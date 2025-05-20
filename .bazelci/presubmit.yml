@@ -58,22 +58,30 @@ tasks:
     bazel: "7.6.1"
     platform: ${{ all_platforms }}
     build_targets: *build_targets
+    build_flags:
+      - "--build_tag_filters=-min_bazel_8,-min_bazel_9"
     test_targets: *test_targets
     test_flags:
       - "--test_tag_filters=-min_bazel_8,-min_bazel_9"
-# Bazel 8+
+# Bazel 8.x
   build_and_test:
     name: "Bazel {modern_bazel}"
     bazel: ${{ modern_bazel }}
     platform: ${{ all_platforms }}
     build_targets: *build_targets
+    build_flags:
+      - "--build_tag_filters=-min_bazel_9"
     test_targets: *test_targets
+    test_flags:
+      - "--test_tag_filters=-min_bazel_9"
 # Bazel 6.x
   build_and_test_bazel6:
     name: "Bazel 6.5.0"
     bazel: 6.5.0
     platform: ${{ all_platforms }}
     build_targets: *build_targets_bazel6
+    build_flags:
+      - "--build_tag_filters=-min_bazel_7,-min_bazel_8,-min_bazel_9"
     test_targets: *test_targets_bazel6
     test_flags:
       - "--test_tag_filters=-min_bazel_7,-min_bazel_8,-min_bazel_9"

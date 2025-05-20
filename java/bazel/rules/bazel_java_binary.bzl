@@ -296,6 +296,7 @@ def _create_windows_exe_launcher(ctx, java_executable, classpath, main_class, jv
         outputs = [executable],
         arguments = [launcher_artifact.path, launch_info, executable.path],
         use_default_shell_env = True,
+        toolchain = _LAUNCHER_MAKER_TOOLCHAIN_TYPE if bazel_features.rules._has_launcher_maker_toolchain else None,
     )
     return executable
 
