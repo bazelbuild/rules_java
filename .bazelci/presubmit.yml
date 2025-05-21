@@ -42,6 +42,7 @@ test_target_integration: &test_target_integration
 flags_workspace_integration: &flags_workspace_integration
   - "--noenable_bzlmod"
   - "--enable_workspace"
+  - "--repositories_without_autoloads=bazel_features_version,bazel_features_globals"
 
 buildifier: latest
 

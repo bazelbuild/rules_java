@@ -74,7 +74,3 @@ http_archive(
     strip_prefix = "bazel_features-59915eb2ca215c7b2266c83c49bb7522a5b6737f",
     url = "https://github.com/bazel-contrib/bazel_features/archive/59915eb2ca215c7b2266c83c49bb7522a5b6737f.zip",
 )
-
-load("@bazel_features//:deps.bzl", "bazel_features_deps")
-
-bazel_features_deps()
