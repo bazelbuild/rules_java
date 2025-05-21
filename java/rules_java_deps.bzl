@@ -210,6 +210,15 @@ def rules_license_repo():
         ],
     )
 
+def bazel_features_repo():
+    maybe(
+        http_archive,
+        name = "bazel_features",
+        sha256 = "a660027f5a87f13224ab54b8dc6e191693c554f2692fcca46e8e29ee7dabc43b",
+        strip_prefix = "bazel_features-1.30.0",
+        url = "https://github.com/bazel-contrib/bazel_features/releases/download/v1.30.0/bazel_features-v1.30.0.tar.gz",
+    )
+
 def rules_java_dependencies():
     """An utility method to load non-toolchain dependencies of rules_java.
 
@@ -223,3 +232,4 @@ def rules_java_dependencies():
     zlib_repo()
     absl_repo()
     rules_license_repo()
+    bazel_features_repo()
