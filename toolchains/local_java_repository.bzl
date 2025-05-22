@@ -235,10 +235,18 @@ local_java_runtime(
 )
 """ % (local_java_runtime_name, runtime_name, java_home, version)
 
+    bazel = native.bazel_version
+    if not bazel or bazel >= "7":
+        # Bazel 7+ uses @platforms//host for the host platform.
+        load_host_constraints = 'load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")\n'
+    else:
+        # Bazel 6 uses @local_config_platform instead, but it's being removed in Bazel 9.
+        load_host_constraints = 'load("@local_config_platform//:constraints.bzl", "HOST_CONSTRAINTS")\n'
+
     repository_ctx.file(
         "BUILD.bazel",
         'load("@rules_java//toolchains:local_java_repository.bzl", "local_java_runtime")\n' +
-        'load("@local_config_platform//:constraints.bzl", "HOST_CONSTRAINTS")\n' +
+        load_host_constraints +
         build_file +
         local_java_runtime_macro,
     )
