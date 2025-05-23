@@ -18,6 +18,16 @@ bazel_dep(name = "rules_java", version = "{VERSION}")
 ~~~
 
 **WORKSPACE setup**
+
+With Bazel 8.0.0 and before 8.3.0, add the following to your `.bazelrc` file:
+
+~~~
+# https://github.com/bazelbuild/bazel/pull/26119
+common --repositories_without_autoloads=bazel_features_version,bazel_features_globals
+~~~
+
+In all cases, add the following to your `WORKSPACE` file:
+
 ~~~
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
@@ -30,6 +40,9 @@ http_archive(
 
 load("@rules_java//java:rules_java_deps.bzl", "rules_java_dependencies")
 rules_java_dependencies()
+
+load("@bazel_features//:deps.bzl", "bazel_features_deps")
+bazel_features_deps()
 
 # note that the following line is what is minimally required from protobuf for the java rules
 # consider using the protobuf_deps() public API from @com_google_protobuf//:protobuf_deps.bzl

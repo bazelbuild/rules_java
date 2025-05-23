@@ -41,6 +41,10 @@ load("//java:rules_java_deps.bzl", "rules_java_dependencies")
 
 rules_java_dependencies()
 
+load("@bazel_features//:deps.bzl", "bazel_features_deps")
+
+bazel_features_deps()
+
 load("@com_google_protobuf//bazel/private:proto_bazel_features.bzl", "proto_bazel_features")  # buildifier: disable=bzl-visibility
 
 proto_bazel_features(name = "proto_bazel_features")
@@ -63,14 +67,3 @@ http_archive(
 load("//test:repositories.bzl", "test_repositories")
 
 test_repositories()
-
-http_archive(
-    name = "bazel_features",
-    sha256 = "48e3cbbca0f2f9137b18728df1e16343ee7c5b1e08b23faf717a1496e06ac4ba",
-    strip_prefix = "bazel_features-59915eb2ca215c7b2266c83c49bb7522a5b6737f",
-    url = "https://github.com/bazel-contrib/bazel_features/archive/59915eb2ca215c7b2266c83c49bb7522a5b6737f.zip",
-)
-
-load("@bazel_features//:deps.bzl", "bazel_features_deps")
-
-bazel_features_deps()

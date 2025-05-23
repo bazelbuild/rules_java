@@ -42,16 +42,33 @@ test_target_integration: &test_target_integration
 flags_workspace_integration: &flags_workspace_integration
   - "--noenable_bzlmod"
   - "--enable_workspace"
+  # TODO(hvd): remove after Bazel 8.3.0
+  - "--repositories_without_autoloads=bazel_features_version,bazel_features_globals"
 
 buildifier: latest
 
 matrix:
   all_platforms: ["ubuntu2004", "macos", "macos_arm64", "windows"]
-  integration_platforms: ["ubuntu2004", "macos", "macos_arm64", "windows"]
   bazel: ["7.6.1", "8.2.1", "last_green"] # Bazel 6 tested separately, needs different flags
-  modern_bazel: ["8.2.1", "last_green"] # Fully supported Bazel versions
+  modern_bazel: ["last_green"] # Fully supported Bazel versions
 
 tasks:
+# Bazel 9+
+  build_and_test:
+    name: "Bazel {modern_bazel}"
+    bazel: ${{ modern_bazel }}
+    platform: ${{ all_platforms }}
+    build_targets: *build_targets
+    test_targets: *test_targets
+# Bazel 8.x
+  build_and_test_bazel8:
+    name: "Bazel 8.2.1"
+    bazel: "8.2.1"
+    platform: ${{ all_platforms }}
+    build_targets: *build_targets
+    test_targets: *test_targets
+    test_flags:
+    - "--test_tag_filters=-min_bazel_9"
 # Bazel 7.x
   build_and_test_bazel7:
     name: "Bazel 7.6.1"
@@ -60,14 +77,7 @@ tasks:
     build_targets: *build_targets
     test_targets: *test_targets
     test_flags:
-      - "--test_tag_filters=-min_bazel_8"
-# Bazel 8+
-  build_and_test:
-    name: "Bazel {modern_bazel}"
-    bazel: ${{ modern_bazel }}
-    platform: ${{ all_platforms }}
-    build_targets: *build_targets
-    test_targets: *test_targets
+      - "--test_tag_filters=-min_bazel_8,-min_bazel_9"
 # Bazel 6.x
   build_and_test_bazel6:
     name: "Bazel 6.5.0"
@@ -76,11 +86,11 @@ tasks:
     build_targets: *build_targets_bazel6
     test_targets: *test_targets_bazel6
     test_flags:
-      - "--test_tag_filters=-min_bazel_7,-min_bazel_8"
+      - "--test_tag_filters=-min_bazel_7,-min_bazel_8,-min_bazel_9"
   ubuntu2004_integration_bazel6:
     name: "Integration w/ Bazel 6.5.0"
     bazel: 6.5.0
-    platform: ${{ integration_platforms }}
+    platform: ${{ all_platforms }}
     working_directory: "test/repo"
     shell_commands:
     - sh setup.sh
@@ -93,7 +103,7 @@ tasks:
   integration_build_and_test:
     name: "Integration w/ Bazel {bazel}"
     bazel: ${{ bazel }}
-    platform: ${{ integration_platforms }}
+    platform: ${{ all_platforms }}
     working_directory: "test/repo"
     shell_commands:
     - sh setup.sh
@@ -104,7 +114,7 @@ tasks:
   integration_build_and_test_workspace:
     name: "Integration (WORKSPACE) w/ Bazel {bazel}"
     bazel: ${{ bazel }}
-    platform: ${{ integration_platforms }}
+    platform: ${{ all_platforms }}
     working_directory: "test/repo"
     shell_commands:
     - sh setup.sh

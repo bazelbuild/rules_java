@@ -1,0 +1,3 @@
+load(":java_binary_tests.bzl", "java_binary_tests")
+
+java_binary_tests(name = "java_binary_tests")
