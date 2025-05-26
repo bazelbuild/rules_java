@@ -60,7 +60,7 @@ def _new_cc_info_libraries_to_link_subject(libraries_to_link, meta):
         meta = meta,
     )
     public = struct(
-        identifiers = lambda: _new_library_to_link_identifiers_subject(self.actual, self.meta),
+        static_libraries = lambda: _new_library_to_link_static_libraries_subject(self.actual, self.meta),
         singleton = lambda: _new_library_to_link_subject(_get_singleton(self.actual), self.meta.derive("[0]")),
     )
     return public
@@ -71,11 +71,11 @@ def _new_library_to_link_subject(library_to_link, meta):
     )
     return public
 
-def _new_library_to_link_identifiers_subject(libraries_to_link, meta):
+def _new_library_to_link_static_libraries_subject(libraries_to_link, meta):
     self = subjects.collection(
-        [testutil.cc_library_to_link_identifier(lib) for lib in libraries_to_link],
-        meta = meta.derive("library_identifier()"),
-    )
+        [testutil.cc_library_to_link_static_library(lib) for lib in libraries_to_link],
+        meta = meta.derive("static_library()"),
+    ).transform(desc = "basename", map_each = lambda file: file.basename)
     public = struct(
         contains_exactly = lambda expected: self.contains_exactly([meta.format_str(e) for e in expected]),
         contains_exactly_predicates = lambda expected: self.contains_exactly_predicates(expected),

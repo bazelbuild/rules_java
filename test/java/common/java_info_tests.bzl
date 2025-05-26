@@ -175,7 +175,7 @@ def _with_native_libraries_test(name):
 def _with_native_libraries_test_impl(env, target):
     assert_native_libs = java_info_subject.from_target(env, target).transitive_native_libraries()
 
-    assert_native_libs.identifiers().contains_exactly_predicates([matching.str_endswith("my_cc_lib_direct")])
+    assert_native_libs.static_libraries().contains_exactly_predicates([matching.str_matches("*my_cc_lib_direct*")])
 
 def _with_deps_and_neverlink_test(name):
     target_name = name + "/my_starlark_rule"
@@ -1136,10 +1136,10 @@ def _transitive_native_libraries_test(name):
 
 def _transitive_native_libraries_test_impl(env, target):
     assert_transitive_native_libraries = java_info_subject.from_target(env, target).transitive_native_libraries()
-    assert_transitive_native_libraries.identifiers().contains_exactly_predicates([
-        matching.str_endswith("my_cc_lib_a.so"),
-        matching.str_endswith("my_cc_lib_b.so"),
-        matching.str_endswith("my_cc_lib_c.so"),
+    assert_transitive_native_libraries.static_libraries().contains_exactly_predicates([
+        matching.str_matches("*my_cc_lib_a.so*"),
+        matching.str_matches("*my_cc_lib_b.so*"),
+        matching.str_matches("*my_cc_lib_c.so*"),
     ])
 
 def _native_libraries_propagation_test(name):
@@ -1197,10 +1197,10 @@ def _native_libraries_propagation_test(name):
 
 def _native_libraries_propagation_test_impl(env, target):
     assert_transitive_native_libraries = java_info_subject.from_target(env, target).transitive_native_libraries()
-    assert_transitive_native_libraries.identifiers().contains_exactly_predicates([
-        matching.str_endswith("native_rdeps1.so"),
-        matching.str_endswith("native_exports1.so"),
-        matching.str_endswith("native_deps1.so"),
+    assert_transitive_native_libraries.static_libraries().contains_exactly_predicates([
+        matching.str_matches("*native_rdeps1.so*"),
+        matching.str_matches("*native_exports1.so*"),
+        matching.str_matches("*native_deps1.so*"),
     ]).in_order()
 
 def _annotation_processing_test(name):

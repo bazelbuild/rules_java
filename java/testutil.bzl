@@ -7,10 +7,10 @@
 def _cc_info_transitive_native_libraries(cc_info):
     return cc_info.transitive_native_libraries()
 
-def _cc_library_to_link_identifier(library_to_link):
-    return library_to_link.library_identifier()
+def _cc_library_to_link_static_library(library_to_link):
+    return library_to_link.static_library or library_to_link.pic_static_library
 
 testutil = struct(
     cc_info_transitive_native_libraries = _cc_info_transitive_native_libraries,
-    cc_library_to_link_identifier = _cc_library_to_link_identifier,
+    cc_library_to_link_static_library = _cc_library_to_link_static_library,
 )

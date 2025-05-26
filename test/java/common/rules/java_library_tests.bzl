@@ -273,9 +273,9 @@ def _test_propagates_direct_native_libraries(name):
 
 def _test_propagates_direct_native_libraries_impl(env, target):
     assert_transitive_native_libraries = java_info_subject.from_target(env, target).transitive_native_libraries()
-    assert_transitive_native_libraries.identifiers().contains_exactly_predicates([
-        matching.str_endswith("native"),
-        matching.str_endswith("ccl"),
+    assert_transitive_native_libraries.static_libraries().contains_exactly_predicates([
+        matching.str_matches("*native*"),
+        matching.str_matches("*ccl*"),
     ]).in_order()
 
 def _test_exposes_native_library_info(name):
