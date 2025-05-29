@@ -196,6 +196,14 @@ def compile(
     direct_jars = depset()
     if is_strict_mode:
         direct_jars = depset(order = "preorder", transitive = [dep.compile_jars for dep in deps])
+
+    header_compilation_direct_deps = depset()
+    if is_strict_mode:
+        header_compilation_direct_deps = depset(
+            order = "preorder",
+            transitive = [dep.header_compilation_direct_deps for dep in deps],
+        )
+
     compilation_classpath = depset(
         order = "preorder",
         transitive = [direct_jars] + [dep.transitive_compile_time_jars for dep in deps],
@@ -207,12 +215,25 @@ def compile(
     # create compile time jar action
     if not has_sources:
         compile_jar = None
+        header_compilation_jar = None
         compile_deps_proto = None
     elif not enable_compile_jar_action:
         compile_jar = output
+        header_compilation_jar = compile_jar
         compile_deps_proto = None
     elif _should_use_header_compilation(ctx, java_toolchain):
         compile_jar = helper.derive_output_file(ctx, output, name_suffix = "-hjar", extension = "jar")
+
+        # TODO: b/417791104 - remove hasattr check once Bazel 8.3.0 is released
+        if hasattr(ctx.fragments.java, "use_header_compilation_direct_deps") and ctx.fragments.java.use_header_compilation_direct_deps():
+            header_compilation_jar = helper.derive_output_file(ctx, output, name_suffix = "-tjar", extension = "jar")
+            header_compilation_extra_args = {
+                "header_compilation_jar": header_compilation_jar,
+                "header_compilation_direct_deps": header_compilation_direct_deps,
+            }
+        else:
+            header_compilation_jar = None
+            header_compilation_extra_args = {}
         compile_deps_proto = helper.derive_output_file(ctx, output, name_suffix = "-hjar", extension = "jdeps")
         get_internal_java_common().create_header_compilation_action(
             ctx,
@@ -232,6 +253,7 @@ def compile(
             injecting_rule_kind,
             enable_direct_classpath,
             annotation_processor_additional_inputs,
+            **header_compilation_extra_args
         )
     elif ctx.fragments.java.use_ijars():
         compile_jar = run_ijar(
@@ -241,9 +263,11 @@ def compile(
             target_label = ctx.label,
             injecting_rule_kind = injecting_rule_kind,
         )
+        header_compilation_jar = compile_jar
         compile_deps_proto = None
     else:
         compile_jar = output
+        header_compilation_jar = compile_jar
         compile_deps_proto = None
 
     native_headers_jar = helper.derive_output_file(ctx, output, name_suffix = "-native-header")
@@ -323,6 +347,7 @@ def compile(
     return java_info_for_compilation(
         output_jar = output,
         compile_jar = compile_jar,
+        header_compilation_jar = header_compilation_jar,
         source_jar = output_source_jar,
         generated_class_jar = generated_class_jar,
         generated_source_jar = generated_source_jar,

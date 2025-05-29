@@ -28,6 +28,7 @@ _JavaOutputInfo = provider(
     fields = {
         "class_jar": "(File) A classes jar file.",
         "compile_jar": "(File) An interface jar file.",
+        "header_compilation_jar": "(File) An header compilation jar file.",
         "ijar": "Deprecated: Please use compile_jar.",
         "compile_jdeps": "(File) Compile time dependencies information (deps.proto file).",
         "generated_class_jar": "(File) A jar containing classes generated via annotation processing.",
@@ -114,6 +115,7 @@ def merge(
     transitive_runtime_jars = []  # [depset[File]]
     transitive_compile_time_jars = []  # [depset[File]]
     compile_jars = []  # [depset[File]]
+    header_compilation_direct_deps = []  # [depset[File]]
     full_compile_jars = []  # [depset[File]]
     _transitive_full_compile_time_jars = []  # [depset[File]]
     _compile_time_java_dependencies = []  # [depset[File]]
@@ -131,6 +133,7 @@ def merge(
         transitive_runtime_jars.append(p.transitive_runtime_jars)
         transitive_compile_time_jars.append(p.transitive_compile_time_jars)
         compile_jars.append(p.compile_jars)
+        header_compilation_direct_deps.append(p.header_compilation_direct_deps)
         full_compile_jars.append(p.full_compile_jars)
         _transitive_full_compile_time_jars.append(p._transitive_full_compile_time_jars)
         _compile_time_java_dependencies.append(p._compile_time_java_dependencies)
@@ -148,6 +151,7 @@ def merge(
         "transitive_runtime_jars": transitive_runtime_jars,
         "transitive_compile_time_jars": transitive_compile_time_jars,
         "compile_jars": depset(order = "preorder", transitive = compile_jars),
+        "header_compilation_direct_deps": depset(order = "preorder", transitive = header_compilation_direct_deps),
         "full_compile_jars": depset(order = "preorder", transitive = full_compile_jars),
         "_transitive_full_compile_time_jars": depset(order = "preorder", transitive = _transitive_full_compile_time_jars),
         "_compile_time_java_dependencies": depset(order = "preorder", transitive = _compile_time_java_dependencies),
@@ -198,6 +202,7 @@ def to_java_binary_info(java_info, compilation_info):
         "transitive_runtime_jars": depset(),
         "transitive_compile_time_jars": depset(),
         "compile_jars": depset(),
+        "header_compilation_direct_deps": depset(),
         "full_compile_jars": depset(),
         "_transitive_full_compile_time_jars": depset(),
         "_compile_time_java_dependencies": depset(),
@@ -220,6 +225,7 @@ def to_java_binary_info(java_info, compilation_info):
     java_outputs = [
         _JavaOutputInfo(
             compile_jar = None,
+            header_compilation_jar = None,
             ijar = None,  # deprecated
             compile_jdeps = None,
             class_jar = output.class_jar,
@@ -253,6 +259,7 @@ def to_implicit_exportable(java_info, neverlink = False):
         "transitive_runtime_jars": depset() if neverlink else java_info.transitive_runtime_jars,
         "transitive_compile_time_jars": java_info.transitive_compile_time_jars,
         "compile_jars": java_info.compile_jars,
+        "header_compilation_direct_deps": java_info.header_compilation_direct_deps,
         "full_compile_jars": java_info.full_compile_jars,
         "_transitive_full_compile_time_jars": java_info._transitive_full_compile_time_jars,
         "_compile_time_java_dependencies": java_info._compile_time_java_dependencies,
@@ -312,6 +319,7 @@ def make_non_strict(java_info):
     result.update(
         compile_jars = java_info.transitive_compile_time_jars,
         full_compile_jars = java_info._transitive_full_compile_time_jars,
+        header_compilation_direct_deps = java_info._transitive_full_compile_time_jars,
     )
 
     # Omit jdeps, which aren't available transitively and aren't useful for reduced classpath
@@ -411,12 +419,15 @@ def java_info_for_compilation(
         add_exports,
         add_opens,
         direct_runtime_jars,
-        compilation_info):
+        compilation_info,
+        header_compilation_jar):
     """Creates a JavaInfo instance represiting the result of java compilation.
 
     Args:
         output_jar: (File) The jar that was created as a result of a compilation.
         compile_jar: (File) A jar that is the compile-time dependency in lieu of `output_jar`.
+        header_compilation_jar: (File) A jar that is used for header compilation in lieu of
+            compile_jar or output_jar.
         source_jar: (File) The source jar that was used to create the output jar.
         generated_class_jar: (File) A jar file containing class files compiled from sources
             generated during annotation processing.
@@ -466,6 +477,7 @@ def java_info_for_compilation(
         generated_source_jar,
         native_libraries,
         neverlink,
+        header_compilation_jar,
     )
 
     # this differs ever so slightly from the usual JavaInfo in that direct_runtime_jars
@@ -557,11 +569,17 @@ def _javainfo_init_base(
         generated_class_jar,
         generated_source_jar,
         native_libraries,
-        neverlink):
+        neverlink,
+        header_compilation_jar = None):
     _validate_provider_list(deps, "deps", JavaInfo)
     _validate_provider_list(runtime_deps, "runtime_deps", JavaInfo)
     _validate_provider_list(exports, "exports", JavaInfo)
     _validate_provider_list(native_libraries, "native_libraries", CcInfo)
+
+    # For clients that don't create a header_compilation_jar (e.g. java_import), fall back to using
+    # the compile jar.
+    if compile_jar and not header_compilation_jar:
+        header_compilation_jar = compile_jar
 
     concatenated_deps = _compute_concatenated_deps(deps, runtime_deps, exports)
 
@@ -575,6 +593,7 @@ def _javainfo_init_base(
     java_outputs = [_JavaOutputInfo(
         class_jar = output_jar,
         compile_jar = compile_jar,
+        header_compilation_jar = header_compilation_jar,
         ijar = compile_jar,  # deprecated
         compile_jdeps = compile_jdeps,
         generated_class_jar = generated_class_jar,
@@ -591,6 +610,11 @@ def _javainfo_init_base(
             order = "preorder",
             direct = [compile_jar] if compile_jar else [],
             transitive = [dep.compile_jars for dep in exports],
+        ),
+        "header_compilation_direct_deps": depset(
+            order = "preorder",
+            direct = [header_compilation_jar] if header_compilation_jar else [],
+            transitive = [dep.header_compilation_direct_deps for dep in exports],
         ),
         "full_compile_jars": depset(
             order = "preorder",
@@ -670,6 +694,7 @@ def _javainfo_init_base(
 def _javainfo_init(
         output_jar,
         compile_jar,
+        header_compilation_jar = None,
         source_jar = None,
         compile_jdeps = None,
         generated_class_jar = None,
@@ -690,6 +715,8 @@ def _javainfo_init(
     Args:
         output_jar: (File) The jar that was created as a result of a compilation.
         compile_jar: (File) A jar that is the compile-time dependency in lieu of `output_jar`.
+        header_compilation_jar: (File) A jar that is used for header compilation in lieu of
+            compile_jar or output_jar.
         source_jar: (File) The source jar that was used to create the output jar. Optional.
         compile_jdeps: (File) jdeps information about compile time dependencies to be consumed by
             JavaCompileAction. This should be a binary proto encoded using the deps.proto protobuf
@@ -739,6 +766,7 @@ def _javainfo_init(
         generated_source_jar,
         native_libraries,
         neverlink,
+        header_compilation_jar = header_compilation_jar,
     )
 
     if neverlink:
@@ -801,6 +829,8 @@ JavaInfo, _new_javainfo = provider(
         "compile_jars": """(depset[File]) The jars required directly at compile time. They can be interface jars
                 (ijar or hjar), regular jars or both, depending on whether rule
                 implementations chose to create interface jars or not.""",
+        "header_compilation_direct_deps": """(depset[File]) The header compilation jars required
+                directly at compile time.""",
         "full_compile_jars": """(depset[File]) The regular, full compile time Jars required by this target directly.
                 They can be:
                  - the corresponding regular Jars of the interface Jars returned by JavaInfo.compile_jars
