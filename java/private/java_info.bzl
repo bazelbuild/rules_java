@@ -319,7 +319,7 @@ def make_non_strict(java_info):
     result.update(
         compile_jars = java_info.transitive_compile_time_jars,
         full_compile_jars = java_info._transitive_full_compile_time_jars,
-        header_compilation_direct_deps = java_info._transitive_full_compile_time_jars,
+        header_compilation_direct_deps = java_info.transitive_compile_time_jars,
     )
 
     # Omit jdeps, which aren't available transitively and aren't useful for reduced classpath
