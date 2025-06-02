@@ -440,9 +440,6 @@ def _test_disallows_empty_jars(name):
         name = name,
         impl = _test_disallows_empty_jars_impl,
         target = name + "/rule",
-        config_settings = {
-            "//command_line_option:incompatible_disallow_java_import_empty_jars": True,
-        },
         expect_failure = True,
     )
 
