@@ -139,7 +139,14 @@ def _java_toolchain_impl(ctx):
         _timezone_data = ctx.file.timezone_data,
     )
     toolchain_info = ToolchainInfo(java = java_toolchain_info)
-    return [java_toolchain_info, toolchain_info, DefaultInfo()]
+    providers = [java_toolchain_info, toolchain_info]
+    if ctx.attr.java_runtime:
+        providers.append(ctx.attr.java_runtime[DefaultInfo])
+        if platform_common.TemplateVariableInfo in ctx.attr.java_runtime:
+            providers.append(ctx.attr.java_runtime[platform_common.TemplateVariableInfo])
+    else:
+        providers.append(DefaultInfo())
+    return providers
 
 def _get_bootclasspath_info(ctx):
     bootclasspath_infos = [dep[BootClassPathInfo] for dep in ctx.attr.bootclasspath if BootClassPathInfo in dep]
