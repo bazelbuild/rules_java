@@ -77,7 +77,7 @@ alias(
 )
 toolchain(
     name = "toolchain",
-    target_compatible_with = {target_compatible_with},
+    exec_compatible_with = {target_compatible_with},
     target_settings = [":version_or_prefix_version_setting"],
     toolchain_type = "@bazel_tools//tools/jdk:runtime_toolchain_type",
     toolchain = "{toolchain}",
