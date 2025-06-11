@@ -96,13 +96,13 @@ def _java_toolchain_impl(ctx):
     oneversion_allowlist = ctx.file.oneversion_allowlist if ctx.file.oneversion_allowlist else ctx.file.oneversion_whitelist
     java_toolchain_info = _new_javatoolchaininfo(
         bootclasspath = bootclasspath_info.bootclasspath,
-        ijar = ctx.attr.ijar.files_to_run if ctx.attr.ijar else None,
-        jacocorunner = ctx.attr.jacocorunner.files_to_run if ctx.attr.jacocorunner else None,
+        ijar = ctx.attr.ijar[DefaultInfo].files_to_run if ctx.attr.ijar else None,
+        jacocorunner = ctx.attr.jacocorunner[DefaultInfo].files_to_run if ctx.attr.jacocorunner else None,
         java_runtime = java_runtime,
         jvm_opt = depset(get_internal_java_common().expand_java_opts(ctx, "jvm_opts", tokenize = False, exec_paths = True)),
         label = ctx.label,
-        proguard_allowlister = ctx.attr.proguard_allowlister.files_to_run if ctx.attr.proguard_allowlister else None,
-        single_jar = ctx.attr.singlejar.files_to_run,
+        proguard_allowlister = ctx.attr.proguard_allowlister[DefaultInfo].files_to_run if ctx.attr.proguard_allowlister else None,
+        single_jar = ctx.attr.singlejar[DefaultInfo].files_to_run,
         source_version = ctx.attr.source_version,
         target_version = ctx.attr.target_version,
         tools = depset(ctx.files.tools),
@@ -131,7 +131,7 @@ def _java_toolchain_impl(ctx):
         _javac_supports_worker_multiplex_sandboxing = ctx.attr.javac_supports_worker_multiplex_sandboxing,
         _jspecify_info = _get_jspecify_info(ctx),
         _local_java_optimization_config = ctx.files._local_java_optimization_configuration,
-        _one_version_tool = ctx.attr.oneversion.files_to_run if ctx.attr.oneversion else None,
+        _one_version_tool = ctx.attr.oneversion[DefaultInfo].files_to_run if ctx.attr.oneversion else None,
         _one_version_allowlist = oneversion_allowlist,
         _one_version_allowlist_for_tests = ctx.file.oneversion_allowlist_for_tests,
         _package_configuration = [dep[JavaPackageConfigurationInfo] for dep in ctx.attr.package_configuration],
@@ -171,7 +171,7 @@ def _get_javac_opts(ctx):
 def _get_android_lint_tool(ctx):
     if not ctx.attr.android_lint_runner:
         return None
-    files_to_run = ctx.attr.android_lint_runner.files_to_run
+    files_to_run = ctx.attr.android_lint_runner[DefaultInfo].files_to_run
     if not files_to_run or not files_to_run.executable:
         fail(ctx.attr.android_lint_runner.label, "does not refer to a valid executable target")
     return struct(
@@ -186,7 +186,7 @@ def _get_tool_from_ctx(ctx, tool_attr, data_attr, opts_attr):
     dep = getattr(ctx.attr, tool_attr)
     if not dep:
         return None
-    files_to_run = dep.files_to_run
+    files_to_run = dep[DefaultInfo].files_to_run
     if not files_to_run or not files_to_run.executable:
         fail(dep.label, "does not refer to a valid executable target")
     data = getattr(ctx.attr, data_attr)
@@ -200,7 +200,7 @@ def _get_tool_from_executable(ctx, attr_name, data = [], jvm_opts = []):
     dep = getattr(ctx.attr, attr_name)
     if not dep:
         return None
-    files_to_run = dep.files_to_run
+    files_to_run = dep[DefaultInfo].files_to_run
     if not files_to_run or not files_to_run.executable:
         fail(dep.label, "does not refer to a valid executable target")
     return struct(tool = files_to_run, data = depset(data), jvm_opts = depset(jvm_opts))
