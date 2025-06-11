@@ -428,6 +428,40 @@ public final class RunfilesTest {
   }
 
   @Test
+  public void testManifestBasedRlocationWithRepoMapping_fromExtensionRepo() throws Exception {
+    Path rm =
+        tempFile(
+            "foo.repo_mapping",
+            ImmutableList.of(
+                ",config.json,config.json+1.2.3",
+                ",my_module,_main",
+                ",my_protobuf,protobuf+3.19.2",
+                ",my_workspace,_main",
+                "my_module++ext+*,my_module,my_module+",
+                "my_module++ext+*,repo1,my_module++ext+repo1"));
+    Path mf =
+        tempFile(
+            "foo.runfiles/MANIFEST",
+            ImmutableList.of(
+                "_repo_mapping " + rm,
+                "config.json /etc/config.json",
+                "protobuf+3.19.2/foo/runfile C:/Actual Path\\protobuf\\runfile",
+                "_main/bar/runfile /the/path/./to/other//other runfile.txt",
+                "protobuf+3.19.2/bar/dir E:\\Actual Path\\Directory",
+                "my_module+/foo/runfile /the/path/to/my_module+/runfile",
+                "my_module++ext+repo1/foo/runfile /the/path/to/my_module++ext+repo1/runfile",
+                "repo2+/foo/runfile /the/path/to/repo2+/runfile"));
+    Runfiles r =
+        Runfiles.createManifestBasedForTesting(mf.toString())
+            .withSourceRepository("my_module++ext+repo1");
+
+    assertThat(r.rlocation("my_module/foo/runfile")).isEqualTo("/the/path/to/my_module+/runfile");
+    assertThat(r.rlocation("repo1/foo/runfile"))
+        .isEqualTo("/the/path/to/my_module++ext+repo1/runfile");
+    assertThat(r.rlocation("repo2+/foo/runfile")).isEqualTo("/the/path/to/repo2+/runfile");
+  }
+
+  @Test
   public void testDirectoryBasedRlocationWithRepoMapping_fromMain() throws Exception {
     Path dir = tempDir.newFolder("foo.runfiles").toPath();
     Path unused =
@@ -550,6 +584,28 @@ public final class RunfilesTest {
   }
 
   @Test
+  public void testDirectoryBasedRlocationWithRepoMapping_fromExtensionRepo() throws Exception {
+    Path dir = tempDir.newFolder("foo.runfiles").toPath();
+    Path unused =
+        tempFile(
+            dir.resolve("_repo_mapping").toString(),
+            ImmutableList.of(
+                ",config.json,config.json+1.2.3",
+                ",my_module,_main",
+                ",my_protobuf,protobuf+3.19.2",
+                ",my_workspace,_main",
+                "my_module++ext+*,my_module,my_module+",
+                "my_module++ext+*,repo1,my_module++ext+repo1"));
+    Runfiles r =
+        Runfiles.createDirectoryBasedForTesting(dir.toString())
+            .withSourceRepository("my_module++ext+repo1");
+
+    assertThat(r.rlocation("my_module/foo")).isEqualTo(dir + "/my_module+/foo");
+    assertThat(r.rlocation("repo1/foo")).isEqualTo(dir + "/my_module++ext+repo1/foo");
+    assertThat(r.rlocation("repo2+/foo")).isEqualTo(dir + "/repo2+/foo");
+  }
+
+  @Test
   public void testDirectoryBasedCtorArgumentValidation() throws IOException {
     assertThrows(
         IllegalArgumentException.class,
@@ -581,7 +637,8 @@ public final class RunfilesTest {
         () -> Runfiles.createManifestBasedForTesting("").withSourceRepository(""));
 
     Path mf = tempFile("foobar", ImmutableList.of("a b"));
-    Runfiles unused = Runfiles.createManifestBasedForTesting(mf.toString()).withSourceRepository("");
+    Runfiles unused =
+        Runfiles.createManifestBasedForTesting(mf.toString()).withSourceRepository("");
   }
 
   @Test
