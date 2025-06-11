@@ -40,6 +40,8 @@ public final class RunfilesTest {
   @Rule
   public TemporaryFolder tempDir = new TemporaryFolder(new File(System.getenv("TEST_TMPDIR")));
 
+  private static final String MAIN_REPO_CANONICAL_NAME = "";
+
   private static boolean isWindows() {
     return File.separatorChar == '\\';
   }
@@ -570,6 +572,235 @@ public final class RunfilesTest {
             .withSourceRepository("");
   }
 
+  // --- Tests for getCanonicalRepositoryName with prefix mapping ---
+
+  private Runfiles createRunfilesForRepoMappingTest(
+      String sourceRepository, Path runfilesRoot, String... repoMappingLines) throws IOException {
+    // Helper to create ManifestBased runfiles for testing getCanonicalRepositoryName.
+    // The runfilesRoot is used to place the MANIFEST and _repo_mapping file.
+    // e.g. runfilesRoot = tempDir.newFolder("mytest.runfiles").toPath();
+    Path repoMappingFile =
+        tempFile(
+            runfilesRoot.resolve("_repo_mapping").toString(), ImmutableList.copyOf(repoMappingLines));
+    Path manifestFile =
+        tempFile(
+            runfilesRoot.resolve("MANIFEST").toString(),
+            ImmutableList.of("_repo_mapping " + repoMappingFile.toString().replace('\\', '/')));
+    return Runfiles.createManifestBasedForTesting(manifestFile.toString())
+        .withSourceRepository(sourceRepository);
+  }
+
+  @Test
+  public void testGetCanonical_exactMatch() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_exact_match.runfiles").toPath();
+    Runfiles r =
+        createRunfilesForRepoMappingTest(
+            "source_exact", runfilesRoot, "source_exact,apparent_name,target_exact_A");
+    assertThat(r.getCanonicalRepositoryName("apparent_name")).isEqualTo("target_exact_A");
+  }
+
+  @Test
+  public void testGetCanonical_prefixMatchSimple() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_prefix_simple.runfiles").toPath();
+    Runfiles r =
+        createRunfilesForRepoMappingTest(
+            "source_prefix_plus_suffix",
+            runfilesRoot,
+            "source_prefix,apparent_name,target_prefix_B");
+    assertThat(r.getCanonicalRepositoryName("apparent_name")).isEqualTo("target_prefix_B");
+  }
+
+  @Test
+  public void testGetCanonical_longestPrefixWins() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_longest_prefix.runfiles").toPath();
+    Runfiles r =
+        createRunfilesForRepoMappingTest(
+            "source_longer_prefix_plus_suffix",
+            runfilesRoot,
+            "source_short_prefix,apparent_name,target_short_C",
+            "source_longer_prefix,apparent_name,target_longer_D");
+    assertThat(r.getCanonicalRepositoryName("apparent_name")).isEqualTo("target_longer_D");
+
+    // Test with different order in file to ensure sorting by length (and then alphabetically) works
+    Path runfilesRoot2 = tempDir.newFolder("test_longest_prefix_order2.runfiles").toPath();
+    r =
+        createRunfilesForRepoMappingTest(
+            "source_longer_prefix_plus_suffix",
+            runfilesRoot2,
+            "source_longer_prefix,apparent_name,target_longer_D",
+            "source_short_prefix,apparent_name,target_short_C");
+    assertThat(r.getCanonicalRepositoryName("apparent_name")).isEqualTo("target_longer_D");
+  }
+
+  @Test
+  public void testGetCanonical_noMatchingPrefix() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_no_prefix_match.runfiles").toPath();
+    Runfiles r =
+        createRunfilesForRepoMappingTest(
+            "source_unrelated", runfilesRoot, "source_other_prefix,apparent_name,target_E");
+    assertThat(r.getCanonicalRepositoryName("apparent_name")).isEqualTo("apparent_name");
+  }
+
+  @Test
+  public void testGetCanonical_noMatchingApparentName() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_no_apparent_match.runfiles").toPath();
+    Runfiles r =
+        createRunfilesForRepoMappingTest(
+            "source_prefix_plus_suffix",
+            runfilesRoot,
+            "source_prefix,apparent_name_X,target_F");
+    assertThat(r.getCanonicalRepositoryName("apparent_name_Y")).isEqualTo("apparent_name_Y");
+  }
+
+  @Test
+  public void testGetCanonical_mainRepositoryAsSource() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_main_repo_source.runfiles").toPath();
+    Runfiles r =
+        createRunfilesForRepoMappingTest(
+            MAIN_REPO_CANONICAL_NAME, runfilesRoot, ",apparent_name,target_main_G"); // Empty string for source repo
+    assertThat(r.getCanonicalRepositoryName("apparent_name")).isEqualTo("target_main_G");
+  }
+
+  @Test
+  public void testGetCanonical_mainRepositorySourceWithPrefixFallback_mainShouldWin()
+      throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_main_with_prefix_fallback.runfiles").toPath();
+    Runfiles r =
+        createRunfilesForRepoMappingTest(
+            MAIN_REPO_CANONICAL_NAME,
+            runfilesRoot,
+            ",apparent_name,target_main_H", // Main repo entry
+            "prefix,apparent_name,target_prefix_I" // Other prefix entry
+            );
+    assertThat(r.getCanonicalRepositoryName("apparent_name")).isEqualTo("target_main_H");
+  }
+
+  @Test
+  public void testGetCanonical_prefixMatchWhenSourceIsMain_shouldNotMatchPrefix() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_prefix_when_main.runfiles").toPath();
+    Runfiles r =
+        createRunfilesForRepoMappingTest(
+            MAIN_REPO_CANONICAL_NAME, runfilesRoot, "some_prefix,apparent_name,target_J");
+    assertThat(r.getCanonicalRepositoryName("apparent_name")).isEqualTo("apparent_name");
+  }
+
+  @Test
+  public void testGetCanonical_emptyRepoMappingFile() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_empty_repo_mapping.runfiles").toPath();
+    Runfiles r =
+        createRunfilesForRepoMappingTest("any_source", runfilesRoot /* no mapping lines */);
+    assertThat(r.getCanonicalRepositoryName("any_apparent")).isEqualTo("any_apparent");
+  }
+
+  @Test
+  public void testGetCanonical_repoMappingFileDoesNotExist() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_no_repo_mapping_file.runfiles").toPath();
+    // Create a manifest that refers to a non-existent _repo_mapping file
+    Path manifestFile =
+        tempFile(
+            runfilesRoot.resolve("MANIFEST").toString(),
+            ImmutableList.of(
+                "_repo_mapping "
+                    + runfilesRoot.resolve("non_existent_repo_mapping").toString().replace('\\', '/')));
+
+    Runfiles r =
+        Runfiles.createManifestBasedForTesting(manifestFile.toString())
+            .withSourceRepository("any_source");
+    assertThat(r.getCanonicalRepositoryName("any_apparent")).isEqualTo("any_apparent");
+  }
+
+  @Test
+  public void testGetCanonical_specificEntryForRepoAndMainRepoMapping() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_specific_and_main.runfiles").toPath();
+    Runfiles rSpecific =
+        createRunfilesForRepoMappingTest(
+            "my_specific_repo",
+            runfilesRoot,
+            ",apparent_name_main,target_for_main", // Mapping for main repo
+            "my_specific_repo,apparent_name_specific,target_for_specific" // Mapping for specific repo
+            );
+
+    assertThat(rSpecific.getCanonicalRepositoryName("apparent_name_specific"))
+        .isEqualTo("target_for_specific");
+    assertThat(rSpecific.getCanonicalRepositoryName("apparent_name_main")).isEqualTo("apparent_name_main");
+
+    Runfiles rMain =
+        createRunfilesForRepoMappingTest(
+            MAIN_REPO_CANONICAL_NAME,
+            runfilesRoot, // Same mapping file, different source repo context
+            ",apparent_name_main,target_for_main",
+            "my_specific_repo,apparent_name_specific,target_for_specific");
+
+    assertThat(rMain.getCanonicalRepositoryName("apparent_name_main")).isEqualTo("target_for_main");
+    assertThat(rMain.getCanonicalRepositoryName("apparent_name_specific"))
+        .isEqualTo("apparent_name_specific");
+  }
+
+  @Test
+  public void testGetCanonical_prefixMatchDoesNotOverstepParentDirectory() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_prefix_parent_overstep.runfiles").toPath();
+    Runfiles r =
+        createRunfilesForRepoMappingTest(
+            "foo_bar_baz", // Current repository
+            runfilesRoot,
+            "foo,apparent,target_foo",
+            "foo_bar,apparent,target_foo_bar" // Longer prefix
+            );
+    assertThat(r.getCanonicalRepositoryName("apparent")).isEqualTo("target_foo_bar");
+  }
+
+  @Test
+  public void testGetCanonical_tieBreakByAlphabeticalOrder() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("test_tie_break_alpha.runfiles").toPath();
+    // Two prefixes of the same length "repo_a" and "repo_b" for "repo_a_suffix"
+    // "repo_a" should win due to alphabetical sorting as a secondary criterion.
+    Runfiles r =
+        createRunfilesForRepoMappingTest(
+            "repo_a_suffix",
+            runfilesRoot,
+            "repo_b,apparent,target_repo_b", // Same length as repo_a
+            "repo_a,apparent,target_repo_a"  // Same length as repo_b
+            );
+    // The sorting is: longest first, then alphabetical.
+    // Here, lengths are equal, so "repo_a" comes before "repo_b".
+    // When matching "repo_a_suffix", "repo_a" is a prefix. "repo_b" is not.
+    // This test actually tests prefix matching more than tie-breaking for identical prefixes.
+    // Let's refine to test actual tie-breaking for identical length prefixes if both match.
+    // The current implementation picks the *first* matching prefix after sorting.
+    // If sourceRepoCanonicalName are "aa" and "ab", and sourceRepository is "aax", "aa" matches.
+    // If sourceRepository is "abx", "ab" matches.
+    // The sorting ensures that if we had "a" and "aa", "aa" comes first.
+    // This specific test as written will have "repo_a" as a match and "repo_b" not.
+    assertThat(r.getCanonicalRepositoryName("apparent")).isEqualTo("target_repo_a");
+
+    // A better test for tie-breaking: two prefixes of same length, both are prefixes.
+    // This shouldn't happen with current logic as sourceRepoCanonicalName is unique per entry.
+    // The sorting is by length (desc) then name (asc).
+    // The lookup iterates and takes the first `sourceRepository.startsWith(entry.sourceRepoCanonicalName)`.
+    // So, if we have "repo_a" and "repo_c" (same length) in mapping, and source is "repo_a_x",
+    // "repo_a" will be checked first (due to alphabetical sort on name for tie-break on length) and match.
+    Path runfilesRoot2 = tempDir.newFolder("test_tie_break_alpha2.runfiles").toPath();
+     r = createRunfilesForRepoMappingTest(
+            "common_prefix_specific", // current repo
+            runfilesRoot2,
+            // two entries with source "common_prefix", but different apparent names
+            // This is not what the tie-breaking refers to.
+            // Tie-breaking is for multiple mapping entries whose sourceRepoCanonicalName
+            // are of the same length AND are prefixes of the current sourceRepository.
+            // Example: repo_mapping has "foo_a,app,target_A" and "foo_b,app,target_B".
+            // If current source is "foo_a_bar", "foo_a" matches.
+            // The sorting `sourceRepoCanonicalName.compareTo` makes this deterministic if lengths are equal.
+            "common_prefix,apparent1,target_common_1",
+            "common_prefix,apparent2,target_common_2"
+            // If we are in "common_prefix", these are exact matches, not prefix length tie-breaks.
+            );
+     assertThat(r.getCanonicalRepositoryName("apparent1")).isEqualTo("target_common_1");
+     assertThat(r.getCanonicalRepositoryName("apparent2")).isEqualTo("target_common_2");
+  }
+
+
+  // --- End of tests for getCanonicalRepositoryName ---
+
   @Test
   public void testManifestBasedCtorArgumentValidation() throws Exception {
     assertThrows(
@@ -587,10 +818,56 @@ public final class RunfilesTest {
   @Test
   public void testInvalidRepoMapping() throws Exception {
     Path rm = tempFile("foo.repo_mapping", ImmutableList.of("a,b,c,d"));
-    Path mf = tempFile("foo.runfiles/MANIFEST", ImmutableList.of("_repo_mapping " + rm));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> Runfiles.createManifestBasedForTesting(mf.toString()).withSourceRepository(""));
+    Path runfilesDir = tempDir.newFolder("invalid_mapping_test.runfiles").toPath();
+    Path mf =
+        tempFile(
+            runfilesDir.resolve("MANIFEST").toString(),
+            ImmutableList.of("_repo_mapping " + rm.toString().replace('\\', '/')));
+    IllegalArgumentException e =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> Runfiles.createManifestBasedForTesting(mf.toString()).withSourceRepository(""));
+    assertThat(e).hasMessageThat().contains("Invalid line in repository mapping: 'a,b,c,d'");
+  }
+
+  // Integration test for rlocation with prefix mapping
+  @Test
+  public void testRlocationWithPrefixMapping() throws Exception {
+    Path runfilesRoot = tempDir.newFolder("rlocation_prefix_test.runfiles").toPath();
+    String sourceRepoForTest = "my_repo_prefix_foo"; // Current repo context
+    String apparentRepoName = "data_repo"; // Apparent name used in rlocation call
+    String targetCanonicalRepoName = "actual_data_repo_v1"; // What apparent maps to for my_repo_prefix
+    String filePathInRepo = "data/file.txt";
+    String rlocationArg = apparentRepoName + "/" + filePathInRepo;
+    String actualDiskPath = "/abs/path/to/" + targetCanonicalRepoName + "/" + filePathInRepo;
+
+    // 1. Create _repo_mapping file
+    Path repoMappingFile =
+        tempFile(
+            runfilesRoot.resolve("_repo_mapping").toString(),
+            ImmutableList.of(
+                "my_repo_prefix," + apparentRepoName + "," + targetCanonicalRepoName,
+                "other_prefix,other_apparent,other_target" // Another entry
+                ));
+
+    // 2. Create MANIFEST file
+    // It needs to map _repo_mapping itself, and the final path after canonicalization.
+    Path manifestFile =
+        tempFile(
+            runfilesRoot.resolve("MANIFEST").toString(),
+            ImmutableList.of(
+                "_repo_mapping " + repoMappingFile.toString().replace('\\', '/'),
+                targetCanonicalRepoName + "/" + filePathInRepo + " " + actualDiskPath));
+
+    // 3. Create Runfiles instance
+    Runfiles r =
+        Runfiles.createManifestBasedForTesting(manifestFile.toString())
+            .withSourceRepository(sourceRepoForTest);
+
+    // 4. Test rlocation
+    // rlocation(data_repo/data/file.txt) should become rlocation(actual_data_repo_v1/data/file.txt)
+    // which then resolves to /abs/path/to/actual_data_repo_v1/data/file.txt
+    assertThat(r.rlocation(rlocationArg)).isEqualTo(actualDiskPath);
   }
 
   private Path tempFile(String path, ImmutableList<String> lines) throws IOException {

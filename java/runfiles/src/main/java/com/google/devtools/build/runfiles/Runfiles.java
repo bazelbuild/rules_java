@@ -171,6 +171,22 @@ public final class Runfiles {
       }
     }
 
+    /** See {@link com.google.devtools.build.lib.analysis.RepoMappingManifestAction.Entry}. */
+    static class RepoMappingEntry {
+      public final String sourceRepoCanonicalName;
+      public final String targetRepoApparentName;
+      public final String targetRepoCanonicalName;
+
+      public RepoMappingEntry(
+          String sourceRepoCanonicalName,
+          String targetRepoApparentName,
+          String targetRepoCanonicalName) {
+        this.sourceRepoCanonicalName = sourceRepoCanonicalName;
+        this.targetRepoApparentName = targetRepoApparentName;
+        this.targetRepoCanonicalName = targetRepoCanonicalName;
+      }
+    }
+
     /**
      * Returns a {@link Runfiles} instance that uses the provided source repository's repository
      * mapping to translate apparent into canonical repository names.
@@ -204,7 +220,7 @@ public final class Runfiles {
 
     protected abstract String rlocationChecked(String path);
 
-    protected abstract Map<RepoMappingKey, String> getRepoMapping();
+    protected abstract List<RepoMappingEntry> getRepoMapping();
 
     // Private constructor, so only nested classes may extend it.
     private Preloaded() {}
@@ -372,11 +388,44 @@ public final class Runfiles {
   }
 
   String getCanonicalRepositoryName(String apparentRepositoryName) {
-    return preloadedRunfiles
-        .getRepoMapping()
-        .getOrDefault(
-            new Preloaded.RepoMappingKey(sourceRepository, apparentRepositoryName),
-            apparentRepositoryName);
+    // If sourceRepository is null (meaning, we are in unmapped mode),
+    // or if the apparentRepositoryName is empty (which shouldn't happen for valid lookups),
+    // then the apparentRepositoryName is the canonical name.
+    if (sourceRepository == null || apparentRepositoryName.isEmpty()) {
+      return apparentRepositoryName;
+    }
+
+    for (Preloaded.RepoMappingEntry entry : preloadedRunfiles.getRepoMapping()) {
+      // Check if the current source repository starts with the entry's source canonical name
+      // (prefix matching) AND if the target apparent name matches.
+      // The list is sorted by longest prefix first, so the first match is the correct one.
+      if (sourceRepository.startsWith(entry.sourceRepoCanonicalName)
+          && apparentRepositoryName.equals(entry.targetRepoApparentName)) {
+        // Additional check: if sourceRepoCanonicalName is empty, it means it's a main repo mapping.
+        // In this case, sourceRepository must also be the main repository.
+        if (entry.sourceRepoCanonicalName.isEmpty() && !sourceRepository.equals(MAIN_REPOSITORY)) {
+          // This specific entry's "" source applies only to the main repo, but we are not in the main repo.
+          // Continue search for a more specific match or a general "" mapping for the current source.
+          // However, given the typical structure of _repo_mapping (where "" sourceRepo means the main workspace),
+          // and how `sourceRepository` is set, this condition might be more nuanced.
+          // For now, we assume that if entry.sourceRepoCanonicalName is "", it should match if sourceRepository is also "".
+          // If sourceRepository is "foo" and entry.sourceRepoCanonicalName is "", it implies a mapping defined *for the main repo*
+          // that "foo" is trying to use. This should only happen if "foo" *is* the main repo.
+          // Let's refine this: if entry.sourceRepoCanonicalName is empty, it should ONLY match if sourceRepository is also empty (MAIN_REPOSITORY).
+          if (entry.sourceRepoCanonicalName.isEmpty() && !sourceRepository.equals(MAIN_REPOSITORY)) {
+            continue; // This mapping is for the main repository, but we are in a different one.
+          }
+        }
+        // If sourceRepoCanonicalName is not empty, it must be a prefix of sourceRepository.
+        // If sourceRepoCanonicalName is empty, sourceRepository must also be empty.
+        boolean sourceMatch = entry.sourceRepoCanonicalName.isEmpty() ? sourceRepository.equals(MAIN_REPOSITORY) : sourceRepository.startsWith(entry.sourceRepoCanonicalName);
+
+        if (sourceMatch && apparentRepositoryName.equals(entry.targetRepoApparentName)) {
+          return entry.targetRepoCanonicalName;
+        }
+      }
+    }
+    return apparentRepositoryName;
   }
 
   /** Returns true if the platform supports runfiles only via manifests. */
@@ -406,31 +455,46 @@ public final class Runfiles {
     return value;
   }
 
-  private static Map<Preloaded.RepoMappingKey, String> loadRepositoryMapping(String path)
+  private static List<Preloaded.RepoMappingEntry> loadRepositoryMapping(String path)
       throws IOException {
     if (path == null || !new File(path).exists()) {
-      return Collections.emptyMap();
+      return Collections.emptyList();
     }
 
     try (BufferedReader r =
         new BufferedReader(
             new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8))) {
-      return Collections.unmodifiableMap(
+      List<Preloaded.RepoMappingEntry> entries =
           r.lines()
               .filter(line -> !line.isEmpty())
               .map(
                   line -> {
-                    String[] split = line.split(",");
+                    String[] split = line.split(",", -1); // Use -1 to keep trailing empty strings
                     if (split.length != 3) {
                       throw new IllegalArgumentException(
-                          "Invalid line in repository mapping: '" + line + "'");
+                          "Invalid line in repository mapping: '" + line + "'. Expected 3 comma-separated values.");
                     }
-                    return split;
+                    // split[0] is source_repo_canonical_name
+                    // split[1] is target_repo_apparent_name
+                    // split[2] is target_repo_canonical_name
+                    return new Preloaded.RepoMappingEntry(split[0], split[1], split[2]);
                   })
-              .collect(
-                  Collectors.toMap(
-                      split -> new Preloaded.RepoMappingKey(split[0], split[1]),
-                      split -> split[2])));
+              .collect(Collectors.toList());
+
+      // Sort entries:
+      // 1. By sourceRepoCanonicalName length in descending order (longest prefix first).
+      // 2. By sourceRepoCanonicalName lexicographically for tie-breaking.
+      entries.sort(
+          (e1, e2) -> {
+            int lenCompare =
+                Integer.compare(
+                    e2.sourceRepoCanonicalName.length(), e1.sourceRepoCanonicalName.length());
+            if (lenCompare != 0) {
+              return lenCompare;
+            }
+            return e1.sourceRepoCanonicalName.compareTo(e2.sourceRepoCanonicalName);
+          });
+      return Collections.unmodifiableList(entries);
     }
   }
 
@@ -439,7 +503,7 @@ public final class Runfiles {
 
     private final Map<String, String> runfiles;
     private final String manifestPath;
-    private final Map<RepoMappingKey, String> repoMapping;
+    private final List<Preloaded.RepoMappingEntry> repoMapping;
 
     ManifestBased(String manifestPath) throws IOException {
       Util.checkArgument(manifestPath != null);
@@ -481,7 +545,7 @@ public final class Runfiles {
     }
 
     @Override
-    protected Map<RepoMappingKey, String> getRepoMapping() {
+    protected List<Preloaded.RepoMappingEntry> getRepoMapping() {
       return repoMapping;
     }
 
@@ -543,7 +607,7 @@ public final class Runfiles {
   private static final class DirectoryBased extends Preloaded {
 
     private final String runfilesRoot;
-    private final Map<RepoMappingKey, String> repoMapping;
+    private final List<Preloaded.RepoMappingEntry> repoMapping;
 
     DirectoryBased(String runfilesDir) throws IOException {
       Util.checkArgument(!Util.isNullOrEmpty(runfilesDir));
@@ -558,7 +622,7 @@ public final class Runfiles {
     }
 
     @Override
-    protected Map<RepoMappingKey, String> getRepoMapping() {
+    protected List<Preloaded.RepoMappingEntry> getRepoMapping() {
       return repoMapping;
     }
 
