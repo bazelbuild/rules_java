@@ -16,6 +16,7 @@
 Common code for reuse across java_* rules
 """
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common/rules:android_lint.bzl", "android_lint_subrule")
 load("//java/private:boot_class_path_info.bzl", "BootClassPathInfo")
@@ -124,6 +125,14 @@ def basic_java_library(
         resources = list(resources)
         resources.extend(properties)
 
+    baseline_coverage_file = None
+    if (
+        bazel_features.rules.instrumented_files_info_has_baseline_coverage_files and
+        ctx.coverage_instrumented() and
+        source_files
+    ):
+        baseline_coverage_file = ctx.actions.declare_file(ctx.label.name + "_baseline_coverage.lcov")
+
     java_info, compilation_info = compile_action(
         ctx,
         output_class_jar = ctx.outputs.classjar,
@@ -147,6 +156,7 @@ def basic_java_library(
         add_opens = add_opens,
         bootclasspath = bootclasspath[BootClassPathInfo] if bootclasspath else None,
         javabuilder_jvm_flags = javabuilder_jvm_flags,
+        baseline_coverage_file = baseline_coverage_file,
     )
     target = {"JavaInfo": java_info}
 
@@ -178,12 +188,16 @@ def basic_java_library(
     if validation_outputs:
         output_groups["_validation"] = depset(transitive = validation_outputs)
 
+    instrumented_files_info_kwargs = {}
+    if baseline_coverage_file:
+        instrumented_files_info_kwargs["baseline_coverage_files"] = [baseline_coverage_file]
     target["InstrumentedFilesInfo"] = coverage_common.instrumented_files_info(
         ctx,
         source_attributes = ["srcs"],
         dependency_attributes = ["deps", "data", "resources", "resource_jars", "exports", "runtime_deps", "jars"],
         coverage_support_files = coverage_config.support_files if coverage_config else depset(),
         coverage_environment = coverage_config.env if coverage_config else {},
+        **instrumented_files_info_kwargs
     )
 
     if proguard_specs != None:
