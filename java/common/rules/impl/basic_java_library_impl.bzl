@@ -131,7 +131,7 @@ def basic_java_library(
         ctx.coverage_instrumented() and
         source_files
     ):
-        baseline_coverage_file = ctx.actions.declare_file(ctx.label.name + "_baseline_coverage.lcov")
+        baseline_coverage_file = ctx.actions.declare_file(ctx.label.name + "_baseline_coverage.dat")
 
     java_info, compilation_info = compile_action(
         ctx,
