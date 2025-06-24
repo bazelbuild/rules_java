@@ -42,14 +42,12 @@ test_target_integration: &test_target_integration
 flags_workspace_integration: &flags_workspace_integration
   - "--noenable_bzlmod"
   - "--enable_workspace"
-  # TODO(hvd): remove after Bazel 8.3.0
-  - "--repositories_without_autoloads=bazel_features_version,bazel_features_globals"
 
 buildifier: latest
 
 matrix:
   all_platforms: ["ubuntu2004", "macos", "macos_arm64", "windows"]
-  bazel: ["7.6.1", "8.2.1", "last_green"] # Bazel 6 tested separately, needs different flags
+  bazel: ["7.6.1", "8.3.0", "last_green"] # Bazel 6 tested separately, needs different flags
   modern_bazel: ["last_green"] # Fully supported Bazel versions
 
 tasks:
@@ -62,8 +60,8 @@ tasks:
     test_targets: *test_targets
 # Bazel 8.x
   build_and_test_bazel8:
-    name: "Bazel 8.2.1"
-    bazel: "8.2.1"
+    name: "Bazel 8.3.0"
+    bazel: "8.3.0"
     platform: ${{ all_platforms }}
     build_targets: *build_targets
     test_targets: *test_targets
