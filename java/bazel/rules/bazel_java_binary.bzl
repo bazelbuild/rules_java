@@ -317,7 +317,7 @@ def make_binary_rule(implementation, *, doc, attrs, executable = False, test = F
         test = test,
         fragments = ["cpp", "java"],
         provides = [JavaInfo],
-        toolchains = [semantics.JAVA_TOOLCHAIN] + use_cc_toolchain() + (
+        toolchains = [semantics.JAVA_TOOLCHAIN] + use_cc_toolchain(mandatory = False) + (
             [semantics.JAVA_RUNTIME_TOOLCHAIN] if executable or test else []
         ) + (
             [_LAUNCHER_MAKER_TOOLCHAIN] if bazel_features.rules._has_launcher_maker_toolchain else []
@@ -331,7 +331,7 @@ def make_binary_rule(implementation, *, doc, attrs, executable = False, test = F
             "unstrippeddeployjar": "%{name}_deploy.jar.unstripped",
         },
         exec_groups = {
-            "cpp_link": exec_group(toolchains = use_cc_toolchain()),
+            "cpp_link": exec_group(toolchains = use_cc_toolchain(mandatory = False)),
         },
         subrules = [android_lint_subrule],
     )
