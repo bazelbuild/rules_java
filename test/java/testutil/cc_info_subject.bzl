@@ -21,12 +21,11 @@ def _new_cc_info_linking_context_subject(cc_info, meta):
     )
     public = struct(
         equals = lambda other: _cc_info_linking_context_equals(self.actual, other, self.meta),
-        libraries_to_link = lambda: _new_cc_info_libraries_to_link_subject(self.actual.libraries_to_link, self.meta.derive("libraries_to_link")),
-        static_mode_params_for_dynamic_library_libs = lambda: _new_static_mode_params_for_dynamic_library_libs_subject(self.actual, self.meta),
+        library_files = lambda: _new_library_files_subject(self.actual, self.meta),
     )
     return public
 
-def _new_static_mode_params_for_dynamic_library_libs_subject(linking_context, meta):
+def _new_library_files_subject(linking_context, meta):
     libs = []
     for input in linking_context.linker_inputs.to_list():
         for lib in input.libraries:
@@ -39,9 +38,9 @@ def _new_static_mode_params_for_dynamic_library_libs_subject(linking_context, me
             else:
                 libs.append(lib.dynamic_library)
 
-    return subjects.collection(
-        libs,
-        meta = meta.derive("static_mode_params_for_dynamic_library_libs"),
+    return subjects.depset_file(
+        depset(libs),
+        meta = meta.derive("library_files"),
     )
 
 def _cc_info_linking_context_equals(actual, expected, meta):
