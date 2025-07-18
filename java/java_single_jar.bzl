@@ -3,9 +3,9 @@
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 
-def _java_single_jar(ctx):
+def _single_jar_inputs(deps, deploy_env):
     transitive_inputs = []
-    for dep in ctx.attr.deps:
+    for dep in deps:
         if JavaInfo in dep:
             info = dep[JavaInfo]
             transitive_inputs.append(info.transitive_runtime_jars)
@@ -25,11 +25,15 @@ def _java_single_jar(ctx):
     if hasattr(java_common, "JavaRuntimeClasspathInfo"):
         deploy_env_jars = depset(transitive = [
             dep[java_common.JavaRuntimeClasspathInfo].runtime_classpath
-            for dep in ctx.attr.deploy_env
+            for dep in deploy_env
         ])
         excluded_jars = {jar: None for jar in deploy_env_jars.to_list()}
         if excluded_jars:
             inputs = depset([jar for jar in inputs.to_list() if jar not in excluded_jars])
+    return inputs
+
+def _java_single_jar(ctx):
+    inputs = _single_jar_inputs(ctx.attr.deps, ctx.attr.deploy_env)
 
     args = ctx.actions.args()
     args.add_all("--sources", inputs)
