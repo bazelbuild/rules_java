@@ -154,7 +154,10 @@ def basic_java_binary(
         if JavaInfo in dep:
             native_libs_depsets.append(dep[JavaInfo].transitive_native_libraries)
         if CcInfo in dep:
-            native_libs_depsets.append(dep[CcInfo].transitive_native_libraries())
+            if hasattr(dep[CcInfo], "_legacy_transitive_native_libraries"):
+                native_libs_depsets.append(dep[CcInfo]._legacy_transitive_native_libraries)
+            else:
+                native_libs_depsets.append(dep[CcInfo].transitive_native_libraries())
     native_libs_dirs = collect_native_deps_dirs(depset(transitive = native_libs_depsets))
     if native_libs_dirs:
         prefix = "${JAVA_RUNFILES}/" + ctx.workspace_name + "/"

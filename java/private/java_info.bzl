@@ -178,7 +178,8 @@ def merge(
         cc_info = semantics.minimize_cc_info(cc_common.merge_cc_infos(cc_infos = [p.cc_link_params_info for p in providers]))
         result.update(
             cc_link_params_info = cc_info,
-            transitive_native_libraries = cc_info.transitive_native_libraries(),
+            transitive_native_libraries =
+                cc_info._legacy_transitive_native_libraries if hasattr(cc_info, "_legacy_transitive_native_libraries") else cc_info.transitive_native_libraries(),
         )
     else:
         result.update(
@@ -679,14 +680,22 @@ def _javainfo_init_base(
         cc_info = semantics.minimize_cc_info(cc_common.merge_cc_infos(cc_infos = transitive_cc_infos))
         result.update(
             cc_link_params_info = cc_info,
-            transitive_native_libraries = cc_info.transitive_native_libraries(),
+            transitive_native_libraries =
+                cc_info._legacy_transitive_native_libraries if hasattr(cc_info, "_legacy_transitive_native_libraries") else cc_info.transitive_native_libraries(),
         )
     else:
+        transitive_native_libraries = []
+        if native_libraries:
+            merged_cc_info = cc_common.merge_cc_infos(cc_infos = native_libraries)
+            if hasattr(merged_cc_info, "_legacy_transitive_native_libraries"):
+                transitive_native_libraries = [merged_cc_info._legacy_transitive_native_libraries]
+            else:
+                transitive_native_libraries = [merged_cc_info.transitive_native_libraries()]
         result.update(
             transitive_native_libraries = depset(
                 order = "topological",
                 transitive = [dep.transitive_native_libraries for dep in concatenated_deps.runtimedeps_exports_deps] +
-                             ([cc_common.merge_cc_infos(cc_infos = native_libraries).transitive_native_libraries()] if native_libraries else []),
+                             transitive_native_libraries,
             ),
         )
     return result, concatenated_deps
