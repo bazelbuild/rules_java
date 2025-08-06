@@ -47,3 +47,21 @@ load("@rules_shell//shell:repositories.bzl", "rules_shell_dependencies", "rules_
 rules_shell_dependencies()
 
 rules_shell_toolchains()
+
+load("@rules_java//toolchains:remote_java_repository.bzl", "remote_java_repository")
+
+remote_java_repository(
+    name = "my_funky_jdk",
+    prefix = "funky",
+    strip_prefix = "zulu24.32.13-ca-jdk24.0.2-linux_x64",
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    urls = [
+        "https://cdn.azul.com/zulu/bin/zulu24.32.13-ca-jdk24.0.2-linux_x64.tar.gz",
+    ],
+    version = "24",
+)
+
+register_toolchains("@my_funky_jdk_toolchain_config_repo//:all")
