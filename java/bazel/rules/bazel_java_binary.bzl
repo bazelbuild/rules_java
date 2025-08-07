@@ -232,7 +232,7 @@ def _create_stub(ctx, java_attrs, launcher, executable, jvm_flags, main_class, c
         jvm_flags_for_launcher = []
         for flag in jvm_flags:
             jvm_flags_for_launcher.extend(ctx.tokenize(flag))
-        return _create_windows_exe_launcher(ctx, java_executable, classpath, main_class, jvm_flags_for_launcher, runfiles_enabled, executable, coverage_main_class)
+        return _create_windows_exe_launcher(ctx, java_executable, classpath, main_class, jvm_flags_for_launcher, runfiles_enabled, coverage_enabled, executable, coverage_main_class)
 
     if runfiles_enabled:
         prefix = "" if helper.is_absolute_target_platform_path(ctx, java_executable) else "${JAVA_RUNFILES}/"
@@ -277,14 +277,15 @@ def _format_classpath_entry(runfiles_enabled, workspace_prefix, file):
 
     return "$(rlocation " + paths.normalize(workspace_prefix + file.short_path) + ")"
 
-def _create_windows_exe_launcher(ctx, java_executable, classpath, main_class, jvm_flags_for_launcher, runfiles_enabled, executable, coverage_main_class):
+def _create_windows_exe_launcher(ctx, java_executable, classpath, main_class, jvm_flags_for_launcher, runfiles_enabled, coverage_enabled, executable, coverage_main_class):
     launch_info = ctx.actions.args().use_param_file("%s", use_always = True).set_param_file_format("multiline")
     launch_info.add("binary_type=Java")
     launch_info.add(ctx.workspace_name, format = "workspace_name=%s")
     launch_info.add("1" if runfiles_enabled else "0", format = "symlink_runfiles_enabled=%s")
     launch_info.add(java_executable, format = "java_bin_path=%s")
     launch_info.add(main_class, format = "java_start_class=%s")
-    launch_info.add(coverage_main_class, format = "jacoco_main_class=%s")
+    if coverage_enabled:
+        launch_info.add(coverage_main_class, format = "jacoco_main_class=%s")
     launch_info.add_joined(classpath, map_each = _short_path, join_with = ";", format_joined = "classpath=%s", omit_if_empty = False)
     launch_info.add_joined(jvm_flags_for_launcher, join_with = "\t", format_joined = "jvm_flags=%s", omit_if_empty = False)
     launch_info.add(semantics.find_java_runtime_toolchain(ctx).java_home_runfiles_path, format = "jar_bin_path=%s/bin/jar.exe")
