@@ -49,6 +49,25 @@ use_repo(
     "remotejdk21_win",
 )
 
+custom_jdk = use_extension("@rules_java//java:extensions.bzl", "java_repository")
+custom_jdk.remote(
+    name = "my_funky_jdk",
+    prefix = "funky",
+    strip_prefix = "zulu24.32.13-ca-jdk24.0.2-linux_x64",
+    target_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    urls = [
+        "https://cdn.azul.com/zulu/bin/zulu24.32.13-ca-jdk24.0.2-linux_x64.tar.gz",
+    ],
+    version = "24",
+)
+use_repo(custom_jdk, "my_funky_jdk", "my_funky_jdk_toolchain_config_repo")
+
+register_toolchains("@my_funky_jdk_toolchain_config_repo//:all")
+
 register_toolchains("//:all")
 
 bazel_dep(name = "rules_shell", version = "0.4.0", dev_dependency = True)
+bazel_dep(name = "platforms", version = "0.0.11", dev_dependency = True)
