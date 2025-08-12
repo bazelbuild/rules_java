@@ -16,6 +16,7 @@
 
 load("@com_google_protobuf//bazel/common:proto_info.bzl", "ProtoInfo")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
+load("@rules_cc//cc/common:cc_helper.bzl", "cc_helper")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules/impl:basic_java_library_impl.bzl", "basic_java_library", "collect_deps")
@@ -468,3 +469,34 @@ def _auto_create_deploy_jar(ctx, info, launcher_info, main_class, coverage_main_
         add_opens = info.add_opens,
     )
     return output
+
+def _test_providers(ctx):
+    test_providers = []
+    if helper.has_target_constraints(ctx, ctx.attr._apple_constraints):
+        test_providers.append(testing.ExecutionInfo({"requires-darwin": ""}))
+
+    test_env = {}
+    test_env.update(cc_helper.get_expanded_env(ctx, {}))
+
+    coverage_config = helper.get_coverage_config(
+        ctx,
+        runner = None,  # we only need the environment
+    )
+    if coverage_config:
+        test_env.update(coverage_config.env)
+    test_providers.append(testing.TestEnvironment(
+        environment = test_env,
+        inherited_environment = ctx.attr.env_inherit,
+    ))
+
+    return test_providers
+
+def _executable_providers(ctx):
+    if ctx.attr.create_executable:
+        return [RunEnvironmentInfo(cc_helper.get_expanded_env(ctx, {}))]
+    return []
+
+binary_provider_helper = struct(
+    executable_providers = _executable_providers,
+    test_providers = _test_providers,
+)

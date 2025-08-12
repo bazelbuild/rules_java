@@ -24,12 +24,12 @@ load(
 load("//java/common/rules:java_binary.bzl", "BASIC_JAVA_BINARY_ATTRIBUTES")
 load("//java/common/rules:rule_util.bzl", "merge_attrs")
 load("//java/common/rules/impl:java_binary_deploy_jar.bzl", "create_deploy_archives")
-load("//java/common/rules/impl:java_binary_impl.bzl", "basic_java_binary")
+load("//java/common/rules/impl:java_binary_impl.bzl", "basic_java_binary", "binary_provider_helper")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
 load("//java/private:java_info.bzl", "JavaInfo")
 
 def _bazel_java_binary_impl(ctx):
-    return bazel_base_binary_impl(ctx, is_test_rule_class = False) + helper.executable_providers(ctx)
+    return bazel_base_binary_impl(ctx, is_test_rule_class = False) + binary_provider_helper.executable_providers(ctx)
 
 def bazel_base_binary_impl(ctx, is_test_rule_class):
     """Common implementation for binaries and tests

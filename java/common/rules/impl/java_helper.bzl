@@ -17,7 +17,6 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
-load("@rules_cc//cc/common:cc_helper.bzl", "cc_helper")
 load("//java/common:java_semantics.bzl", "semantics")
 
 # copybara: rules_java visibility
@@ -278,32 +277,6 @@ def _get_test_support(ctx):
         return ctx.attr._test_support
     return None
 
-def _test_providers(ctx):
-    test_providers = []
-    if _has_target_constraints(ctx, ctx.attr._apple_constraints):
-        test_providers.append(testing.ExecutionInfo({"requires-darwin": ""}))
-
-    test_env = {}
-    test_env.update(cc_helper.get_expanded_env(ctx, {}))
-
-    coverage_config = _get_coverage_config(
-        ctx,
-        runner = None,  # we only need the environment
-    )
-    if coverage_config:
-        test_env.update(coverage_config.env)
-    test_providers.append(testing.TestEnvironment(
-        environment = test_env,
-        inherited_environment = ctx.attr.env_inherit,
-    ))
-
-    return test_providers
-
-def _executable_providers(ctx):
-    if ctx.attr.create_executable:
-        return [RunEnvironmentInfo(cc_helper.get_expanded_env(ctx, {}))]
-    return []
-
 def _resource_mapper(file):
     root_relative_path = paths.relativize(
         path = file.path,
@@ -499,8 +472,6 @@ helper = struct(
     is_target_platform_windows = _is_target_platform_windows,
     runfiles_enabled = _runfiles_enabled,
     get_test_support = _get_test_support,
-    test_providers = _test_providers,
-    executable_providers = _executable_providers,
     create_single_jar = _create_single_jar,
     shell_escape = _shell_escape,
     detokenize_javacopts = _detokenize_javacopts,
@@ -508,4 +479,5 @@ helper = struct(
     derive_output_file = _derive_output_file,
     is_stamping_enabled = _is_stamping_enabled,
     get_relative = _get_relative,
+    has_target_constraints = _has_target_constraints,
 )
