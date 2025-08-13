@@ -23,6 +23,7 @@ load(
     "remote_jdk21_repos",
     "remote_jdk8_repos",
 )
+load("//toolchains:extensions.bzl", _java_repository = "java_repository")
 
 def _toolchains_impl(module_ctx):
     java_tools_repos()
@@ -38,3 +39,5 @@ def _toolchains_impl(module_ctx):
         return None
 
 toolchains = module_extension(_toolchains_impl)
+
+java_repository = _java_repository
