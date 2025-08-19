@@ -53,4 +53,9 @@ default_java_toolchain(
     name = "my_funky_toolchain",
     bootclasspath = ["@bazel_tools//tools/jdk:platformclasspath"],
     configuration = NONPREBUILT_TOOLCHAIN_CONFIGURATION,
+    exec_compatible_with = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
+    ],
+    java_runtime = "@my_funky_jdk//:jdk",
 )
