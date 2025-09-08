@@ -47,7 +47,7 @@ buildifier: latest
 
 matrix:
   all_platforms: ["ubuntu2004", "macos", "macos_arm64", "windows"]
-  bazel: ["7.6.1", "8.3.0", "last_green"] # Bazel 6 tested separately, needs different flags
+  bazel: ["7.6.1", "8.4.0", "last_green"] # Bazel 6 tested separately, needs different flags
   modern_bazel: ["last_green"] # Fully supported Bazel versions
 
 tasks:
@@ -60,8 +60,8 @@ tasks:
     test_targets: *test_targets
 # Bazel 8.x
   build_and_test_bazel8:
-    name: "Bazel 8.3.0"
-    bazel: "8.3.0"
+    name: "Bazel 8.4.0"
+    bazel: "8.4.0"
     platform: ${{ all_platforms }}
     build_targets: *build_targets
     test_targets: *test_targets
