@@ -54,7 +54,7 @@ JavaRuntimeInfo, _new_javaruntimeinfo = provider(
 )
 
 def _is_main_repo(label):
-    return label.workspace_name == ""
+    return label.repo_name == ""
 
 def _default_java_home(label):
     if _is_main_repo(label):
@@ -70,7 +70,7 @@ def _get_runfiles_java_executable(ctx, java_home, label):
     if paths.is_absolute(java_home) or _is_main_repo(label):
         return helper.get_relative(java_home, _get_bin_java(ctx))
     else:
-        repo_runfiles_path = "" if _is_main_repo(label) else helper.get_relative("..", label.workspace_name)
+        repo_runfiles_path = "" if _is_main_repo(label) else helper.get_relative("..", label.repo_name)
         return helper.get_relative(repo_runfiles_path, _get_bin_java(ctx))
 
 def _is_java_binary(path):
