@@ -1,12 +1,11 @@
 """Module extension for compatibility with previous Bazel versions"""
 
+load("@bazel_features//private:util.bzl", _bazel_version_ge = "ge")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 def _compatibility_proxy_repo_impl(rctx):
-    # TODO: use @bazel_features
-    bazel = native.bazel_version
-    if not bazel or bazel >= "8":
+    if _bazel_version_ge("8.0.0"):
         rctx.file(
             "BUILD.bazel",
             """
@@ -210,15 +209,6 @@ def rules_license_repo():
         ],
     )
 
-def bazel_features_repo():
-    maybe(
-        http_archive,
-        name = "bazel_features",
-        sha256 = "a660027f5a87f13224ab54b8dc6e191693c554f2692fcca46e8e29ee7dabc43b",
-        strip_prefix = "bazel_features-1.30.0",
-        url = "https://github.com/bazel-contrib/bazel_features/releases/download/v1.30.0/bazel_features-v1.30.0.tar.gz",
-    )
-
 def rules_java_dependencies():
     """An utility method to load non-toolchain dependencies of rules_java.
 
@@ -232,4 +222,3 @@ def rules_java_dependencies():
     zlib_repo()
     absl_repo()
     rules_license_repo()
-    bazel_features_repo()

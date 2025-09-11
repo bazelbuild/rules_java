@@ -38,11 +38,18 @@ http_archive(
     sha256 = "$$sha",
 )
 
-load("@rules_java//java:rules_java_deps.bzl", "rules_java_dependencies")
-rules_java_dependencies()
+http_archive(
+    name = "bazel_features",
+    sha256 = "a660027f5a87f13224ab54b8dc6e191693c554f2692fcca46e8e29ee7dabc43b",
+    strip_prefix = "bazel_features-1.30.0",
+    url = "https://github.com/bazel-contrib/bazel_features/releases/download/v1.30.0/bazel_features-v1.30.0.tar.gz",
+)
 
 load("@bazel_features//:deps.bzl", "bazel_features_deps")
 bazel_features_deps()
+
+load("@rules_java//java:rules_java_deps.bzl", "rules_java_dependencies")
+rules_java_dependencies()
 
 # note that the following line is what is minimally required from protobuf for the java rules
 # consider using the protobuf_deps() public API from @com_google_protobuf//:protobuf_deps.bzl
