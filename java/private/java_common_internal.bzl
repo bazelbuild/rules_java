@@ -141,7 +141,7 @@ def compile(
     if ("com.google.devtools.build.runfiles.AutoBazelRepositoryProcessor" in
         plugin_info.plugins.processor_classes.to_list()):
         all_javac_opts.append(depset(
-            ["-Abazel.repository=" + ctx.label.workspace_name],
+            ["-Abazel.repository=" + ctx.label.repo_name],
             order = "preorder",
         ))
     system_bootclasspath = None
