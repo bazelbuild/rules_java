@@ -353,12 +353,12 @@ alias(
     actual = ":toolchain",
 )
 
-RELEASES = (8, 9, 10, 11, 17, 21)
+RELEASES = (8, 9, 10, 11, 17, 21, 25)
 
 [
     default_java_toolchain(
         name = ("toolchain_java%d" if release <= 11 else "toolchain_jdk_%d") % release,
-        configuration = DEFAULT_TOOLCHAIN_CONFIGURATION,
+        configuration = DEFAULT_TOOLCHAIN_CONFIGURATION if release <= 21 else DEFAULT_TOOLCHAIN_CONFIGURATION | {"java_runtime": ":remotejdk_%d" % release},
         source_version = "%s" % release,
         target_version = "%s" % release,
     )
@@ -387,6 +387,12 @@ java_runtime_version_alias(
 java_runtime_version_alias(
     name = "remotejdk_21",
     runtime_version = "remotejdk_21",
+    visibility = ["//visibility:public"],
+)
+
+java_runtime_version_alias(
+    name = "remotejdk_25",
+    runtime_version = "remotejdk_25",
     visibility = ["//visibility:public"],
 )
 

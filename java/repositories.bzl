@@ -325,6 +325,54 @@ _REMOTE_JDK_CONFIGS_LIST = [
         urls = ["https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6+7/OpenJDK21U-jdk_s390x_linux_hotspot_21.0.6_7.tar.gz", "https://mirror.bazel.build/github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.6+7/OpenJDK21U-jdk_s390x_linux_hotspot_21.0.6_7.tar.gz"],
         version = "21",
     ),
+    struct(
+        name = "remotejdk25_linux_aarch64",
+        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:aarch64"],
+        sha256 = "b60eb9d54c97ba4159547834a98cc5d016281dd2b3e60e7475cba4911324bcb4",
+        strip_prefix = "zulu25.28.85-ca-jdk25.0.0-linux_aarch64",
+        urls = ["https://cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-linux_aarch64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-linux_aarch64.tar.gz"],
+        version = "25",
+    ),
+    struct(
+        name = "remotejdk25_linux",
+        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:x86_64"],
+        sha256 = "164d901e5a240b8c18516f5ab55bc11fc9689ab6e829045aea8467356dcdb340",
+        strip_prefix = "zulu25.28.85-ca-jdk25.0.0-linux_x64",
+        urls = ["https://cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-linux_x64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-linux_x64.tar.gz"],
+        version = "25",
+    ),
+    struct(
+        name = "remotejdk25_macos_aarch64",
+        target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:aarch64"],
+        sha256 = "73f64f6bad7c3df31fba740fbcbbbef7c1a5cedeffbb5df386dd79bc72aba9b6",
+        strip_prefix = "zulu25.28.85-ca-jdk25.0.0-macosx_aarch64",
+        urls = ["https://cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-macosx_aarch64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-macosx_aarch64.tar.gz"],
+        version = "25",
+    ),
+    struct(
+        name = "remotejdk25_macos",
+        target_compatible_with = ["@platforms//os:macos", "@platforms//cpu:x86_64"],
+        sha256 = "c2cde1d313d904b793c3760214eefa207ecca7df04e7c4084abdf1f6bbebc27a",
+        strip_prefix = "zulu25.28.85-ca-jdk25.0.0-macosx_x64",
+        urls = ["https://cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-macosx_x64.tar.gz", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-macosx_x64.tar.gz"],
+        version = "25",
+    ),
+    struct(
+        name = "remotejdk25_win_arm64",
+        target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:arm64"],
+        sha256 = "f5f6d8a913695649e8e2607fe0dc79c81953b2583013ac1fb977c63cb4935bfb",
+        strip_prefix = "zulu25.28.85-ca-jdk25.0.0-win_aarch64",
+        urls = ["https://cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-win_aarch64.zip", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-win_aarch64.zip"],
+        version = "25",
+    ),
+    struct(
+        name = "remotejdk25_win",
+        target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:x86_64"],
+        sha256 = "5efcf4e6a613cae06c8041de8a3695b7346aad0307d397b66bf55281cf1a5cb6",
+        strip_prefix = "zulu25.28.85-ca-jdk25.0.0-win_x64",
+        urls = ["https://cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-win_x64.zip", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu25.28.85-ca-jdk25.0.0-win_x64.zip"],
+        version = "25",
+    ),
 ]
 
 def _make_version_to_remote_jdks():
@@ -369,6 +417,10 @@ def remote_jdk21_repos():
     """Imports OpenJDK 21 repositories."""
     _remote_jdk_repos_for_version("21")
 
+def remote_jdk25_repos():
+    """Imports OpenJDK 25 repositories."""
+    _remote_jdk_repos_for_version("25")
+
 def rules_java_dependencies():
     """DEPRECATED: No-op, kept for backwards compatibility"""
     print("DEPRECATED: use rules_java_dependencies() from rules_java_deps.bzl")  # buildifier: disable=print
@@ -384,6 +436,7 @@ def rules_java_toolchains(name = "toolchains"):
     remote_jdk11_repos()
     remote_jdk17_repos()
     remote_jdk21_repos()
+    remote_jdk25_repos()
     java_tools_repos()
 
     native.register_toolchains(
