@@ -29,7 +29,7 @@ while read -r config; do
     TMP_FILE=$$(mktemp -q /tmp/remotejdk.XXXXXX)
     IFS=\\| read -r name version urls strip_prefix target_compatible_with primary_url <<< "$$config"
     echo "fetching: $$primary_url to $$TMP_FILE" > /dev/stderr
-    curl --silent --fail -o $$TMP_FILE -L "$$primary_url" > /dev/stderr
+    curl --retry 5 --write-out '%{{onerror}}%{{url}}\n' --show-error --silent --fail -o $$TMP_FILE -L "$$primary_url" > /dev/stderr
     sha256=`sha256sum $$TMP_FILE | cut -d' ' -f1`
     echo "struct("
     echo "  name = \\"$$name\\","
