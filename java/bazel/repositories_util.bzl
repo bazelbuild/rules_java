@@ -86,6 +86,16 @@ _RELEASE_CONFIGS = {
             },
         },
     },
+    "25": {
+        "zulu": {
+            "release": "25.28.85-ca-jdk25.0.0",
+            "platforms": {
+                "linux": ["aarch64", "x86_64"],
+                "macos": ["aarch64", "x86_64"],
+                "windows": ["arm64", "x86_64"],
+            },
+        },
+    },
 }
 
 _STRIP_PREFIX_OVERRIDES = {
