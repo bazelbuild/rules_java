@@ -98,6 +98,8 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
     reduced_classpath_incompatible_processors = [
         "dagger.hilt.processor.internal.root.RootProcessor",  # see b/21307381
     ],
+    # TODO: Update to JDK 25 after some time has passed - it no longer supports
+    # targeting JDK 7.
     java_runtime = Label("//toolchains:remotejdk_21"),
     oneversion = Label("//toolchains:one_version"),
 )
