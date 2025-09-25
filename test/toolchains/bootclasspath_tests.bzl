@@ -13,6 +13,8 @@ def _test_utf_8_environment(name):
 
 def _test_utf_8_environment_impl(env, target):
     for action in target.actions:
+        if action.mnemonic == "Ijar":
+            continue
         env_subject = env.expect.where(action = action).that_dict(action.env)
         env_subject.keys().contains("LC_CTYPE")
         env_subject.get("LC_CTYPE", factory = subjects.str).contains("UTF-8")

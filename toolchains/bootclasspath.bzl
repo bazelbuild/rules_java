@@ -101,6 +101,20 @@ _bootclasspath_transition = transition(
     ],
 )
 
+def _run_ijar(*, actions, label, ijar, input, output):
+    args = actions.args()
+    args.add(input)
+    args.add(output)
+    args.add("--target_label", label)
+    actions.run(
+        inputs = [input],
+        outputs = [output],
+        executable = ijar,
+        arguments = [args],
+        progress_message = "Extracting interfaces from %{input}",
+        mnemonic = "Ijar",
+    )
+
 _JAVA_BOOTSTRAP_RUNTIME_TOOLCHAIN_TYPE = Label("@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type")
 
 # Opt the Java bootstrap actions into path mapping:
@@ -138,7 +152,7 @@ def _bootclasspath_impl(ctx):
         use_default_shell_env = True,
     )
 
-    bootclasspath = ctx.outputs.output_jar
+    unstripped_bootclasspath = ctx.actions.declare_file("%s_unstripped.jar" % ctx.label.name)
 
     args = ctx.actions.args()
     args.add("-XX:+IgnoreUnrecognizedVMOptions")
@@ -148,7 +162,7 @@ def _bootclasspath_impl(ctx):
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
     args.add_all("-cp", [class_dir], expand_directories = False)
     args.add("DumpPlatformClassPath")
-    args.add(bootclasspath)
+    args.add(unstripped_bootclasspath)
 
     if ctx.attr.language_version_bootstrap_runtime:
         # The attribute is subject to a split transition.
@@ -201,12 +215,22 @@ Rerun with --toolchain_resolution_debug='@bazel_tools//tools/jdk:bootstrap_runti
         executable = str(exec_javabase.java_executable_exec_path),
         mnemonic = "JavaToolchainCompileBootClasspath",
         inputs = inputs,
-        outputs = [bootclasspath],
+        outputs = [unstripped_bootclasspath],
         arguments = [args],
         env = env,
         execution_requirements = _SUPPORTS_PATH_MAPPING,
         use_default_shell_env = True,
     )
+
+    bootclasspath = ctx.outputs.output_jar
+    _run_ijar(
+        actions = ctx.actions,
+        label = ctx.label,
+        ijar = ctx.executable._ijar,
+        input = unstripped_bootclasspath,
+        output = bootclasspath,
+    )
+
     return [
         DefaultInfo(files = depset([bootclasspath])),
         java_common.BootClassPathInfo(
@@ -233,6 +257,11 @@ _bootclasspath = rule(
         ),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+        "_ijar": attr.label(
+            default = "//toolchains:ijar",
+            cfg = "exec",
+            executable = True,
         ),
         "_utf8_environment": attr.label(
             default = ":utf8_environment",
