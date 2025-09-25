@@ -112,6 +112,7 @@ def _run_ijar(*, actions, label, ijar, input, output):
         executable = ijar,
         arguments = [args],
         progress_message = "Extracting interfaces from %{input}",
+        execution_requirements = _SUPPORTS_PATH_MAPPING,
         mnemonic = "Ijar",
     )
 
