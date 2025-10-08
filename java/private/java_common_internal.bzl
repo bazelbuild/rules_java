@@ -224,16 +224,11 @@ def compile(
     elif _should_use_header_compilation(ctx, java_toolchain):
         compile_jar = helper.derive_output_file(ctx, output, name_suffix = "-hjar", extension = "jar")
 
-        # TODO: b/417791104 - remove hasattr check once Bazel 8.3.0 is released
-        if hasattr(ctx.fragments.java, "use_header_compilation_direct_deps") and ctx.fragments.java.use_header_compilation_direct_deps():
+        # TODO: b/417791104 - remove check after a Bazel release
+        if ctx.fragments.java.use_header_compilation_direct_deps():
             header_compilation_jar = helper.derive_output_file(ctx, output, name_suffix = "-tjar", extension = "jar")
-            header_compilation_extra_args = {
-                "header_compilation_jar": header_compilation_jar,
-                "header_compilation_direct_deps": header_compilation_direct_deps,
-            }
         else:
             header_compilation_jar = None
-            header_compilation_extra_args = {}
         compile_deps_proto = helper.derive_output_file(ctx, output, name_suffix = "-hjar", extension = "jdeps")
         get_internal_java_common().create_header_compilation_action(
             ctx,
@@ -253,7 +248,8 @@ def compile(
             injecting_rule_kind,
             enable_direct_classpath,
             annotation_processor_additional_inputs,
-            **header_compilation_extra_args
+            header_compilation_jar,
+            header_compilation_direct_deps,
         )
     elif ctx.fragments.java.use_ijars():
         compile_jar = run_ijar(
