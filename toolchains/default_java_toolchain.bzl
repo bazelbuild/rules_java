@@ -59,8 +59,6 @@ DEFAULT_JAVACOPTS = [
     "--should-stop=ifError=FLOW",  # See b/27049950, https://github.com/google/error-prone/issues/4595
     "-g",
     "-parameters",
-    # https://github.com/bazelbuild/bazel/issues/15219
-    "-Xep:ReturnValueIgnored:OFF",
     # https://github.com/bazelbuild/bazel/issues/16996
     "-Xep:IgnoredPureGetter:OFF",
     "-Xep:EmptyTopLevelDeclaration:OFF",
