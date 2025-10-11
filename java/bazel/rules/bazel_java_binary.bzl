@@ -84,7 +84,7 @@ def bazel_base_binary_impl(ctx, is_test_rule_class):
             test_class = helper.primary_class(ctx)
         if test_class == None:
             fail("cannot determine test class. You might want to rename the " +
-                 " rule or add a 'test_class' attribute.")
+                 "rule or add a 'test_class' attribute.")
         jvm_flags.extend([
             "-ea",
             "-Dbazel.test_suite=" + helper.shell_escape(test_class),
