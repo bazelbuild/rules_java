@@ -65,6 +65,9 @@ DEFAULT_JAVACOPTS = [
     "-Xep:LenientFormatStringValidation:OFF",
     "-Xep:ReturnMissingNullable:OFF",
     "-Xep:UseCorrectAssertInTests:OFF",
+    # Please see https://github.com/bazelbuild/bazel/issues/25927#issuecomment-2825206105
+    # we need to make sure not to filter any warnings so that Bazel can trigger them as errors.
+    "-Xmaxwarns -1",
 ]
 
 # If this is changed, the docs for "{,tool_}java_language_version" also
