@@ -46,7 +46,7 @@ flags_workspace_integration: &flags_workspace_integration
 buildifier: latest
 
 matrix:
-  all_platforms: ["ubuntu2004", "windows"] # TODO: b/443213966 - re-enable macos/macos_arm64
+  all_platforms: ["ubuntu2004", "macos", "macos_arm64", "windows"]
   bazel: ["7.6.1", "8.4.0", "last_green"] # Bazel 6 tested separately, needs different flags
   modern_bazel: ["last_green", "rolling"] # Fully supported Bazel versions
 
