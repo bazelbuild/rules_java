@@ -190,6 +190,7 @@ cc_library(
     )
     for OS in [
         "linux",
+        "linux_aarch64",
         "darwin_x86_64",
         "darwin_arm64",
         "windows",
@@ -207,6 +208,7 @@ alias(
         "@bazel_tools//src/conditions:darwin_arm64": ":ijar_prebuilt_binary_darwin_arm64",
         "@bazel_tools//src/conditions:darwin_x86_64": ":ijar_prebuilt_binary_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
+        "@bazel_tools//src/conditions:linux_aarch64": ":ijar_prebuilt_binary_linux_aarch64",
         "@bazel_tools//src/conditions:windows": ":ijar_prebuilt_binary_windows",
         "//conditions:default": "@remote_java_tools//:ijar_cc_binary",
     }),
@@ -218,6 +220,7 @@ alias(
         "@bazel_tools//src/conditions:darwin_arm64": ":ijar_prebuilt_binary_darwin_arm64",
         "@bazel_tools//src/conditions:darwin_x86_64": ":ijar_prebuilt_binary_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":ijar_prebuilt_binary_linux",
+        "@bazel_tools//src/conditions:linux_aarch64": "ijar_prebuilt_binary_linux_aarch64",
         "@bazel_tools//src/conditions:windows": ":ijar_prebuilt_binary_windows",
     }),
 )
@@ -233,6 +236,7 @@ alias(
         "@bazel_tools//src/conditions:darwin_arm64": ":prebuilt_singlejar_darwin_arm64",
         "@bazel_tools//src/conditions:darwin_x86_64": ":prebuilt_singlejar_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
+        "@bazel_tools//src/conditions:linux_aarch64": ":prebuilt_singlejar_linux_aarch64",
         "@bazel_tools//src/conditions:windows": ":prebuilt_singlejar_windows",
         "//conditions:default": "@remote_java_tools//:singlejar_cc_bin",
     }),
@@ -244,6 +248,7 @@ alias(
         "@bazel_tools//src/conditions:darwin_arm64": ":prebuilt_singlejar_darwin_arm64",
         "@bazel_tools//src/conditions:darwin_x86_64": ":prebuilt_singlejar_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_singlejar_linux",
+        "@bazel_tools//src/conditions:linux_aarch64": ":prebuilt_singlejar_linux_aarch64",
         "@bazel_tools//src/conditions:windows": ":prebuilt_singlejar_windows",
     }),
 )
@@ -259,6 +264,7 @@ alias(
         "@bazel_tools//src/conditions:darwin_arm64": ":prebuilt_one_version_darwin_arm64",
         "@bazel_tools//src/conditions:darwin_x86_64": ":prebuilt_one_version_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_one_version_linux",
+        "@bazel_tools//src/conditions:linux_aarch64": ":prebuilt_one_version_linux_aarch64",
         "@bazel_tools//src/conditions:windows": ":prebuilt_one_version_windows",
         "//conditions:default": "@remote_java_tools//:one_version_cc_bin",
     }),
@@ -270,6 +276,7 @@ alias(
         "@bazel_tools//src/conditions:darwin_arm64": ":prebuilt_one_version_darwin_arm64",
         "@bazel_tools//src/conditions:darwin_x86_64": ":prebuilt_one_version_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":prebuilt_one_version_linux",
+        "@bazel_tools//src/conditions:linux_aarch64": ":prebuilt_one_version_linux_aarch64",
         "@bazel_tools//src/conditions:windows": ":prebuilt_one_version_windows",
     }),
 )
@@ -285,6 +292,7 @@ alias(
         "@bazel_tools//src/conditions:darwin_arm64": ":turbine_direct_graal_darwin_arm64",
         "@bazel_tools//src/conditions:darwin_x86_64": ":turbine_direct_graal_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":turbine_direct_graal_linux",
+        "@bazel_tools//src/conditions:linux_aarch64": ":turbine_direct_graal_linux_aarch64",
         "@bazel_tools//src/conditions:windows": ":turbine_direct_graal_windows",
         "//conditions:default": "@remote_java_tools//:TurbineDirect",
     }),
@@ -296,6 +304,7 @@ alias(
         "@bazel_tools//src/conditions:darwin_arm64": ":turbine_direct_graal_darwin_arm64",
         "@bazel_tools//src/conditions:darwin_x86_64": ":turbine_direct_graal_darwin_x86_64",
         "@bazel_tools//src/conditions:linux_x86_64": ":turbine_direct_graal_linux",
+        "@bazel_tools//src/conditions:linux_aarch64": ":turbine_direct_graal_linux_aarch64",
         "@bazel_tools//src/conditions:windows": ":turbine_direct_graal_windows",
     }),
 )
