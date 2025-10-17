@@ -22,33 +22,38 @@ load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
 # visible for tests
 JAVA_TOOLS_CONFIG = {
-    "version": "v16.0",
+    "version": "v17.0",
     "release": "true",
     "artifacts": {
         "java_tools_linux": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v16.0/java_tools_linux-v16.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v16.0/java_tools_linux-v16.0.zip",
-            "sha": "7c360c60da9b9079e31f18de198f23a22555dfb7b6e91e3c6a7103127b1a8538",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v17.0/java_tools_linux-v17.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v17.0/java_tools_linux-v17.0.zip",
+            "sha": "5f89d5d04b41dbe1d661836b6a76c468113e0080953bcd72aaf6711c7462b86a",
+        },
+        "java_tools_linux_aarch64": {
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v17.0/java_tools_linux_aarch64-v17.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v17.0/java_tools_linux_aarch64-v17.0.zip",
+            "sha": "c36a17057e895b260cb8f2f7961ed7480812ab6923dab5a39f0c93263e2f76f2",
         },
         "java_tools_windows": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v16.0/java_tools_windows-v16.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v16.0/java_tools_windows-v16.0.zip",
-            "sha": "b41faa85fceeb2f852e48d51d000d3bf4f29da86ee61d0fc8cca46d297bccf22",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v17.0/java_tools_windows-v17.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v17.0/java_tools_windows-v17.0.zip",
+            "sha": "3ae5075b228ce464c74bd23602a65016f662895556fa8952cba2995d50904c86",
         },
         "java_tools_darwin_x86_64": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v16.0/java_tools_darwin_x86_64-v16.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v16.0/java_tools_darwin_x86_64-v16.0.zip",
-            "sha": "a41de64afb663bb4880af52b55886098241b9222ee8ec1a0f6258d006ba247fb",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v17.0/java_tools_darwin_x86_64-v17.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v17.0/java_tools_darwin_x86_64-v17.0.zip",
+            "sha": "c65a181af0e723ed1a36c494aa0f70753f128adb7655a7b57f8f7e71217ad35c",
         },
         "java_tools_darwin_arm64": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v16.0/java_tools_darwin_arm64-v16.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v16.0/java_tools_darwin_arm64-v16.0.zip",
-            "sha": "b79900dccca7c26fbae9a38c4da80987445e07194517ec53e169c45f1a88c7be",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v17.0/java_tools_darwin_arm64-v17.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v17.0/java_tools_darwin_arm64-v17.0.zip",
+            "sha": "00787917e359e2218953dbc30e228670e83fa20c4a0a5f914e0b6ecdee85fa9d",
         },
         "java_tools": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v16.0/java_tools-v16.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v16.0/java_tools-v16.0.zip",
-            "sha": "d8b126078705e91677db67b05f7b25ad6fa8865949e2dd38ff85e0553bfb0be2",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v17.0/java_tools-v17.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v17.0/java_tools-v17.0.zip",
+            "sha": "9a441ca2d4ae393edd305b0e465b0ed8ee86b22123c41c26455fb856bf9bc897",
         },
     },
 }
