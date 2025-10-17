@@ -18,7 +18,7 @@ visibility(["//test"])
 _RELEASE_CONFIGS = {
     "8": {
         "zulu": {
-            "release": "8.84.0.15-ca-jdk8.0.442",
+            "release": "8.88.0.19-ca-jdk8.0.462",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -34,7 +34,7 @@ _RELEASE_CONFIGS = {
     },
     "11": {
         "zulu": {
-            "release": "11.78.15-ca-jdk11.0.26",
+            "release": "11.82.19-ca-jdk11.0.28",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -56,7 +56,7 @@ _RELEASE_CONFIGS = {
     },
     "17": {
         "zulu": {
-            "release": "17.56.15-ca-jdk17.0.14",
+            "release": "17.60.17-ca-jdk17.0.16",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -72,7 +72,7 @@ _RELEASE_CONFIGS = {
     },
     "21": {
         "zulu": {
-            "release": "21.40.17-ca-jdk21.0.6",
+            "release": "21.44.17-ca-jdk21.0.8",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
