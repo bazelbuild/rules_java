@@ -190,11 +190,18 @@ def bazel_java_import_rule(
     )
 
     output_group_src_jars = depset() if srcjar == None else depset([srcjar])
+
+    validation_group = []
+    if jdeps_artifact != None:
+        validation_group.append(jdeps_artifact)
+    if srcjar != None:
+        validation_group.append(srcjar)
+
     target["OutputGroupInfo"] = OutputGroupInfo(
         **{
             "_source_jars": output_group_src_jars,
             "_direct_source_jars": output_group_src_jars,
-            "_validation": depset() if jdeps_artifact == None else depset([jdeps_artifact]),
+            "_validation": depset(validation_group),
             "_hidden_top_level_INTERNAL_": target["ProguardSpecProvider"].specs,
         }
     )

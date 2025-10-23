@@ -293,6 +293,33 @@ def _test_src_jars_impl(env, target):
         "{package}/library.srcjar",
     ])
 
+def _test_srcjar_added_to_validation_output_group(name):
+    util.helper_target(
+        java_import,
+        name = name + "/libraryjar_with_srcjar",
+        jars = ["import.jar"],
+        srcjar = "library.srcjar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_srcjar_added_to_validation_output_group_impl,
+        target = name + "/libraryjar_with_srcjar",
+        # Starlark rules are only used with Bazel 8 onwards.
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_srcjar_added_to_validation_output_group_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.outputs().source_output_jars().contains_exactly([
+        "{package}/library.srcjar",
+    ])
+
+    # Check that the srcjar is in the _validation output group.
+    env.expect.that_target(target).output_group("_validation").contains_at_least([
+        "{package}/library.srcjar",
+    ])
+
 def _test_from_genrule(name):
     target_name = name + "/library-jar"
     util.helper_target(
@@ -933,6 +960,7 @@ def java_import_tests(name):
             _test_java_library_allows_import_in_deps,
             _test_module_flags,
             _test_src_jars,
+            _test_srcjar_added_to_validation_output_group,
             _test_from_genrule,
             _test_transitive_dependencies,
             _test_exposes_java_provider,
