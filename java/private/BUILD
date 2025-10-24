@@ -38,6 +38,7 @@ bzl_library(
         "//java/common/rules:toolchain_rules",
         "//java/common/rules/impl:java_helper_bzl",
         "@bazel_skylib//lib:paths",
+        "@bazel_skylib//rules:common_settings",
         "@rules_cc//cc:find_cc_toolchain_bzl",
         "@rules_cc//cc/common",
     ],
