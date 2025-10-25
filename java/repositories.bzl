@@ -190,7 +190,7 @@ _REMOTE_JDK_CONFIGS_LIST = [
         name = "remotejdk11_win_arm64",
         target_compatible_with = ["@platforms//os:windows", "@platforms//cpu:arm64"],
         sha256 = "1e7bfad513a1c2930000db1af19c813460c7a788503c39a7f1f27375310880f8",
-        strip_prefix = "jdk-11.0.26+4",
+        strip_prefix = "jdk-11.0.28+6",
         urls = ["https://aka.ms/download-jdk/microsoft-jdk-11.0.28-windows-aarch64.zip", "https://mirror.bazel.build/aka.ms/download-jdk/microsoft-jdk-11.0.28-windows-aarch64.zip"],
         version = "11",
     ),
