@@ -40,12 +40,12 @@ for config in "$@"; do
     fi
     if [[ -n "${mirror_url}" ]]; then
       echo "checking mirror: ${mirror_url}"
-      curl --silent --fail -I -L ${mirror_url} > /dev/null || { _MISSING_MIRRORS+=("${mirror_url}"); }
+      curl --silent --fail -I -L ${mirror_url} > /dev/null || { _MISSING_MIRRORS+=("${url}"); }
     fi
 done
 
 if [[ ${#_MISSING_MIRRORS[@]} -gt 0 ]]; then
-  echo "Missing mirror URLs:"
+  echo "URLs that aren't mirrored:"
   for m in "${_MISSING_MIRRORS[@]}"; do
     echo "  ${m}"
   done
