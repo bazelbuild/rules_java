@@ -18,7 +18,7 @@ visibility(["//test"])
 _RELEASE_CONFIGS = {
     "8": {
         "zulu": {
-            "release": "8.88.0.19-ca-jdk8.0.462",
+            "release": "8.90.0.19-ca-jdk8.0.472",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -34,7 +34,7 @@ _RELEASE_CONFIGS = {
     },
     "11": {
         "zulu": {
-            "release": "11.82.19-ca-jdk11.0.28",
+            "release": "11.84.17-ca-jdk11.0.29",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -42,13 +42,13 @@ _RELEASE_CONFIGS = {
             },
         },
         "adoptium": {
-            "release": "11.0.26+4",
+            "release": "11.0.28+6",
             "platforms": {
                 "linux": ["ppc64le", "s390x"],
             },
         },
         "microsoft": {
-            "release": "11.0.26",
+            "release": "11.0.28",
             "platforms": {
                 "windows": ["arm64"],
             },
@@ -56,7 +56,7 @@ _RELEASE_CONFIGS = {
     },
     "17": {
         "zulu": {
-            "release": "17.60.17-ca-jdk17.0.16",
+            "release": "17.62.17-ca-jdk17.0.17",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -64,7 +64,7 @@ _RELEASE_CONFIGS = {
             },
         },
         "adoptium": {
-            "release": "17.0.14+7",
+            "release": "17.0.16+8",
             "platforms": {
                 "linux": ["ppc64le", "s390x"],
             },
@@ -72,7 +72,7 @@ _RELEASE_CONFIGS = {
     },
     "21": {
         "zulu": {
-            "release": "21.44.17-ca-jdk21.0.8",
+            "release": "21.46.19-ca-jdk21.0.9",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -80,7 +80,7 @@ _RELEASE_CONFIGS = {
             },
         },
         "adoptium": {
-            "release": "21.0.6+7",
+            "release": "21.0.8+9",
             "platforms": {
                 "linux": ["ppc64le", "riscv64", "s390x"],
             },
@@ -88,7 +88,7 @@ _RELEASE_CONFIGS = {
     },
     "25": {
         "zulu": {
-            "release": "25.28.85-ca-jdk25.0.0",
+            "release": "25.30.17-ca-jdk25.0.1",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -99,7 +99,7 @@ _RELEASE_CONFIGS = {
 }
 
 _STRIP_PREFIX_OVERRIDES = {
-    "remotejdk11_win_arm64": "jdk-11.0.26+4",
+    "remotejdk11_win_arm64": "jdk-11.0.28+6",
 }
 
 def _name_for_remote_jdk(version, os, cpu):
