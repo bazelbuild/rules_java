@@ -351,6 +351,17 @@ bootclasspath(
     }),
 )
 
+bootclasspath(
+    name = "platformclasspath_unstripped",
+    src = "DumpPlatformClassPath.java",
+    java_runtime_alias = ":current_java_runtime",
+    language_version_bootstrap_runtime = select({
+        ":incompatible_language_version_bootclasspath_enabled": ":language_version_bootstrap_runtime",
+        "//conditions:default": None,
+    }),
+    strip = False,
+)
+
 default_java_toolchain(
     name = "toolchain",
     configuration = DEFAULT_TOOLCHAIN_CONFIGURATION,

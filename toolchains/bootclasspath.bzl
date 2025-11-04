@@ -231,7 +231,7 @@ Rerun with --toolchain_resolution_debug='@bazel_tools//tools/jdk:bootstrap_runti
         input = unstripped_bootclasspath,
         output = bootclasspath,
     )
-
+    bootclasspath = bootclasspath if ctx.attr.strip else unstripped_bootclasspath
     return [
         DefaultInfo(files = depset([bootclasspath])),
         java_common.BootClassPathInfo(
@@ -256,6 +256,7 @@ _bootclasspath = rule(
             cfg = "exec",
             allow_single_file = True,
         ),
+        "strip": attr.bool(default = True),
         "_allowlist_function_transition": attr.label(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
         ),

@@ -143,6 +143,7 @@ NONPREBUILT_TOOLCHAIN_CONFIGURATION = dict(
     singlejar = [Label("@remote_java_tools//:singlejar_cc_bin")],
     header_compiler_direct = [Label("@remote_java_tools//:TurbineDirect")],
     oneversion = Label("@remote_java_tools//:one_version_cc_bin"),
+    bootclasspath = [Label("//toolchains:platformclasspath_unstripped")],
 )
 
 def default_java_toolchain(name, configuration = DEFAULT_TOOLCHAIN_CONFIGURATION, toolchain_definition = True, exec_compatible_with = [], target_compatible_with = [], **kwargs):
