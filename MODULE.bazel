@@ -6,7 +6,14 @@ module(
 )
 
 bazel_dep(name = "platforms", version = "0.0.11")
-bazel_dep(name = "rules_cc", version = "0.2.8")
+bazel_dep(name = "rules_cc", version = "0.2.13")
+archive_override(
+    module_name = "rules_cc",
+    integrity = "sha256-y3RA9zEyB7HqBXVTgrlFmvfJARcEDzILe2ugNGC4ZrE=",
+    strip_prefix = "rules_cc-b5a65591334f74371f4d75003768957a740cd868",
+    urls = ["https://github.com/bazelbuild/rules_cc/archive/b5a65591334f74371f4d75003768957a740cd868.tar.gz"],
+)
+
 bazel_dep(name = "bazel_features", version = "1.30.0")
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
 bazel_dep(name = "protobuf", version = "32.1", repo_name = "com_google_protobuf")
