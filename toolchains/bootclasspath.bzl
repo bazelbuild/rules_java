@@ -224,14 +224,16 @@ Rerun with --toolchain_resolution_debug='@bazel_tools//tools/jdk:bootstrap_runti
     )
 
     bootclasspath = ctx.outputs.output_jar
-    _run_ijar(
-        actions = ctx.actions,
-        label = ctx.label,
-        ijar = ctx.executable._ijar,
-        input = unstripped_bootclasspath,
-        output = bootclasspath,
-    )
-    bootclasspath = bootclasspath if ctx.attr.strip else unstripped_bootclasspath
+    if ctx.attr.strip:
+        _run_ijar(
+            actions = ctx.actions,
+            label = ctx.label,
+            ijar = ctx.executable._ijar,
+            input = unstripped_bootclasspath,
+            output = bootclasspath,
+        )
+    else:
+        ctx.actions.symlink(output = bootclasspath, target_file = unstripped_bootclasspath)
     return [
         DefaultInfo(files = depset([bootclasspath])),
         java_common.BootClassPathInfo(
@@ -240,6 +242,9 @@ Rerun with --toolchain_resolution_debug='@bazel_tools//tools/jdk:bootstrap_runti
         ),
         OutputGroupInfo(jar = [bootclasspath]),
     ]
+
+def _compute_ijar(strip):
+    return Label("//toolchains:ijar") if strip else None
 
 _bootclasspath = rule(
     implementation = _bootclasspath_impl,
@@ -261,7 +266,7 @@ _bootclasspath = rule(
             default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
         ),
         "_ijar": attr.label(
-            default = "//toolchains:ijar",
+            default = _compute_ijar,
             cfg = "exec",
             executable = True,
         ),
