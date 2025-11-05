@@ -352,7 +352,7 @@ bootclasspath(
 )
 
 bootclasspath(
-    name = "platformclasspath_unstripped",
+    name = "platformclasspath_nostrip",
     src = "DumpPlatformClassPath.java",
     java_runtime_alias = ":current_java_runtime",
     language_version_bootstrap_runtime = select({
