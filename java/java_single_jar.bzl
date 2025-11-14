@@ -59,6 +59,9 @@ def _java_single_jar(ctx):
     if ctx.attr.multi_release:
         args.add("--multi_release")
 
+    if ctx.attr.exclude_pattern:
+        args.add("--exclude_pattern", ctx.attr.exclude_pattern)
+
     ctx.actions.run(
         inputs = inputs,
         outputs = [ctx.outputs.jar],
@@ -110,6 +113,9 @@ java_single_jar = rule(
             Whether to omit the build-data.properties file generated
             by default."""),
         "multi_release": attr.bool(default = True, doc = """Whether to enable Multi-Release output jars."""),
+        "exclude_pattern": attr.string(default = "", doc = """
+            A regex pattern of files to exclude from the jar.
+        """),
         "_singlejar": attr.label(
             default = Label("//toolchains:singlejar"),
             cfg = "exec",
