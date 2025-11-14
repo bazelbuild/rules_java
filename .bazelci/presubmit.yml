@@ -135,4 +135,5 @@ tasks:
       - "git commit --allow-empty -m 'Fake commit message for testing'"
     test_targets:
       - "//test:check_remote_jdk_configs_test"
+      - "//test:check_remote_java_tools_configs_test"
       - "//test:check_release_notes_test"

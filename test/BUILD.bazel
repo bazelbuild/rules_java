@@ -48,6 +48,7 @@ sh_test(
         ])
         for name, config in JAVA_TOOLS_CONFIG["artifacts"].items()
     ],
+    tags = ["manual"],  # explicitly tested only on Linux
 )
 
 sh_test(
