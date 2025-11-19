@@ -40,7 +40,7 @@ def _java_single_jar(ctx):
     args.use_param_file("@%s")
     args.set_param_file_format("multiline")
     args.add_all("--deploy_manifest_lines", ctx.attr.deploy_manifest_lines)
-    args.add("--output", ctx.outputs.jar)
+    args.add("--output", ctx.outputs.output)
     args.add("--normalize")
 
     # Deal with limitation of singlejar flags: tool's default behavior is
@@ -64,15 +64,15 @@ def _java_single_jar(ctx):
 
     ctx.actions.run(
         inputs = inputs,
-        outputs = [ctx.outputs.jar],
+        outputs = [ctx.outputs.output],
         arguments = [args],
-        progress_message = "Merging into %s" % ctx.outputs.jar.short_path,
+        progress_message = "Merging into %s" % ctx.outputs.output.short_path,
         mnemonic = "JavaSingleJar",
         executable = ctx.executable._singlejar,
         use_default_shell_env = True,
     )
 
-    files = depset([ctx.outputs.jar])
+    files = depset([ctx.outputs.output])
     providers = [DefaultInfo(
         files = files,
         runfiles = ctx.runfiles(transitive_files = files),
@@ -80,6 +80,11 @@ def _java_single_jar(ctx):
     if hasattr(java_common, "JavaRuntimeClasspathInfo"):
         providers.append(java_common.JavaRuntimeClasspathInfo(runtime_classpath = inputs))
     return providers
+
+def _init(name, **kwargs):
+    if "output" not in kwargs:
+        kwargs["output"] = name + ".jar"
+    return kwargs
 
 java_single_jar = rule(
     attrs = {
@@ -122,10 +127,9 @@ java_single_jar = rule(
             allow_single_file = True,
             executable = True,
         ),
+        "output": attr.output(),
     },
-    outputs = {
-        "jar": "%{name}.jar",
-    },
+    initializer = _init,
     implementation = _java_single_jar,
     doc = """
 Collects Java dependencies and jar files into a single jar
