@@ -83,9 +83,10 @@ filegroup(
         ":core_rules",
         ":java_single_jar",
         ":rules",
+        # TODO(bazel-team@): Add for_bazel_tests from rules_cc
+        "//java/common:for_bazel_tests",
         "//java/bazel:for_bazel_tests",  # copybara-use-repo-external-label
         "//java/bazel/rules:for_bazel_tests",  # copybara-use-repo-external-label
-        "//java/common:for_bazel_tests",
         "//java/private:for_bazel_tests",
         "//java/toolchains:for_bazel_tests",
         "@bazel_skylib//:test_deps",
