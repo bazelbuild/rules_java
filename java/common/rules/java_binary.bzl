@@ -303,7 +303,7 @@ will be ignored for this target.
         "classpath_resources": attr.label_list(
             allow_files = True,
             doc = """
-<em class="harmful">DO NOT USE THIS OPTION UNLESS THERE IS NO OTHER WAY)</em>
+<em class="harmful">DO NOT USE THIS OPTION UNLESS THERE IS NO OTHER WAY</em>
 <p>
 A list of resources that must be located at the root of the java tree. This attribute's
 only purpose is to support third-party libraries that require that their resources be
