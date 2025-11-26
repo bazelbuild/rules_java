@@ -77,11 +77,11 @@ _DEFAULT_JAVA_LANGUAGE_VERSION = "11"
 # Default java_toolchain parameters
 _BASE_TOOLCHAIN_CONFIGURATION = dict(
     forcibly_disable_header_compilation = False,
-    genclass = [Label("@remote_java_tools//:GenClass")],
-    header_compiler = [Label("@remote_java_tools//:TurbineDirect")],
-    header_compiler_direct = [Label("//toolchains:turbine_direct")],
-    ijar = [Label("//toolchains:ijar")],
-    javabuilder = [Label("@remote_java_tools//:JavaBuilder")],
+    genclass = Label("@remote_java_tools//:GenClass"),
+    header_compiler = Label("@remote_java_tools//:TurbineDirect"),
+    header_compiler_direct = Label("//toolchains:turbine_direct"),
+    ijar = Label("//toolchains:ijar"),
+    javabuilder = Label("@remote_java_tools//:JavaBuilder"),
     javac_supports_workers = True,
     jacocorunner = Label("@remote_java_tools//:jacoco_coverage_runner_filegroup"),
     jvm_opts = BASE_JDK9_JVM_OPTS,
@@ -90,7 +90,7 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
         "-XX:+UseParallelGC",
     ],
     misc = DEFAULT_JAVACOPTS,
-    singlejar = [Label("//toolchains:singlejar")],
+    singlejar = Label("//toolchains:singlejar"),
     # Code to enumerate target JVM boot classpath uses host JVM. Because
     # java_runtime-s are involved, its implementation is in @bazel_tools.
     bootclasspath = [Label("//toolchains:platformclasspath")],
@@ -121,7 +121,7 @@ DEFAULT_TOOLCHAIN_CONFIGURATION = _BASE_TOOLCHAIN_CONFIGURATION
 # However it does allow using a wider range of `--host_javabase`s, including
 # versions newer than the current JDK.
 VANILLA_TOOLCHAIN_CONFIGURATION = dict(
-    javabuilder = [Label("@remote_java_tools//:VanillaJavaBuilder")],
+    javabuilder = Label("@remote_java_tools//:VanillaJavaBuilder"),
     jvm_opts = [],
     java_runtime = None,
 )
@@ -132,16 +132,16 @@ VANILLA_TOOLCHAIN_CONFIGURATION = dict(
 # same, otherwise the binaries will not work on the execution
 # platform.
 PREBUILT_TOOLCHAIN_CONFIGURATION = dict(
-    ijar = [Label("//toolchains:ijar_prebuilt_binary")],
-    singlejar = [Label("//toolchains:prebuilt_singlejar")],
+    ijar = Label("//toolchains:ijar_prebuilt_binary"),
+    singlejar = Label("//toolchains:prebuilt_singlejar"),
     oneversion = Label("//toolchains:prebuilt_one_version"),
 )
 
 # The new toolchain is using all the tools from sources.
 NONPREBUILT_TOOLCHAIN_CONFIGURATION = dict(
-    ijar = [Label("@remote_java_tools//:ijar_cc_binary")],
-    singlejar = [Label("@remote_java_tools//:singlejar_cc_bin")],
-    header_compiler_direct = [Label("@remote_java_tools//:TurbineDirect")],
+    ijar = Label("@remote_java_tools//:ijar_cc_binary"),
+    singlejar = Label("@remote_java_tools//:singlejar_cc_bin"),
+    header_compiler_direct = Label("@remote_java_tools//:TurbineDirect"),
     oneversion = Label("@remote_java_tools//:one_version_cc_bin"),
     bootclasspath = [Label("//toolchains:platformclasspath_nostrip")],
 )

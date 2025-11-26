@@ -13,12 +13,12 @@ def _declare_java_toolchain(*, name, **kwargs):
     util.helper_target(
         java_toolchain,
         name = name,
-        genclass = [kwargs.get("genclass", "default_genclass.jar")],
+        genclass = kwargs.get("genclass", "default_genclass.jar"),
         jacocorunner = kwargs.get("jacocorunner", None),
-        javabuilder = [kwargs.get("javabuilder", "default_javabuilder.jar")],
+        javabuilder = kwargs.get("javabuilder", "default_javabuilder.jar"),
         java_runtime = kwargs["java_runtime"],
-        ijar = [kwargs.get("ijar", "default_ijar.jar")],
-        singlejar = [kwargs.get("singlejar", "default_singlejar.jar")],
+        ijar = kwargs.get("ijar", "default_ijar.jar"),
+        singlejar = kwargs.get("singlejar", "default_singlejar.jar"),
     )
 
 def _test_jacocorunner(name):

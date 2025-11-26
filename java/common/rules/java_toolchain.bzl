@@ -240,6 +240,7 @@ def _extract_singleton_list_value(dict, key):
         else:
             dict[key] = None
 
+# TODO: b/463873596 - remove this in Bazel 10
 _LEGACY_ANY_TYPE_ATTRS = [
     "genclass",
     "deps_checker",
