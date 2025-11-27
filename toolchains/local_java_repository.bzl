@@ -14,7 +14,6 @@
 
 """Rules for importing a local JDK."""
 
-load("@bazel_features//private:util.bzl", _bazel_version_ge = "ge")
 load("//java/toolchains:java_runtime.bzl", "java_runtime")
 load(":default_java_toolchain.bzl", "default_java_toolchain")
 
@@ -236,17 +235,10 @@ local_java_runtime(
 )
 """ % (local_java_runtime_name, runtime_name, java_home, version)
 
-    if _bazel_version_ge("7.0.0"):
-        # Bazel 7+ uses @platforms//host for the host platform.
-        load_host_constraints = 'load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")\n'
-    else:
-        # Bazel 6 uses @local_config_platform instead, but it's being removed in Bazel 9.
-        load_host_constraints = 'load("@local_config_platform//:constraints.bzl", "HOST_CONSTRAINTS")\n'
-
     repository_ctx.file(
         "BUILD.bazel",
         'load("@rules_java//toolchains:local_java_repository.bzl", "local_java_runtime")\n' +
-        load_host_constraints +
+        'load("@platforms//host:constraints.bzl", "HOST_CONSTRAINTS")\n' +
         build_file +
         local_java_runtime_macro,
     )
