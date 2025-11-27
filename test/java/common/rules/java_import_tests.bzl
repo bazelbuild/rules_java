@@ -775,8 +775,6 @@ def _test_neverlink_is_populated(name):
         name = name,
         impl = _test_neverlink_is_populated_impl,
         target = target_name,
-        # in Bazel 6, JavaInfo._neverlink isn't exposed to Starlark
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_neverlink_is_populated_impl(env, target):

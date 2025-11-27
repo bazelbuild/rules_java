@@ -1255,7 +1255,6 @@ def _output_source_jars_returns_depset_test(name):
         name = name,
         impl = _output_source_jars_returns_depset_test_impl,
         target = target_name,
-        attr_values = {"tags": ["min_bazel_7"]},  # changed in Bazel 7
     )
 
 def _output_source_jars_returns_depset_test_impl(env, target):

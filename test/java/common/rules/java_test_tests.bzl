@@ -56,9 +56,6 @@ def _test_java_test_propagates_direct_native_libraries(name):
         name = name,
         impl = _test_java_test_propagates_direct_native_libraries_impl,
         target = name + "/binary",
-        # in Bazel 6, the windows stub was created by a bespoke, native and
-        # opaque-to-Starlark LauncherFileWriteAction
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_java_test_propagates_direct_native_libraries_impl(env, target):

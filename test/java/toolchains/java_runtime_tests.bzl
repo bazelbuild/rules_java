@@ -38,8 +38,6 @@ def _test_with_absolute_java_home(name):
         config_settings = {
             "//command_line_option:extra_toolchains": [Label(name + "/java_runtime_toolchain")],
         },
-        # Bazel 6 doesn't accept Label's for the transition above
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_with_absolute_java_home_impl(env, target):
@@ -80,8 +78,6 @@ def _test_with_hermetic_java_home(name):
         config_settings = {
             "//command_line_option:extra_toolchains": [Label(name + "/java_runtime_toolchain")],
         },
-        # Bazel 6 doesn't accept Label's for the transition above
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_with_hermetic_java_home_impl(env, target):
@@ -129,8 +125,6 @@ def _test_with_generated_java_executable(name):
         config_settings = {
             "//command_line_option:extra_toolchains": [Label(name + "/java_runtime_toolchain")],
         },
-        # Bazel 6 doesn't accept Label's for the transition above
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_with_generated_java_executable_impl(env, target):

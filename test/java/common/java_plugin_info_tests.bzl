@@ -124,7 +124,6 @@ def _test_without_processor_class(name):
         name = name,
         impl = _test_without_processor_class_impl,
         target = target_name,
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_without_processor_class_impl(env, target):

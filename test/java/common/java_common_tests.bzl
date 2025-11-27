@@ -91,8 +91,6 @@ def _test_compile_exports_with_sources(name):
         name = name,
         impl = _test_compile_exports_with_sources_impl,
         target = target_name,
-        # Bazel 6 JavaInfo doesn't expose compile_time_java_dependencies
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_compile_exports_with_sources_impl(env, target):
@@ -138,7 +136,6 @@ def _test_compile_extend_compile_time_jdeps(name):
         name = name,
         impl = _test_compile_extend_compile_time_jdeps_impl,
         target = name + "/foo",
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_compile_extend_compile_time_jdeps_impl(env, target):
@@ -181,7 +178,6 @@ def _test_compile_extend_compile_time_jdeps_rule_outputs(name):
             "bar": name + "/bar",
             "baz": name + "/baz",
         },
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_compile_extend_compile_time_jdeps_rule_outputs_impl(env, targets):
@@ -234,7 +230,6 @@ def _test_compile_bootclasspath(name):
         name = name,
         impl = _test_compile_bootclasspath_impl,
         target = name + "/custom",
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_compile_bootclasspath_impl(env, target):
@@ -269,7 +264,6 @@ def _test_compile_override_with_empty_bootclasspath(name):
         name = name,
         impl = _test_compile_override_with_empty_bootclasspath_impl,
         target = name + "/custom",
-        attr_values = {"tags": ["min_bazel_7"]},
     )
 
 def _test_compile_override_with_empty_bootclasspath_impl(env, target):
