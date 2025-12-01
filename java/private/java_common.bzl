@@ -16,9 +16,9 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//java/common:java_semantics.bzl", "semantics")
+load("//java/common/rules:java_helper.bzl", "helper")
 load("//java/common/rules:java_runtime.bzl", "JavaRuntimeInfo")
 load("//java/common/rules:java_toolchain.bzl", "JavaToolchainInfo")
-load("//java/common/rules/impl:java_helper.bzl", "helper")
 load(":boot_class_path_info.bzl", "BootClassPathInfo")
 load(
     ":java_common_internal.bzl",

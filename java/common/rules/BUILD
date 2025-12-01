@@ -26,6 +26,12 @@ bzl_library(
 )
 
 bzl_library(
+    name = "java_helper_bzl",
+    srcs = ["java_helper.bzl"],
+    visibility = ["//java:__subpackages__"],
+)
+
+bzl_library(
     name = "core_rules",
     srcs = [
         "basic_java_library.bzl",
@@ -57,6 +63,15 @@ bzl_library(
     visibility = [
         "//java:__subpackages__",
         "@compatibility_proxy//:__pkg__",
+    ],
+    deps = [
+        ":java_helper_bzl",
+        "//java/common:semantics_bzl",
+        "//java/private:boot_class_path_info_bzl",
+        "//java/private:java_info_bzl",
+        "//java/private:native_bzl",
+        "@bazel_skylib//lib:paths",
+        "@rules_cc//cc/common",
     ],
 )
 

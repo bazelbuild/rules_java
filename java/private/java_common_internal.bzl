@@ -16,8 +16,8 @@
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("//java/common:java_semantics.bzl", "semantics")
+load("//java/common/rules:java_helper.bzl", "helper")
 load("//java/common/rules:java_toolchain.bzl", "JavaToolchainInfo")
-load("//java/common/rules/impl:java_helper.bzl", "helper")
 load(
     ":java_info.bzl",
     "JavaPluginInfo",
@@ -222,14 +222,14 @@ def compile(
         header_compilation_jar = compile_jar
         compile_deps_proto = None
     elif _should_use_header_compilation(ctx, java_toolchain):
-        compile_jar = helper.derive_output_file(ctx, output, name_suffix = "-hjar", extension = "jar")
+        compile_jar = _derive_output_file(ctx, output, name_suffix = "-hjar", extension = "jar")
 
         # TODO: b/417791104 - remove check after a Bazel release
         if ctx.fragments.java.use_header_compilation_direct_deps():
-            header_compilation_jar = helper.derive_output_file(ctx, output, name_suffix = "-tjar", extension = "jar")
+            header_compilation_jar = _derive_output_file(ctx, output, name_suffix = "-tjar", extension = "jar")
         else:
             header_compilation_jar = None
-        compile_deps_proto = helper.derive_output_file(ctx, output, name_suffix = "-hjar", extension = "jdeps")
+        compile_deps_proto = _derive_output_file(ctx, output, name_suffix = "-hjar", extension = "jdeps")
         get_internal_java_common().create_header_compilation_action(
             ctx,
             java_toolchain,
@@ -266,16 +266,16 @@ def compile(
         header_compilation_jar = compile_jar
         compile_deps_proto = None
 
-    native_headers_jar = helper.derive_output_file(ctx, output, name_suffix = "-native-header")
-    manifest_proto = helper.derive_output_file(ctx, output, extension_suffix = "_manifest_proto")
+    native_headers_jar = _derive_output_file(ctx, output, name_suffix = "-native-header")
+    manifest_proto = _derive_output_file(ctx, output, extension_suffix = "_manifest_proto")
     deps_proto = None
     if ctx.fragments.java.generate_java_deps() and has_sources:
-        deps_proto = helper.derive_output_file(ctx, output, extension = "jdeps")
+        deps_proto = _derive_output_file(ctx, output, extension = "jdeps")
     generated_class_jar = None
     generated_source_jar = None
     if uses_annotation_processing:
-        generated_class_jar = helper.derive_output_file(ctx, output, name_suffix = "-gen")
-        generated_source_jar = helper.derive_output_file(ctx, output, name_suffix = "-gensrc")
+        generated_class_jar = _derive_output_file(ctx, output, name_suffix = "-gen")
+        generated_source_jar = _derive_output_file(ctx, output, name_suffix = "-gensrc")
     get_internal_java_common().create_compilation_action(
         ctx,
         java_toolchain,
@@ -309,7 +309,7 @@ def compile(
 
     create_output_source_jar = len(source_files) > 0 or source_jars != [output_source_jar]
     if not output_source_jar:
-        output_source_jar = helper.derive_output_file(ctx, output, name_suffix = "-src", extension = "jar")
+        output_source_jar = _derive_output_file(ctx, output, name_suffix = "-src", extension = "jar")
     if create_output_source_jar:
         helper.create_single_jar(
             ctx.actions,
@@ -363,6 +363,35 @@ def compile(
         direct_runtime_jars = direct_runtime_jars,
         compilation_info = compilation_info,
     )
+
+def _derive_output_file(ctx, base_file, *, name_suffix = "", extension = None, extension_suffix = ""):
+    """Declares a new file whose name is derived from the given file
+
+    This method allows appending a suffix to the name (before extension), changing
+    the extension or appending a suffix after the extension. The new file is declared
+    as a sibling of the given base file. At least one of the three options must be
+    specified. It is an error to specify both `extension` and `extension_suffix`.
+
+    Args:
+        ctx: (RuleContext) the rule context.
+        base_file: (File) the file from which to derive the resultant file.
+        name_suffix: (str) Optional. The suffix to append to the name before the
+        extension.
+        extension: (str) Optional. The new extension to use (without '.'). By default,
+        the base_file's extension is used.
+        extension_suffix: (str) Optional. The suffix to append to the base_file's extension
+
+    Returns:
+        (File) the derived file
+    """
+    if not name_suffix and not extension_suffix and not extension:
+        fail("At least one of name_suffix, extension or extension_suffix is required")
+    if extension and extension_suffix:
+        fail("only one of extension or extension_suffix can be specified")
+    if extension == None:
+        extension = base_file.extension
+    new_basename = paths.replace_extension(base_file.basename, name_suffix + "." + extension + extension_suffix)
+    return ctx.actions.declare_file(new_basename, sibling = base_file)
 
 def _should_use_header_compilation(ctx, toolchain):
     if not ctx.fragments.java.use_header_compilation():

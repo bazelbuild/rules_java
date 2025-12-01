@@ -30,6 +30,13 @@ bzl_library(
     name = "java_helper_bzl",
     srcs = ["java_helper.bzl"],
     visibility = ["//java:__subpackages__"],
+    deps = [
+        "//java/common:semantics_bzl",
+        "//java/common/rules:java_helper_bzl",
+        "@bazel_skylib//lib:paths",
+        "@rules_cc//cc:find_cc_toolchain_bzl",
+        "@rules_cc//cc/common",
+    ],
 )
 
 filegroup(

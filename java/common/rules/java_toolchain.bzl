@@ -17,7 +17,7 @@ Definition of java_toolchain rule and JavaToolchainInfo provider.
 """
 
 load("//java/common:java_semantics.bzl", "semantics")
-load("//java/common/rules/impl:java_helper.bzl", "helper")
+load("//java/common/rules:java_helper.bzl", "helper")
 load("//java/private:boot_class_path_info.bzl", "BootClassPathInfo")
 load("//java/private:java_info.bzl", "JavaPluginDataInfo")
 load("//java/private:native.bzl", "get_internal_java_common")

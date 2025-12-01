@@ -23,10 +23,8 @@ bzl_library(
 bzl_library(
     name = "internals",
     srcs = [
-        "boot_class_path_info.bzl",
         "java_common.bzl",
         "java_common_internal.bzl",
-        "java_info.bzl",
         "message_bundle_info.bzl",
     ],
     visibility = [
@@ -34,12 +32,33 @@ bzl_library(
         "@compatibility_proxy//:__pkg__",
     ],
     deps = [
+        ":boot_class_path_info_bzl",
+        ":java_info_bzl",
         ":native_bzl",
+        "//java/common:semantics_bzl",
+        "//java/common/rules:java_helper_bzl",
         "//java/common/rules:toolchain_rules",
-        "//java/common/rules/impl:java_helper_bzl",
         "@bazel_skylib//lib:paths",
         "@bazel_skylib//rules:common_settings",
         "@rules_cc//cc:find_cc_toolchain_bzl",
+        "@rules_cc//cc/common",
+    ],
+)
+
+bzl_library(
+    name = "boot_class_path_info_bzl",
+    srcs = ["boot_class_path_info.bzl"],
+    visibility = ["//java:__subpackages__"],
+    deps = ["@bazel_skylib//lib:paths"],
+)
+
+bzl_library(
+    name = "java_info_bzl",
+    srcs = ["java_info.bzl"],
+    visibility = ["//java:__subpackages__"],
+    deps = [
+        ":native_bzl",
+        "//java/common:semantics_bzl",
         "@rules_cc//cc/common",
     ],
 )

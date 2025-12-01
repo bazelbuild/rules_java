@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Common util functions for java_* rules"""
+"""Common util functions for java_* rules implementations"""
 
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "find_cc_toolchain")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("//java/common:java_semantics.bzl", "semantics")
+load("//java/common/rules:java_helper.bzl", _loading_phase_helper = "helper")
 
 # copybara: rules_java visibility
 
@@ -93,7 +94,7 @@ def _primary_class(ctx):
         for src in ctx.files.srcs:
             if src.basename == main:
                 return _full_classname(_strip_extension(src))
-    return _full_classname(_get_relative(ctx.label.package, ctx.label.name))
+    return _full_classname(helper.get_relative(ctx.label.package, ctx.label.name))
 
 def _strip_extension(file):
     return file.dirname + "/" + (
@@ -102,40 +103,8 @@ def _strip_extension(file):
 
 # TODO(b/193629418): once out of builtins, create a canonical implementation and remove duplicates in depot
 def _full_classname(path):
-    java_segments = _java_segments(path)
+    java_segments = _loading_phase_helper.java_segments(path)
     return ".".join(java_segments) if java_segments != None else None
-
-def _java_segments(path):
-    if path.startswith("/"):
-        fail("path must not be absolute: '%s'" % path)
-    segments = path.split("/")
-    root_idx = -1
-    for idx, segment in enumerate(segments):
-        if segment in ["java", "javatests", "src", "testsrc"]:
-            root_idx = idx
-            break
-    if root_idx < 0:
-        return None
-    is_src = "src" == segments[root_idx]
-    check_mvn_idx = root_idx if is_src else -1
-    if (root_idx == 0 or is_src):
-        for i in range(root_idx + 1, len(segments) - 1):
-            segment = segments[i]
-            if "src" == segment or (is_src and (segment in ["java", "javatests"])):
-                next = segments[i + 1]
-                if next in ["com", "org", "net"]:
-                    root_idx = i
-                elif "src" == segment:
-                    check_mvn_idx = i
-                break
-
-    if check_mvn_idx >= 0 and check_mvn_idx < len(segments) - 2:
-        next = segments[check_mvn_idx + 1]
-        if next in ["main", "test"]:
-            next = segments[check_mvn_idx + 2]
-            if next in ["java", "resources"]:
-                root_idx = check_mvn_idx + 2
-    return segments[(root_idx + 1):]
 
 def _concat(*lists):
     result = []
@@ -250,19 +219,8 @@ def _get_java_executable(ctx, java_runtime_toolchain, launcher):
         java_executable = ctx.workspace_name + "/" + java_executable
     return paths.normalize(java_executable)
 
-def _has_target_constraints(ctx, constraints):
-    # Constraints is a label_list.
-    for constraint in constraints:
-        constraint_value = constraint[platform_common.ConstraintValueInfo]
-        if ctx.target_platform_has_constraint(constraint_value):
-            return True
-    return False
-
-def _is_target_platform_windows(ctx):
-    return _has_target_constraints(ctx, ctx.attr._windows_constraints)
-
 def _is_absolute_target_platform_path(ctx, path):
-    if _is_target_platform_windows(ctx):
+    if helper.is_target_platform_windows(ctx):
         return len(path) > 2 and path[1] == ":"
     return path.startswith("/")
 
@@ -274,139 +232,6 @@ def _get_test_support(ctx):
         return ctx.attr._test_support
     return None
 
-def _resource_mapper(file):
-    root_relative_path = paths.relativize(
-        path = file.path,
-        start = paths.join(file.root.path, file.owner.workspace_root),
-    )
-    return "%s:%s" % (
-        file.path,
-        semantics.get_default_resource_path(root_relative_path, segment_extractor = _java_segments),
-    )
-
-def _create_single_jar(
-        actions,
-        toolchain,
-        output,
-        sources = depset(),
-        resources = depset(),
-        mnemonic = "JavaSingleJar",
-        progress_message = "Building singlejar jar %{output}",
-        build_target = None,
-        output_creator = None):
-    """Register singlejar action for the output jar.
-
-    Args:
-      actions: (actions) ctx.actions
-      toolchain: (JavaToolchainInfo) The java toolchain
-      output: (File) Output file of the action.
-      sources: (depset[File]) The jar files to merge into the output jar.
-      resources: (depset[File]) The files to add to the output jar.
-      mnemonic: (str) The action identifier
-      progress_message: (str) The action progress message
-      build_target: (Label) The target label to stamp in the manifest. Optional.
-      output_creator: (str) The name of the tool to stamp in the manifest. Optional,
-          defaults to 'singlejar'
-    Returns:
-      (File) Output file which was used for registering the action.
-    """
-    args = actions.args()
-    args.set_param_file_format("shell").use_param_file("@%s", use_always = True)
-    args.add("--output", output)
-    args.add_all(
-        [
-            "--compression",
-            "--normalize",
-            "--exclude_build_data",
-            "--warn_duplicate_resources",
-        ],
-    )
-    args.add_all("--sources", sources)
-    args.add_all("--resources", resources, map_each = _resource_mapper)
-
-    args.add("--build_target", build_target)
-    args.add("--output_jar_creator", output_creator)
-
-    actions.run(
-        mnemonic = mnemonic,
-        progress_message = progress_message,
-        executable = toolchain.single_jar,
-        toolchain = semantics.JAVA_TOOLCHAIN_TYPE,
-        inputs = depset(transitive = [resources, sources]),
-        tools = [toolchain.single_jar],
-        outputs = [output],
-        arguments = [args],
-        use_default_shell_env = True,
-    )
-    return output
-
-# TODO(hvd): use skylib shell.quote()
-def _shell_escape(s):
-    """Shell-escape a string
-
-    Quotes a word so that it can be used, without further quoting, as an argument
-    (or part of an argument) in a shell command.
-
-    Args:
-        s: (str) the string to escape
-
-    Returns:
-        (str) the shell-escaped string
-    """
-    if not s:
-        # Empty string is a special case: needs to be quoted to ensure that it
-        # gets treated as a separate argument.
-        return "''"
-    for c in s.elems():
-        # We do this positively so as to be sure we don't inadvertently forget
-        # any unsafe characters.
-        if not c.isalnum() and c not in "@%-_+:,./":
-            return "'" + s.replace("'", "'\\''") + "'"
-    return s
-
-def _detokenize_javacopts(opts):
-    """Detokenizes a list of options to a depset.
-
-    Args:
-        opts: ([str]) the javac options to detokenize
-
-    Returns:
-        (depset[str]) depset of detokenized options
-    """
-    return depset(
-        [" ".join([_shell_escape(opt) for opt in opts])],
-        order = "preorder",
-    )
-
-def _derive_output_file(ctx, base_file, *, name_suffix = "", extension = None, extension_suffix = ""):
-    """Declares a new file whose name is derived from the given file
-
-    This method allows appending a suffix to the name (before extension), changing
-    the extension or appending a suffix after the extension. The new file is declared
-    as a sibling of the given base file. At least one of the three options must be
-    specified. It is an error to specify both `extension` and `extension_suffix`.
-
-    Args:
-        ctx: (RuleContext) the rule context.
-        base_file: (File) the file from which to derive the resultant file.
-        name_suffix: (str) Optional. The suffix to append to the name before the
-        extension.
-        extension: (str) Optional. The new extension to use (without '.'). By default,
-        the base_file's extension is used.
-        extension_suffix: (str) Optional. The suffix to append to the base_file's extension
-
-    Returns:
-        (File) the derived file
-    """
-    if not name_suffix and not extension_suffix and not extension:
-        fail("At least one of name_suffix, extension or extension_suffix is required")
-    if extension and extension_suffix:
-        fail("only one of extension or extension_suffix can be specified")
-    if extension == None:
-        extension = base_file.extension
-    new_basename = paths.replace_extension(base_file.basename, name_suffix + "." + extension + extension_suffix)
-    return ctx.actions.declare_file(new_basename, sibling = base_file)
-
 def _is_stamping_enabled(ctx, stamp):
     if ctx.configuration.is_tool_configuration():
         return 0
@@ -415,40 +240,6 @@ def _is_stamping_enabled(ctx, stamp):
 
     # stamp == -1 / auto
     return int(ctx.configuration.stamp_binaries())
-
-def _get_relative(path_a, path_b):
-    if paths.is_absolute(path_b):
-        return path_b
-    return paths.normalize(paths.join(path_a, path_b))
-
-def _tokenize_javacopts(ctx = None, opts = []):
-    """Tokenizes a list or depset of options to a list.
-
-    Iff opts is a depset, we reverse the flattened list to ensure right-most
-    duplicates are preserved in their correct position.
-
-    If the ctx parameter is omitted, a slow, but pure Starlark, implementation
-    of shell tokenization is used. Otherwise, tokenization is performed using
-    ctx.tokenize() which has significantly better performance (up to 100x for
-    large options lists).
-
-    Args:
-        ctx: (RuleContext|None) the rule context
-        opts: (depset[str]|[str]) the javac options to tokenize
-    Returns:
-        [str] list of tokenized options
-    """
-    if hasattr(opts, "to_list"):
-        opts = reversed(opts.to_list())
-    if ctx:
-        return [
-            token
-            for opt in opts
-            for token in ctx.tokenize(opt)
-        ]
-    else:
-        # TODO: optimize and use the pure Starlark implementation in cc_helper
-        return semantics.tokenize_javacopts(opts)
 
 helper = struct(
     collect_all_targets_as_deps = _collect_all_targets_as_deps,
@@ -466,15 +257,14 @@ helper = struct(
     get_coverage_config = _get_coverage_config,
     get_java_executable = _get_java_executable,
     is_absolute_target_platform_path = _is_absolute_target_platform_path,
-    is_target_platform_windows = _is_target_platform_windows,
+    is_target_platform_windows = _loading_phase_helper.is_target_platform_windows,
     runfiles_enabled = _runfiles_enabled,
     get_test_support = _get_test_support,
-    create_single_jar = _create_single_jar,
-    shell_escape = _shell_escape,
-    detokenize_javacopts = _detokenize_javacopts,
-    tokenize_javacopts = _tokenize_javacopts,
-    derive_output_file = _derive_output_file,
+    create_single_jar = _loading_phase_helper.create_single_jar,
+    shell_escape = _loading_phase_helper.shell_escape,
+    detokenize_javacopts = _loading_phase_helper.detokenize_javacopts,
+    tokenize_javacopts = _loading_phase_helper.tokenize_javacopts,
     is_stamping_enabled = _is_stamping_enabled,
-    get_relative = _get_relative,
-    has_target_constraints = _has_target_constraints,
+    get_relative = _loading_phase_helper.get_relative,
+    has_target_constraints = _loading_phase_helper.has_target_constraints,
 )
