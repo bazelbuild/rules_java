@@ -170,18 +170,15 @@ def _get_shared_native_deps_path(
     method below is only ensured by validations in the CppLinkAction.Builder.build() method.
     """
 
-    fp = ""
-    for artifact in linker_inputs:
-        fp += artifact.short_path
-    fp += str(len(link_opts))
-    for opt in link_opts:
-        fp += opt
-    for artifact in linkstamps:
-        fp += artifact.short_path
-    for artifact in build_info_artifacts:
-        fp += artifact.short_path
-    for feature in features:
-        fp += feature
+    fp = []
+
+    # join() is faster than concatenating many strings individually
+    fp += [a.short_path for a in linker_inputs]
+    fp.append(str(len(link_opts)))
+    fp += link_opts
+    fp += [a.short_path for a in linkstamps]
+    fp += [a.short_path for a in build_info_artifacts]
+    fp += features
 
     # Sharing of native dependencies may cause an ActionConflictException when ThinLTO is
     # disabled for test and test-only targets that are statically linked, but enabled for other
@@ -190,9 +187,9 @@ def _get_shared_native_deps_path(
     # this, we allow creation of multiple artifacts for the shared native library - one shared
     # among the test and test-only targets where ThinLTO is disabled, and the other shared among
     # other targets where ThinLTO is enabled.
-    fp += "1" if is_test_target_partially_disabled_thin_lto else "0"
+    fp.append("1" if is_test_target_partially_disabled_thin_lto else "0")
 
-    fingerprint = "%x" % hash(fp)
+    fingerprint = "%x" % hash("".join(fp))
     return "_nativedeps/" + fingerprint
 
 def _check_and_get_one_version_attribute(ctx, attr):
