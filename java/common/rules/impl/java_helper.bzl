@@ -101,7 +101,7 @@ def _strip_extension(file):
         file.basename[:-(1 + len(file.extension))] if file.extension else file.basename
     )
 
-# TODO(b/193629418): once out of builtins, create a canonical implementation and remove duplicates in depot
+# TODO(b/465048589): once out of builtins, create a canonical implementation and remove duplicates in depot
 def _full_classname(path):
     java_segments = _loading_phase_helper.java_segments(path)
     return ".".join(java_segments) if java_segments != None else None
