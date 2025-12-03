@@ -118,6 +118,7 @@ def basic_java_binary(
         add_exports = ctx.attr.add_exports,
         add_opens = ctx.attr.add_opens,
         bootclasspath = ctx.attr.bootclasspath,
+        is_library = False,
     )
     java_info = target["JavaInfo"]
     compilation_info = java_info.compilation_info

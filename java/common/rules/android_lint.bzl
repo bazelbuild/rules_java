@@ -22,7 +22,7 @@ def _tokenize_opts(opts_depset):
     opts = reversed(opts_depset.to_list())
     return semantics.tokenize_javacopts(opts)
 
-def _android_lint_action(ctx, source_files, source_jars, compilation_info):
+def _android_lint_action(ctx, source_files, source_jars, compilation_info, is_library):
     """
     Creates an action that runs Android lint against Java source files.
 
@@ -42,6 +42,7 @@ def _android_lint_action(ctx, source_files, source_jars, compilation_info):
       source_jars: (list[File])  A list of .jar or .srcjar files containing
         source files. It should also include generated source jars.
       compilation_info: (struct) Information about compilation.
+      is_library: (bool) Whether the target is a library.
 
     Returns:
       (None|File) The Android lint output file or None if no source files were
@@ -101,6 +102,7 @@ def _android_lint_action(ctx, source_files, source_jars, compilation_info):
     args.add_all("--classpath", classpath)
     args.add_all("--lint_rules", compilation_info.plugins.processor_jars)
     args.add("--target_label", ctx.label)
+    args.add("--library", str(is_library).lower())
 
     javac_opts = compilation_info.javac_options
     if javac_opts:
