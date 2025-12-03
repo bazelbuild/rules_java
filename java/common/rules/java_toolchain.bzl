@@ -43,7 +43,7 @@ JavaToolchainInfo, _new_javatoolchaininfo = provider(
         "jvm_opt": "(depset[str]) The default options for the JVM running the java compiler and associated tools.",
         "label": "(label) The toolchain label.",
         "proguard_allowlister": "(FilesToRunProvider) The binary to validate proguard configuration.",
-        "single_jar": "(FilesToRunProvider) The SingleJar deploy jar.",
+        "single_jar": "(FilesToRunProvider) The SingleJar executable.",
         "source_version": "(str) The java source version.",
         "target_version": "(str) The java target version.",
         "tools": "(depset[File]) The compilation tools.",
@@ -546,7 +546,7 @@ Label of the Proguard allowlister.
             allow_files = True,
             executable = True,
             doc = """
-Label of the SingleJar deploy jar.
+Label of the SingleJar executable.
             """,
         ),
         "source_version": attr.string(
