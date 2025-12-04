@@ -14,6 +14,8 @@
 
 """Redirects for private native APIs"""
 
+# copybara: default visibility
+
 # Used for some private native APIs that we can't replicate just yet in Starlark
 def get_internal_java_common():
     return java_common.internal_DO_NOT_USE()  # buildifier: disable=native-java-common

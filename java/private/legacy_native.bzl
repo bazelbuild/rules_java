@@ -17,6 +17,8 @@
 
 """Lovely workaround to be able to expose native constants pretending to be Starlark."""
 
+# copybara: default visibility
+
 # Unused with Bazel@HEAD, only used by the compatibility layer for older Bazel versions
 
 # buildifier: disable=native-java-common
