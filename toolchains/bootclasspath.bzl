@@ -114,40 +114,18 @@ def _bootclasspath_impl(ctx):
     exec_javabase = ctx.attr.java_runtime_alias[java_common.JavaRuntimeInfo]
     env = ctx.attr._utf8_environment[Utf8EnvironmentInfo].environment
 
-    class_dir = ctx.actions.declare_directory("%s_classes" % ctx.label.name)
-
-    args = ctx.actions.args()
-    args.add("-source")
-    args.add("8")
-    args.add("-target")
-    args.add("8")
-    args.add("-Xlint:-options")
-    args.add("-J-XX:-UsePerfData")
-    args.add("-d")
-    args.add_all([class_dir], expand_directories = False)
-    args.add(ctx.file.src)
-
-    ctx.actions.run(
-        executable = "%s/bin/javac" % exec_javabase.java_home,
-        mnemonic = "JavaToolchainCompileClasses",
-        inputs = [ctx.file.src] + ctx.files.java_runtime_alias,
-        outputs = [class_dir],
-        arguments = [args],
-        env = env,
-        execution_requirements = _SUPPORTS_PATH_MAPPING,
-        use_default_shell_env = True,
-    )
-
     bootclasspath = ctx.outputs.output_jar
 
+    # Use JDK 11+'s ability to run a single Java file to avoid compiling DumpPlatformClassPath.
+    # That compilation requires a tree artifact, i.e., declare_directory and those seem to have
+    # trouble materializing sometimes.
     args = ctx.actions.args()
     args.add("-XX:+IgnoreUnrecognizedVMOptions")
     args.add("-XX:-UsePerfData")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.platform=ALL-UNNAMED")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
-    args.add_all("-cp", [class_dir], expand_directories = False)
-    args.add("DumpPlatformClassPath")
+    args.add(ctx.file.src)
     args.add(bootclasspath)
 
     if ctx.attr.language_version_bootstrap_runtime:
@@ -196,7 +174,7 @@ Rerun with --toolchain_resolution_debug='@bazel_tools//tools/jdk:bootstrap_runti
     if len(system) != len(system_files):
         system = None
 
-    inputs = depset([class_dir] + ctx.files.java_runtime_alias, transitive = [any_javabase.files])
+    inputs = depset([ctx.file.src] + ctx.files.java_runtime_alias, transitive = [any_javabase.files])
     ctx.actions.run(
         executable = str(exec_javabase.java_executable_exec_path),
         mnemonic = "JavaToolchainCompileBootClasspath",
