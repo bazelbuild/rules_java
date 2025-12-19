@@ -1,6 +1,7 @@
 """Custom rule to test java_common.compile(plugins = ...) expects JavaPluginInfo"""
 
-load("//java:defs.bzl", "JavaInfo", "java_common")
+load("//java/common:java_common.bzl", "java_common")
+load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 
 def _impl(ctx):
