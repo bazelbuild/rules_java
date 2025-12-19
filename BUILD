@@ -1,6 +1,6 @@
 load("@rules_license//rules:license.bzl", "license")
 
-package(default_applicable_licenses = ["@rules_java//:license"])
+package(default_applicable_licenses = [":license"])
 
 licenses(["notice"])
 
