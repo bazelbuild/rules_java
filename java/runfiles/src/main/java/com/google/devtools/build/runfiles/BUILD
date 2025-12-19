@@ -1,4 +1,5 @@
-load("//java:defs.bzl", "java_library", "java_plugin")
+load("//java:java_library.bzl", "java_library")
+load("//java:java_plugin.bzl", "java_plugin")
 
 package(default_applicable_licenses = ["@rules_java//:license"])
 

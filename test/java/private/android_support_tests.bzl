@@ -15,7 +15,8 @@
 
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
-load("//java:defs.bzl", "java_library", "java_plugin")
+load("//java:java_library.bzl", "java_library")
+load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/private:android_support.bzl", "android_support")  # buildifier: disable=bzl-visibility
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
