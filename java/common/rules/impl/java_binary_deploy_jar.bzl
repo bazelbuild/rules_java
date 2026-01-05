@@ -182,6 +182,7 @@ def create_deploy_archive(
     args.add("--build_target", build_target)
     args.add("--normalize")
     args.add("--compression")
+    args.add("--nocompress_suffixes", "protobuf.meta")
     if main_class:
         args.add("--main_class", main_class)
     args.add_all("--deploy_manifest_lines", manifest_lines)
