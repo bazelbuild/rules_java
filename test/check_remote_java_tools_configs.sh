@@ -22,7 +22,11 @@ function download_and_check_hash() {
     TMP_FILE=$(mktemp -q /tmp/remotejavatools.XXXXXX)
     echo "fetching $name from $url to ${TMP_FILE}"
     curl --silent -o ${TMP_FILE} -L "$url"
-    actual_hash=`sha256sum ${TMP_FILE} | cut -d' ' -f1`
+    if command -v sha256sum &> /dev/null; then
+        actual_hash=`sha256sum ${TMP_FILE} | cut -d' ' -f1`
+    else
+        actual_hash=`shasum -a 256 ${TMP_FILE} | cut -d' ' -f1`
+    fi
     if [ "${hash}" != "${actual_hash}" ]; then
       echo "ERROR: wrong hash for ${name}! wanted: ${hash}, got: ${actual_hash}"
       exit 1
