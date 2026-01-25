@@ -9,6 +9,8 @@ Java Rules for Bazel https://bazel.build.
 
 For a quickstart tutorial, see https://bazel.build/start/java
 
+The fastest way to try this in an empty project is to click the green "Use this template" button on https://github.com/bazel-starters/java.
+
 For slightly more advanced usage, like setting up toolchains
 or writing your own java-like rules,
 see https://bazel.build/docs/bazel-and-java
