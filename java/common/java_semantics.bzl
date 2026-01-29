@@ -113,4 +113,5 @@ semantics = struct(
     tokenize_javacopts = _tokenize_javacopts,
     PLATFORMS_ROOT = "@platforms//",
     INCOMPATIBLE_DISABLE_NON_EXECUTABLE_JAVA_BINARY = False,  # Flip when java_single_jar is feature complete
+    expand_javacopts_make_variables = True,
 )
