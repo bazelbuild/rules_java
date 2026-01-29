@@ -95,6 +95,12 @@ _RELEASE_CONFIGS = {
                 "windows": ["arm64", "x86_64"],
             },
         },
+        "adoptium": {
+            "release": "25.0.2+10",
+            "platforms": {
+                "linux": ["ppc64le", "riscv64", "s390x"],
+            },
+        },
     },
 }
 
