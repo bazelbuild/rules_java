@@ -135,7 +135,10 @@ def compile_action(
       Files_to_build may include an empty .jar file when there are no sources
       or resources present, whereas runfiles in this case are empty.
     """
-
+    expanded_javacopts = javacopts
+    if semantics.expand_javacopts_make_variables:
+        expanded_javacopts = [ctx.expand_make_variables("javacopts", opt, {}) for opt in expanded_javacopts]
+    expanded_javacopts = [ctx.expand_location(opt) for opt in expanded_javacopts]
     java_info = _compile_private_for_builtins(
         ctx,
         output = output_class_jar,
@@ -151,7 +154,7 @@ def compile_action(
         runtime_deps = runtime_deps,
         exports = exports,
         exported_plugins = exported_plugins,
-        javac_opts = [ctx.expand_location(opt) for opt in javacopts],
+        javac_opts = expanded_javacopts,
         neverlink = neverlink,
         output_source_jar = output_source_jar,
         strict_deps = _filter_strict_deps(strict_deps),
