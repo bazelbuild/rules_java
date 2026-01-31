@@ -660,9 +660,14 @@ def _test_runtime_deps_are_not_on_classpath(name):
     target_name = name + "/depends_on_runtimedep"
     util.helper_target(
         java_import,
+        name = target_name + "/import_runtime",
+        jars = ["import_runtime.jar"],
+    )
+    util.helper_target(
+        java_import,
         name = target_name + "/import_dep",
         jars = ["import_compile.jar"],
-        runtime_deps = ["import_runtime.jar"],
+        runtime_deps = [target_name + "/import_runtime"],
     )
     util.helper_target(
         java_library,
