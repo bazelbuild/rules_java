@@ -129,29 +129,35 @@ def _bootclasspath_impl(ctx):
     exec_javabase = ctx.attr.java_runtime_alias[java_common.JavaRuntimeInfo]
     env = ctx.attr._utf8_environment[Utf8EnvironmentInfo].environment
 
-    class_dir = ctx.actions.declare_directory("%s_classes" % ctx.label.name)
+    # If possible, use JDK 11+'s ability to run a single Java file to avoid a
+    # separate action to compile DumpPlatformClassPath.
+    use_source_launcher = exec_javabase.version >= 11
 
-    args = ctx.actions.args()
-    args.add("-source")
-    args.add("8")
-    args.add("-target")
-    args.add("8")
-    args.add("-Xlint:-options")
-    args.add("-J-XX:-UsePerfData")
-    args.add("-d")
-    args.add_all([class_dir], expand_directories = False)
-    args.add(ctx.file.src)
+    class_dir = None
+    if not use_source_launcher:
+        class_dir = ctx.actions.declare_directory("%s_classes" % ctx.label.name)
 
-    ctx.actions.run(
-        executable = "%s/bin/javac" % exec_javabase.java_home,
-        mnemonic = "JavaToolchainCompileClasses",
-        inputs = [ctx.file.src] + ctx.files.java_runtime_alias,
-        outputs = [class_dir],
-        arguments = [args],
-        env = env,
-        execution_requirements = _SUPPORTS_PATH_MAPPING,
-        use_default_shell_env = True,
-    )
+        args = ctx.actions.args()
+        args.add("-source")
+        args.add("8")
+        args.add("-target")
+        args.add("8")
+        args.add("-Xlint:-options")
+        args.add("-J-XX:-UsePerfData")
+        args.add("-d")
+        args.add_all([class_dir], expand_directories = False)
+        args.add(ctx.file.src)
+
+        ctx.actions.run(
+            executable = "%s/bin/javac" % exec_javabase.java_home,
+            mnemonic = "JavaToolchainCompileClasses",
+            inputs = [ctx.file.src] + ctx.files.java_runtime_alias,
+            outputs = [class_dir],
+            arguments = [args],
+            env = env,
+            execution_requirements = _SUPPORTS_PATH_MAPPING,
+            use_default_shell_env = True,
+        )
 
     unstripped_bootclasspath = ctx.actions.declare_file("%s_unstripped.jar" % ctx.label.name)
 
@@ -161,8 +167,13 @@ def _bootclasspath_impl(ctx):
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.platform=ALL-UNNAMED")
     args.add("--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED")
-    args.add_all("-cp", [class_dir], expand_directories = False)
-    args.add("DumpPlatformClassPath")
+
+    if use_source_launcher:
+        args.add(ctx.file.src)
+    else:
+        args.add_all("-cp", [class_dir], expand_directories = False)
+        args.add("DumpPlatformClassPath")
+
     args.add(unstripped_bootclasspath)
 
     if ctx.attr.language_version_bootstrap_runtime:
@@ -211,7 +222,8 @@ Rerun with --toolchain_resolution_debug='@bazel_tools//tools/jdk:bootstrap_runti
     if len(system) != len(system_files):
         system = None
 
-    inputs = depset([class_dir] + ctx.files.java_runtime_alias, transitive = [any_javabase.files])
+    classpath_input = ctx.file.src if use_source_launcher else class_dir
+    inputs = depset([classpath_input] + ctx.files.java_runtime_alias, transitive = [any_javabase.files])
     ctx.actions.run(
         executable = str(exec_javabase.java_executable_exec_path),
         mnemonic = "JavaToolchainCompileBootClasspath",
