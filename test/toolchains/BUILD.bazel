@@ -1,7 +1,8 @@
 load(":bootclasspath_tests.bzl", "bootclasspath_tests")
+load(":default_java_toolchain_tests.bzl", "default_java_toolchain_tests")
 
 package(default_applicable_licenses = ["@rules_java//:license"])
 
-bootclasspath_tests(
-    name = "bootclasspath_tests",
-)
+bootclasspath_tests(name = "bootclasspath_tests")
+
+default_java_toolchain_tests(name = "default_java_toolchain_tests")
