@@ -378,6 +378,30 @@ _REMOTE_JDK_CONFIGS_LIST = [
         urls = ["https://cdn.azul.com/zulu/bin/zulu25.32.17-ca-jdk25.0.2-win_x64.zip", "https://mirror.bazel.build/cdn.azul.com/zulu/bin/zulu25.32.17-ca-jdk25.0.2-win_x64.zip"],
         version = "25",
     ),
+    struct(
+        name = "remotejdk25_linux_ppc64le",
+        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:ppc64le"],
+        sha256 = "b262b735b215173003766da36588d5f717dceada0286db41b439f93fb2ada468",
+        strip_prefix = "jdk-25.0.2+10",
+        urls = ["https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2+10/OpenJDK25U-jdk_ppc64le_linux_hotspot_25.0.2_10.tar.gz", "https://mirror.bazel.build/github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2+10/OpenJDK25U-jdk_ppc64le_linux_hotspot_25.0.2_10.tar.gz"],
+        version = "25",
+    ),
+    struct(
+        name = "remotejdk25_linux_riscv64",
+        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:riscv64"],
+        sha256 = "168119e4fba350f4e6b3ca92450a2b90a8502b89a235a04415e9adf9f5d3164e",
+        strip_prefix = "jdk-25.0.2+10",
+        urls = ["https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2+10/OpenJDK25U-jdk_riscv64_linux_hotspot_25.0.2_10.tar.gz", "https://mirror.bazel.build/github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2+10/OpenJDK25U-jdk_riscv64_linux_hotspot_25.0.2_10.tar.gz"],
+        version = "25",
+    ),
+    struct(
+        name = "remotejdk25_linux_s390x",
+        target_compatible_with = ["@platforms//os:linux", "@platforms//cpu:s390x"],
+        sha256 = "15e5cbcadcf3d43623c31b825063cdc2817b9f1ba840b51dc6ef70e5d33c84e3",
+        strip_prefix = "jdk-25.0.2+10",
+        urls = ["https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2+10/OpenJDK25U-jdk_s390x_linux_hotspot_25.0.2_10.tar.gz", "https://mirror.bazel.build/github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2+10/OpenJDK25U-jdk_s390x_linux_hotspot_25.0.2_10.tar.gz"],
+        version = "25",
+    ),
 ]
 
 def _make_version_to_remote_jdks():
