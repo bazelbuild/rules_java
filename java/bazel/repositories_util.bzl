@@ -88,7 +88,7 @@ _RELEASE_CONFIGS = {
     },
     "25": {
         "zulu": {
-            "release": "25.30.17-ca-jdk25.0.1",
+            "release": "25.32.17-ca-jdk25.0.2",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
