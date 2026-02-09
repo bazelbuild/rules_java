@@ -89,10 +89,9 @@ tasks:
     build_flags: *flags_workspace_integration
     test_targets: *test_target_integration
     test_flags: *flags_workspace_integration
-# Linux-only tests
-  linux_only_tests:
-    name: "Extra tests w/ Bazel {bazel}"
-    bazel: ${{ bazel }}
+  # internal tests for configs and release process
+  internal_tests:
+    name: "Internal tests"
     platform: "ubuntu2004"
     shell_commands:
       - "git init"
