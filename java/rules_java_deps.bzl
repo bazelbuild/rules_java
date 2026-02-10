@@ -209,6 +209,17 @@ def rules_license_repo():
         ],
     )
 
+def re2_repo():
+    maybe(
+        http_archive,
+        name = "re2",
+        sha256 = "5bb6875ae1cd1e9fedde98018c346db7260655f86fdb8837e3075103acd3649b",
+        strip_prefix = "re2-2023-09-01",
+        urls = [
+            "https://github.com/google/re2/releases/download/2023-09-01/re2-2023-09-01.tar.gz",
+        ],
+    )
+
 def rules_java_dependencies():
     """An utility method to load non-toolchain dependencies of rules_java.
 
@@ -222,3 +233,4 @@ def rules_java_dependencies():
     zlib_repo()
     absl_repo()
     rules_license_repo()
+    re2_repo()
