@@ -103,8 +103,6 @@ _BASE_TOOLCHAIN_CONFIGURATION = dict(
     # targeting JDK 7.
     java_runtime = Label("//toolchains:remotejdk_21"),
     oneversion = Label("//toolchains:one_version"),
-    # TODO: remove after https://github.com/protocolbuffers/protobuf/issues/20760 is fixed
-    javabuilder_jvm_opts = ["--sun-misc-unsafe-memory-access=allow"],
 )
 
 DEFAULT_TOOLCHAIN_CONFIGURATION = _BASE_TOOLCHAIN_CONFIGURATION
