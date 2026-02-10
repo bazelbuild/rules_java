@@ -66,7 +66,7 @@ bzl_library(
     srcs = ["java_single_jar.bzl"],
     visibility = ["//visibility:public"],
     deps = [
-        "//java/bazel/rules",  # copybara-use-repo-external-label
+        "//java/bazel/rules:java_single_jar_bzl",  # copybara-use-repo-external-label
     ],
 )
 

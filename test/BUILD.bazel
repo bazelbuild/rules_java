@@ -81,3 +81,9 @@ starlark_doc_extract(
     src = "@compatibility_proxy//:proxy.bzl",
     deps = ["@compatibility_proxy//:proxy_bzl"],
 )
+
+starlark_doc_extract(
+    name = "java_single_jar_bzl_graph",
+    src = "//java:java_single_jar.bzl",
+    deps = ["//java:java_single_jar"],
+)

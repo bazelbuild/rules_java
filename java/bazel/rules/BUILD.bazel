@@ -23,7 +23,10 @@ filegroup(
 
 bzl_library(
     name = "rules",
-    srcs = glob(["*.bzl"]),
+    srcs = glob(
+        ["*.bzl"],
+        exclude = ["bazel_java_single_jar.bzl"],
+    ),
     visibility = ["//visibility:public"],  # for Bazel docgen
     deps = [
         "//java/common:semantics_bzl",
@@ -33,6 +36,17 @@ bzl_library(
         "@bazel_skylib//lib:paths",
         "@rules_cc//cc:find_cc_toolchain_bzl",
         "@rules_cc//cc/common",
+    ],
+)
+
+bzl_library(
+    name = "java_single_jar_bzl",
+    srcs = ["bazel_java_single_jar.bzl"],
+    visibility = [
+        "//java:__pkg__",
+    ],
+    deps = [
+        "//java/common/rules:java_single_jar_bzl",
     ],
 )
 
