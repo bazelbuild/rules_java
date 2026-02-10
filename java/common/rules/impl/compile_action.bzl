@@ -136,9 +136,9 @@ def compile_action(
       or resources present, whereas runfiles in this case are empty.
     """
     expanded_javacopts = javacopts
+    expanded_javacopts = [ctx.expand_location(opt) for opt in expanded_javacopts]
     if semantics.expand_javacopts_make_variables:
         expanded_javacopts = [ctx.expand_make_variables("javacopts", opt, {}) for opt in expanded_javacopts]
-    expanded_javacopts = [ctx.expand_location(opt) for opt in expanded_javacopts]
     java_info = _compile_private_for_builtins(
         ctx,
         output = output_class_jar,

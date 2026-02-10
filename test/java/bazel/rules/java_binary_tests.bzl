@@ -77,11 +77,32 @@ def _test_java_binary_javacopts_make_variable_expansion_impl(env, target):
     assert_java_info.compilation_info().javac_options().not_contains("$(MY_CUSTOM_OPT)")
     assert_java_info.compilation_info().javac_options().contains("MY_OPT_VALUE")
 
+def _test_java_binary_javacopts_location_expansion(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["A.java"],
+        javacopts = ["-XepOpt:foo=$(location :A.java)"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_javacopts_location_expansion_impl,
+        target = name + "/bin",
+    )
+
+def _test_java_binary_javacopts_location_expansion_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.compilation_info().javac_options().contains(
+        "-XepOpt:foo={package}/A.java",
+    )
+
 def java_binary_tests(name):
     test_suite(
         name = name,
         tests = [
             _test_java_binary_cross_compilation_to_unix,
             _test_java_binary_javacopts_make_variable_expansion,
+            _test_java_binary_javacopts_location_expansion,
         ],
     )
