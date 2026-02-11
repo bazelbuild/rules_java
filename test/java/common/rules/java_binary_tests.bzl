@@ -167,6 +167,33 @@ def _test_java_binary_propagates_direct_native_libraries_impl(env, target):
         matching.str_matches("-Djava.library.path=${JAVA_RUNFILES}/*/test_java_binary_propagates_direct_native_libraries"),
     )
 
+def _test_java_compile_only(name):
+    util.helper_target(
+        java_library,
+        name = name + "/hello_library",
+        srcs = ["HelloLibrary.java"],
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/main",
+        srcs = ["Main.java"],
+        main_class = "main.Main",
+        deps = [name + "/hello_library"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_compile_only_impl,
+        target = name + "/main",
+    )
+
+def _test_java_compile_only_impl(env, target):
+    # Assert that the compilation output is exactly main jar, and does not contain a variant of
+    # hello_library.jar.
+    env.expect.that_target(target).output_group(
+        "compilation_outputs",
+    ).contains_exactly(["{package}/{name}.jar"])
+
 def java_binary_tests(name):
     test_suite(
         name = name,
@@ -175,5 +202,6 @@ def java_binary_tests(name):
             _test_stamp_conversion_does_not_override_int,
             _test_java_binary_attributes,
             _test_java_binary_propagates_direct_native_libraries,
+            _test_java_compile_only,
         ],
     )
