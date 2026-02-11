@@ -65,9 +65,7 @@ def _compile(
         sourcepath = [],
         resources = [],
         neverlink = False,
-        enable_annotation_processing = True,
-        add_exports = [],
-        add_opens = []):
+        enable_annotation_processing = True):
     return _compile_internal(
         ctx,
         output = output,
@@ -90,8 +88,6 @@ def _compile(
         resources = resources,
         neverlink = neverlink,
         enable_annotation_processing = enable_annotation_processing,
-        add_exports = add_exports,
-        add_opens = add_opens,
     )
 
 def _run_ijar(actions, jar, java_toolchain, target_label = None):
