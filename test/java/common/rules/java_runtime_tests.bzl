@@ -73,6 +73,25 @@ def _test_absolute_java_home_with_java_impl(env, target):
         matching.str_matches("'java_home' with an absolute path requires 'java' to be empty."),
     )
 
+def _test_bin_java_path_name(name):
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        java = "java",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_bin_java_path_name_impl,
+        target = name + "/jvm",
+        expect_failure = True,
+    )
+
+def _test_bin_java_path_name_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("the path to 'java' must end in 'bin/java'."),
+    )
+
 def java_runtime_tests(name):
     test_suite(
         name = name,
@@ -80,5 +99,6 @@ def java_runtime_tests(name):
             _test_java_runtime_simple,
             _test_absolute_java_home_with_srcs,
             _test_absolute_java_home_with_java,
+            _test_bin_java_path_name,
         ],
     )
