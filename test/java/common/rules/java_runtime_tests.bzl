@@ -108,6 +108,22 @@ def _test_absolute_java_home(name):
 def _test_absolute_java_home_impl(env, target):
     java_runtime_info_subject.from_target(env, target).java_home().equals("/absolute/path")
 
+def _test_relative_java_home(name):
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        java_home = "b/c",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_relative_java_home_impl,
+        target = name + "/jvm",
+    )
+
+def _test_relative_java_home_impl(env, target):
+    java_runtime_info_subject.from_target(env, target).java_home().equals("{package}/b/c")
+
 def java_runtime_tests(name):
     test_suite(
         name = name,
@@ -117,5 +133,6 @@ def java_runtime_tests(name):
             _test_absolute_java_home_with_java,
             _test_bin_java_path_name,
             _test_absolute_java_home,
+            _test_relative_java_home,
         ],
     )
