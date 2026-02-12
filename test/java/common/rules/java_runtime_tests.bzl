@@ -92,6 +92,22 @@ def _test_bin_java_path_name_impl(env, target):
         matching.str_matches("the path to 'java' must end in 'bin/java'."),
     )
 
+def _test_absolute_java_home(name):
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        java_home = "/absolute/path",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_absolute_java_home_impl,
+        target = name + "/jvm",
+    )
+
+def _test_absolute_java_home_impl(env, target):
+    java_runtime_info_subject.from_target(env, target).java_home().equals("/absolute/path")
+
 def java_runtime_tests(name):
     test_suite(
         name = name,
@@ -100,5 +116,6 @@ def java_runtime_tests(name):
             _test_absolute_java_home_with_srcs,
             _test_absolute_java_home_with_java,
             _test_bin_java_path_name,
+            _test_absolute_java_home,
         ],
     )
