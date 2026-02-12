@@ -53,11 +53,32 @@ def _test_absolute_java_home_with_srcs_impl(env, target):
         matching.str_matches("'java_home' with an absolute path requires 'srcs' to be empty."),
     )
 
+def _test_absolute_java_home_with_java(name):
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        java = "bin/java",
+        java_home = "/absolute/path",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_absolute_java_home_with_java_impl,
+        target = name + "/jvm",
+        expect_failure = True,
+    )
+
+def _test_absolute_java_home_with_java_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("'java_home' with an absolute path requires 'java' to be empty."),
+    )
+
 def java_runtime_tests(name):
     test_suite(
         name = name,
         tests = [
             _test_java_runtime_simple,
             _test_absolute_java_home_with_srcs,
+            _test_absolute_java_home_with_java,
         ],
     )
