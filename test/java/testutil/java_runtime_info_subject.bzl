@@ -14,6 +14,7 @@ def _new_java_runtime_info_subject(java_runtime_info, meta):
         java_home_runfiles_path = lambda: _new_path_string_subject(self.actual.java_home_runfiles_path, self.meta.derive("java_home_runfiles_path")),
         java_executable_exec_path = lambda: _new_path_string_subject(self.actual.java_executable_exec_path, self.meta.derive("java_executable_exec_path")),
         java_executable_runfiles_path = lambda: _new_path_string_subject(self.actual.java_executable_runfiles_path, self.meta.derive("java_executable_runfiles_path")),
+        files = lambda: subjects.depset_file(self.actual.files, self.meta.derive("files")),
     )
     return public
 
