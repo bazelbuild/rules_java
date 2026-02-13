@@ -135,6 +135,22 @@ def _test_with_generated_java_executable_impl(env, target):
     assert_info.java_executable_exec_path().starts_with("{bindir}/{package}/foo/bar/bin/java")
     assert_info.java_executable_runfiles_path().starts_with("{package}/foo/bar/bin/java")
 
+def _test_runtime_alias(name):
+    util.helper_target(
+        java_runtime_alias,
+        name = name + "/alias",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_runtime_alias_impl,
+        target = name + "/alias",
+    )
+
+def _test_runtime_alias_impl(env, target):
+    env.expect.that_target(target).has_provider(platform_common.ToolchainInfo)
+    env.expect.that_target(target).has_provider(platform_common.TemplateVariableInfo)
+
 def java_runtime_tests(name):
     test_suite(
         name = name,
@@ -142,5 +158,6 @@ def java_runtime_tests(name):
             _test_with_absolute_java_home,
             _test_with_hermetic_java_home,
             _test_with_generated_java_executable,
+            _test_runtime_alias,
         ],
     )
