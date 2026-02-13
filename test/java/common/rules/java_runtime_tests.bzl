@@ -124,6 +124,25 @@ def _test_relative_java_home(name):
 def _test_relative_java_home_impl(env, target):
     java_runtime_info_subject.from_target(env, target).java_home().equals("{package}/b/c")
 
+def _test_java_home_with_invalid_make_variables(name):
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        java_home = "/opt/$(WTF)",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_home_with_invalid_make_variables_impl,
+        target = name + "/jvm",
+        expect_failure = True,
+    )
+
+def _test_java_home_with_invalid_make_variables_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("$(WTF) not defined"),
+    )
+
 def java_runtime_tests(name):
     test_suite(
         name = name,
@@ -134,5 +153,6 @@ def java_runtime_tests(name):
             _test_bin_java_path_name,
             _test_absolute_java_home,
             _test_relative_java_home,
+            _test_java_home_with_invalid_make_variables,
         ],
     )
