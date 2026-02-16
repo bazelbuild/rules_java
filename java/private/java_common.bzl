@@ -299,7 +299,6 @@ def _make_java_common():
         "default_javac_opts": _default_javac_opts,
         "default_javac_opts_depset": _default_javac_opts_depset,
         "merge": _merge,
-        "make_non_strict": _make_non_strict,
         "JavaPluginInfo": JavaPluginInfo,
         "JavaToolchainInfo": JavaToolchainInfo,
         "JavaRuntimeInfo": JavaRuntimeInfo,
@@ -313,6 +312,10 @@ def _make_java_common():
             get_constraints = _get_constraints,
             set_annotation_processing = _set_annotation_processing,
             java_toolchain_label = _java_toolchain_label,
+        )
+    if semantics.IS_BAZEL:
+        methods.update(
+            make_non_strict = _make_non_strict,
         )
     return struct(**methods)
 
