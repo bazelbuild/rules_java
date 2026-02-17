@@ -27,6 +27,7 @@ def _new_java_info_subject(java_info, meta):
         transitive_source_jars_list = lambda: subjects.collection(java_info.transitive_source_jars.to_list(), self.meta.derive("transitive_source_jars.to_list()")),
         runtime_output_jars = lambda: subjects.depset_file(java_info.runtime_output_jars, self.meta.derive("runtime_output_jars")),
         module_flags = lambda: _new_java_module_flags_subject(self.actual, self.meta),
+        is_neverlink = lambda: subjects.bool(getattr(java_info, "_neverlink", False), self.meta.derive("_neverlink")),
     )
     return public
 

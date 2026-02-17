@@ -1261,6 +1261,24 @@ def _output_source_jars_returns_depset_test_impl(env, target):
     source_jars = target[JavaInfo].java_outputs[0].source_jars
     env.expect.that_str(type(source_jars)).equals(type(depset()))
 
+def _java_info_constructor_with_neverlink_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+        neverlink = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _java_info_constructor_with_neverlink_test_impl,
+        target = target_name,
+    )
+
+def _java_info_constructor_with_neverlink_test_impl(env, target):
+    java_info_subject.from_target(env, target).is_neverlink().equals(True)
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -1305,5 +1323,6 @@ def java_info_tests(name):
             _annotation_processing_test,
             _compilation_info_test,
             _output_source_jars_returns_depset_test,
+            _java_info_constructor_with_neverlink_test,
         ],
     )
