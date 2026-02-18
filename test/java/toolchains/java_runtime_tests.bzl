@@ -1,7 +1,7 @@
 """Tests for the java_runtime rule"""
 
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
-load("@rules_testing//lib:truth.bzl", "matching")
+load("@rules_testing//lib:truth.bzl", "matching", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/toolchains:java_runtime.bzl", "java_runtime")
@@ -289,6 +289,27 @@ def _test_java_home_with_invalid_make_variables_impl(env, target):
         matching.str_matches("$(WTF) not defined"),
     )
 
+def _test_make_variables(name):
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        java_home = "/foo/bar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_make_variables_impl,
+        target = name + "/jvm",
+    )
+
+def _test_make_variables_impl(env, target):
+    env.expect.that_target(target).provider(
+        platform_common.TemplateVariableInfo,
+    ).variables().contains_at_least({"JAVABASE": "/foo/bar"})
+    env.expect.that_target(target).provider(
+        platform_common.TemplateVariableInfo,
+    ).variables().get("JAVA", factory = subjects.str).starts_with("/foo/bar/bin/java")
+
 def java_runtime_tests(name):
     test_suite(
         name = name,
@@ -304,5 +325,6 @@ def java_runtime_tests(name):
             _test_absolute_java_home,
             _test_relative_java_home,
             _test_java_home_with_invalid_make_variables,
+            _test_make_variables,
         ],
     )
