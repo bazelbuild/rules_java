@@ -310,6 +310,24 @@ def _test_make_variables_impl(env, target):
         platform_common.TemplateVariableInfo,
     ).variables().get("JAVA", factory = subjects.str).starts_with("/foo/bar/bin/java")
 
+def _test_no_srcs(name):
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        java_home = "/opt/jvm",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_no_srcs_impl,
+        target = name + "/jvm",
+    )
+
+def _test_no_srcs_impl(env, target):
+    assert_info = java_runtime_info_subject.from_target(env, target)
+    assert_info.java_home().equals("/opt/jvm")
+    assert_info.files().contains_exactly([])
+
 def java_runtime_tests(name):
     test_suite(
         name = name,
@@ -326,5 +344,6 @@ def java_runtime_tests(name):
             _test_relative_java_home,
             _test_java_home_with_invalid_make_variables,
             _test_make_variables,
+            _test_no_srcs,
         ],
     )
