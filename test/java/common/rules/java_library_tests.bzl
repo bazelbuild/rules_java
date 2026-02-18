@@ -267,8 +267,6 @@ def _test_propagates_direct_native_libraries(name):
         name = name,
         impl = _test_propagates_direct_native_libraries_impl,
         target = target_name,
-        # LibraryToLink.library_indentifier only available from Bazel 8
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_propagates_direct_native_libraries_impl(env, target):

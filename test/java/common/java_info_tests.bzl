@@ -10,7 +10,9 @@ load("//java/common:java_info.bzl", "JavaInfo")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:rules/bad_java_info_rules.bzl", "bad_deps", "bad_exports", "bad_libs", "bad_runtime_deps", "compile_jar_not_set", "compile_jar_set_to_none")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
+load("//test/java/testutil:rules/custom_library.bzl", "custom_library")
 load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
+load("//test/java/testutil:rules/java_info_merge.bzl", "java_info_merge_rule")
 
 def _with_output_jar_only_test(name):
     target_name = name + "/my_starlark_rule"
@@ -168,8 +170,6 @@ def _with_native_libraries_test(name):
         name = name,
         impl = _with_native_libraries_test_impl,
         target = target_name,
-        # LibraryToLink.library_indentifier only available from Bazel 8
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _with_native_libraries_test_impl(env, target):
@@ -1279,6 +1279,117 @@ def _java_info_constructor_with_neverlink_test(name):
 def _java_info_constructor_with_neverlink_test_impl(env, target):
     java_info_subject.from_target(env, target).is_neverlink().equals(True)
 
+def _java_common_merge_with_neverlink_test(name):
+    target_name = name + "/merged"
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name + "/with_neverlink",
+        output_jar = target_name + "/with_neverlink.jar",
+        neverlink = True,
+    )
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name + "/without_neverlink",
+        output_jar = target_name + "/without_neverlink.jar",
+        neverlink = False,
+    )
+    util.helper_target(
+        java_info_merge_rule,
+        name = target_name,
+        deps = [target_name + "/with_neverlink", target_name + "/without_neverlink"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _java_common_merge_with_neverlink_test_impl,
+        target = target_name,
+    )
+
+def _java_common_merge_with_neverlink_test_impl(env, target):
+    java_info_subject.from_target(env, target).is_neverlink().equals(True)
+
+def _java_common_compile_with_neverlink_test(name):
+    target_name = name + "/compiled"
+    util.helper_target(
+        custom_library,
+        name = target_name,
+        srcs = ["A.java"],
+        neverlink = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _java_common_compile_with_neverlink_test_impl,
+        target = target_name,
+    )
+
+def _java_common_compile_with_neverlink_test_impl(env, target):
+    java_info_subject.from_target(env, target).is_neverlink().equals(True)
+
+# Tests that java_common.compile propagates native libraries from deps,
+# runtime_deps, and exports.
+def _java_common_compile_native_libraries_propagate_test(name):
+    target_name = name + "/compiled"
+
+    util.helper_target(
+        cc_library,
+        name = target_name + "/native_dep",
+        srcs = ["a.cc"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_dep",
+        srcs = ["B.java"],
+        deps = [target_name + "/native_dep"],
+    )
+
+    util.helper_target(
+        cc_library,
+        name = target_name + "/native_rdep",
+        srcs = ["c.cc"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_rdep",
+        srcs = ["D.java"],
+        deps = [target_name + "/native_rdep"],
+    )
+
+    util.helper_target(
+        cc_library,
+        name = target_name + "/native_export",
+        srcs = ["e.cc"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_export",
+        srcs = ["F.java"],
+        deps = [target_name + "/native_export"],
+    )
+
+    util.helper_target(
+        custom_library,
+        name = target_name,
+        srcs = ["G.java"],
+        deps = [target_name + "/lib_dep"],
+        runtime_deps = [target_name + "/lib_rdep"],
+        exports = [target_name + "/lib_export"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _java_common_compile_native_libraries_propagate_test_impl,
+        target = target_name,
+    )
+
+def _java_common_compile_native_libraries_propagate_test_impl(env, target):
+    assert_native_libs = java_info_subject.from_target(env, target).transitive_native_libraries()
+    assert_native_libs.static_libraries().contains_exactly_predicates([
+        matching.str_matches("*native_rdep*"),
+        matching.str_matches("*native_export*"),
+        matching.str_matches("*native_dep*"),
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -1324,5 +1435,8 @@ def java_info_tests(name):
             _compilation_info_test,
             _output_source_jars_returns_depset_test,
             _java_info_constructor_with_neverlink_test,
+            _java_common_merge_with_neverlink_test,
+            _java_common_compile_with_neverlink_test,
+            _java_common_compile_native_libraries_propagate_test,
         ],
     )
