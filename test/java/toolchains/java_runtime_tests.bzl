@@ -328,6 +328,31 @@ def _test_no_srcs_impl(env, target):
     assert_info.java_home().equals("/opt/jvm")
     assert_info.files().contains_exactly([])
 
+def _test_java_home_generated(name):
+    util.helper_target(
+        native.genrule,
+        name = name + "/gen",
+        outs = ["generated_java_home/bin/java"],
+        cmd = "touch $@",
+    )
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        java = "generated_java_home/bin/java",
+        java_home = "generated_java_home",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_home_generated_impl,
+        target = name + "/jvm",
+    )
+
+def _test_java_home_generated_impl(env, target):
+    java_runtime_info_subject.from_target(env, target).java_home().equals(
+        "{gendir}/{package}/generated_java_home",
+    )
+
 def java_runtime_tests(name):
     test_suite(
         name = name,
@@ -345,5 +370,6 @@ def java_runtime_tests(name):
             _test_java_home_with_invalid_make_variables,
             _test_make_variables,
             _test_no_srcs,
+            _test_java_home_generated,
         ],
     )

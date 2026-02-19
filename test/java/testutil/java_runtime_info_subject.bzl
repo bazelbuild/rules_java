@@ -41,6 +41,7 @@ def _from_target(env, target):
                 "name": target.label.name,
                 "package": target.label.package,
                 "bindir": target[TestingAspectInfo].bin_path,
+                "gendir": env.ctx.configuration.genfiles_dir.path,
             },
         ),
     )
