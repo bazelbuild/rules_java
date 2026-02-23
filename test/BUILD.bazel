@@ -72,6 +72,8 @@ diff_test(
     """,
     file1 = "//java/docs:rules.md",
     file2 = "//java/docs:rules_docs",
+    # TODO: b/369123329 - re-enable docs after moving them out of https://bazel.build/reference/be/java
+    tags = ["manual"],
 )
 
 validate_configs()

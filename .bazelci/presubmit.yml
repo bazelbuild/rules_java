@@ -10,9 +10,7 @@ build_targets: &build_targets
   - "@remote_java_tools//:singlejar_cc_bin"
   # can't build @remote_java_tools_X repos for other platforms
   - "-//toolchains/..."
-  # TODO: re-enable docs after moving them out of https://bazel.build/reference/be/java
   - "-//java/docs/..."
-  - "-//test:docs_up_to_date_test"
 
 build_targets_integration: &build_targets_integration
   - "//..."
@@ -20,8 +18,6 @@ build_targets_integration: &build_targets_integration
 
 test_targets: &test_targets
   - "//test/..."
-  # TODO: re-enable docs after moving them out of https://bazel.build/reference/be/java
-  - "-//test:docs_up_to_date_test"
 
 test_target_integration: &test_target_integration
   - "//:MyTest"
