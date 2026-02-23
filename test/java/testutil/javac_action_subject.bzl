@@ -4,10 +4,10 @@ load("@rules_testing//lib:truth.bzl", "subjects", "truth")
 load("@rules_testing//lib:util.bzl", "TestingAspectInfo")
 
 def _new_javac_action_subject(env, target, output):
-    action = env.expect.that_target(target).action_generating(output).actual
+    action_subject = env.expect.that_target(target).action_generating(output)
     self = struct(
-        actual = action,
-        parsed_flags = _parse_flags(action.argv),
+        actual = action_subject.actual,
+        parsed_flags = _parse_flags(action_subject.actual.argv),
         meta = truth.expect(env).meta.derive(
             "Javac",
             format_str_kwargs = {
@@ -17,8 +17,15 @@ def _new_javac_action_subject(env, target, output):
             },
         ),
     )
+
     public = struct(
-        direct_dependencies = lambda: subjects.collection(self.parsed_flags["--direct_dependencies"], self.meta.derive("--direct_dependencies"), format = True),
+        direct_dependencies = lambda: _create_subject_for_flag("--direct_dependencies", self.parsed_flags, self.meta),
+        source = lambda: _create_subject_for_flag("-source", self.parsed_flags, self.meta),
+        target = lambda: _create_subject_for_flag("-target", self.parsed_flags, self.meta),
+        xmaxerrs = lambda: _create_subject_for_flag("-Xmaxerrs", self.parsed_flags, self.meta),
+        jar = lambda: _create_subject_for_flag("-jar", self.parsed_flags, self.meta),
+        inputs = action_subject.inputs,
+        argv = action_subject.argv,
     )
     return public
 
@@ -42,6 +49,10 @@ def _parse_flags(argv):
             flag_values[current_flag_name].append(arg)
 
     return flag_values
+
+def _create_subject_for_flag(flag_name, parsed_flags, meta):
+    """Helper to create a collection subject for a given flag."""
+    return subjects.collection(parsed_flags[flag_name], meta.derive(flag_name), format = True)
 
 javac_action_subject = struct(
     of = _new_javac_action_subject,
