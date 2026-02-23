@@ -19,7 +19,7 @@ jobs:
       draft: false
       generate_release_notes: true
       release_files: bazel-bin/distro/rules_java-*.tar.gz
-      bazel_test_command: "bazel test -- //test/..."
+      bazel_test_command: "bazel test //test/..."
   publish:
     needs: release
     uses: ./.github/workflows/publish.yaml
