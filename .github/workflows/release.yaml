@@ -12,7 +12,7 @@ permissions:
   contents: write
 jobs:
   release:
-    uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.2.3
+    uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.3.0
     with:
       tag_name: ${{ github.ref_name }}
       prerelease: false
