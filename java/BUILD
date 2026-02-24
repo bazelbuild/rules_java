@@ -61,6 +61,11 @@ bzl_library(
     visibility = ["//visibility:public"],
 )
 
+exports_files(
+    ["java_single_jar.bzl"],
+    visibility = ["//test:__pkg__"],
+)
+
 bzl_library(
     name = "java_single_jar",
     srcs = ["java_single_jar.bzl"],
