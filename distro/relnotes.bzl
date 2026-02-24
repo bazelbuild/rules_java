@@ -5,7 +5,7 @@ def print_rel_notes(*, name, version, archive):
         name = name,
         outs = [name + ".txt"],
         cmd = """
-              last_rel=$$(git describe --tags --abbrev=0)
+              last_rel=$$(git describe --tags --abbrev=0 HEAD~1)
               changelog=$$(/usr/bin/git log tags/$$last_rel..HEAD --format=oneline --invert-grep --grep 'ignore-relnotes' --)
               sha=$$(/usr/bin/sha256sum $(SRCS) | cut -d ' '  -f1)
               cat > $@ <<EOF
