@@ -2,6 +2,7 @@
 
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
+load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/toolchains:java_runtime.bzl", "java_runtime")
@@ -110,11 +111,59 @@ def _test_jacocorunner_impl(env, target):
 
     assert_toolchain.jacocorunner().short_path_equals("{package}/myjacocorunner.jar")
 
+def _test_singlejar_get_command_line(name):
+    _declare_java_toolchain(name = name)
+    util.helper_target(
+        java_binary,
+        name = name + "/a",
+        srcs = ["a.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_singlejar_get_command_line_impl,
+        target = name + "/a",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+        # This crashes in earlier Bazel versions where native rules handled deploy jars differently.
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_singlejar_get_command_line_impl(env, target):
+    assert_javac_action = javac_action_subject.of(env, target, "{package}/{name}_deploy.jar")
+    assert_javac_action.executable_file_name().equals(target.label.package + "/singlejar")
+
+def _test_genclass_get_command_line(name):
+    _declare_java_toolchain(name = name)
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["a.java"],
+        javacopts = ["-processor NOSUCH"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_genclass_get_command_line_impl,
+        target = name + "/a",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+    )
+
+def _test_genclass_get_command_line_impl(env, target):
+    assert_javac_action = javac_action_subject.of(env, target, "{package}/lib{name}-gen.jar")
+
+    assert_javac_action.jar().contains_exactly(["{package}/GenClass_deploy.jar"])
+
 def java_toolchain_tests(name):
     test_suite(
         name = name,
         tests = [
             _test_jacocorunner,
             _test_javac_gets_options,
+            _test_singlejar_get_command_line,
+            _test_genclass_get_command_line,
         ],
     )
