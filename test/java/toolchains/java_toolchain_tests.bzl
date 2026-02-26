@@ -8,6 +8,7 @@ load("//java:java_library.bzl", "java_library")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/toolchains:java_runtime.bzl", "java_runtime")
 load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
+load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:java_toolchain_info_subject.bzl", "java_toolchain_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
 
@@ -194,6 +195,30 @@ def _test_java_binary_uses_timezone_data_impl(env, target):
     assert_action.sources().contains("{package}/tzdata.jar")
     assert_action.inputs().contains_predicate(matching.file_basename_equals("tzdata.jar"))
 
+def _test_ijar_get_command_line(name):
+    _declare_java_toolchain(name = name)
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["a.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_ijar_get_command_line_impl,
+        target = name + "/a",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+            "//command_line_option:java_header_compilation": "false",
+        },
+    )
+
+def _test_ijar_get_command_line_impl(env, target):
+    compile_jar = java_info_subject.from_target(env, target).java_outputs().singleton().compile_jar().actual
+    env.expect.that_target(target).action_generating(compile_jar.short_path).argv().contains(
+        "{package}/ijar",
+    )
+
 def java_toolchain_tests(name):
     test_suite(
         name = name,
@@ -204,5 +229,6 @@ def java_toolchain_tests(name):
             _test_genclass_get_command_line,
             _test_timezone_data_is_correct,
             _test_java_binary_uses_timezone_data,
+            _test_ijar_get_command_line,
         ],
     )
