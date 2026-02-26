@@ -6,6 +6,7 @@ load("//java/common:java_common.bzl", "java_common")
 def _new_java_toolchain_info_subject(info, meta):
     public = struct(
         jacocorunner = lambda: subjects.file(info.jacocorunner.executable, meta.derive("jacocorunner.executable")),
+        timezone_data = lambda: subjects.file(info._timezone_data, meta.derive("_timezone_data")),
     )
     return public
 

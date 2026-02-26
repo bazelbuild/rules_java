@@ -24,6 +24,7 @@ def _new_javac_action_subject(env, target, output):
         target = lambda: _create_subject_for_flag("-target", self.parsed_flags, self.meta),
         xmaxerrs = lambda: _create_subject_for_flag("-Xmaxerrs", self.parsed_flags, self.meta),
         jar = lambda: _create_subject_for_flag("-jar", self.parsed_flags, self.meta),
+        sources = lambda: _create_subject_for_flag("--sources", self.parsed_flags, self.meta),
         executable_file_name = lambda: subjects.str(action_subject.actual.argv[0], self.meta),
         inputs = action_subject.inputs,
         argv = action_subject.argv,
