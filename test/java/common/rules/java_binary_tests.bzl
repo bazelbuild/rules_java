@@ -1,5 +1,6 @@
 """Tests for the java_binary rule"""
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
@@ -7,6 +8,7 @@ load("@rules_testing//lib:truth.bzl", "matching", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
+load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
@@ -194,6 +196,59 @@ def _test_java_compile_only_impl(env, target):
         "compilation_outputs",
     ).contains_exactly(["{package}/{name}.jar"])
 
+def _test_java_binary_can_set_transitive_validation(name):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        # exit early because this test case would be a loading phase error otherwise
+        always_passes(name)
+        return
+
+    env_name = name + "_env"
+    util.helper_target(
+        java_library,
+        name = env_name + "_leaf",
+        srcs = ["A.java"],
+        neverlink = True,  # add runtime_classpath to validation output group
+    )
+    util.helper_target(
+        java_binary,
+        name = env_name,
+        srcs = ["Env.java"],
+        deps = [env_name + "_leaf"],
+        neverlink = True,  # add runtime_classpath to validation output group
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "_bin",
+        srcs = ["Bin.java"],
+        data = [env_name],
+        deploy_env = [env_name],
+        create_executable = False,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_can_set_transitive_validation_impl,
+        targets = {
+            "bin": name + "_bin",
+            "env": env_name,
+        },
+        # Turn off other validations
+        config_settings = {
+            "//command_line_option:experimental_run_android_lint_on_java_rules": False,
+            "//command_line_option:experimental_one_version_enforcement": "OFF",
+        },
+    )
+
+def _test_java_binary_can_set_transitive_validation_impl(env, targets):
+    # ensure the env target has validation outputs
+    env.expect.that_target(targets.env).output_group("_validation").contains_at_least([
+        "{package}/{name}.jar",
+        "{package}/lib{name}_leaf.jar",
+    ])
+
+    # ensure they don't propagate to `bin` because they're a part of the `deploy_env`
+    env.expect.that_target(targets.bin).output_group("_validation").contains_exactly([])
+
 def java_binary_tests(name):
     test_suite(
         name = name,
@@ -203,5 +258,6 @@ def java_binary_tests(name):
             _test_java_binary_attributes,
             _test_java_binary_propagates_direct_native_libraries,
             _test_java_compile_only,
+            _test_java_binary_can_set_transitive_validation,
         ],
     )
