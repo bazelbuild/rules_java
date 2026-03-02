@@ -302,6 +302,40 @@ def _test_no_header_compiler_header_compilation_disabled_analyzes_successfully_i
     # Implicitly succeeds.
     pass
 
+def _test_header_compiler_builtin_processors(name):
+    util.helper_target(
+        java_toolchain,
+        name = name + "/java_toolchain",
+        header_compiler_builtin_processors = ["BuiltinProc1", "BuiltinProc2"],
+        singlejar = "singlejar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_header_compiler_builtin_processors_impl,
+        target = name + "/java_toolchain",
+    )
+
+def _test_header_compiler_builtin_processors_impl(env, target):
+    java_toolchain_info_subject.from_target(env, target).header_compiler_builtin_processors().contains_exactly(["BuiltinProc1", "BuiltinProc2"])
+
+def _test_reduced_classpath_incompatible_processors(name):
+    util.helper_target(
+        java_toolchain,
+        name = name + "/java_toolchain",
+        reduced_classpath_incompatible_processors = ["IncompatibleProc1", "IncompatibleProc2"],
+        singlejar = "singlejar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_reduced_classpath_incompatible_processors_impl,
+        target = name + "/java_toolchain",
+    )
+
+def _test_reduced_classpath_incompatible_processors_impl(env, target):
+    java_toolchain_info_subject.from_target(env, target).reduced_classpath_incompatible_processors().contains_exactly(["IncompatibleProc1", "IncompatibleProc2"])
+
 def java_toolchain_tests(name):
     test_suite(
         name = name,
@@ -316,5 +350,7 @@ def java_toolchain_tests(name):
             _test_no_header_compiler_header_compilation_enabled_fails,
             _test_no_header_compiler_direct_header_compilation_enabled_fails,
             _test_no_header_compiler_header_compilation_disabled_analyzes_successfully,
+            _test_header_compiler_builtin_processors,
+            _test_reduced_classpath_incompatible_processors,
         ],
     )
