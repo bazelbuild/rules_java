@@ -219,6 +219,89 @@ def _test_ijar_get_command_line_impl(env, target):
         "{package}/ijar",
     )
 
+def _test_no_header_compiler_header_compilation_enabled_fails(name):
+    _declare_java_toolchain(
+        name = name,
+        header_compiler = None,
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["a.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_no_header_compiler_header_compilation_enabled_fails_impl,
+        target = name + "/a",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+            "//command_line_option:java_header_compilation": "true",
+        },
+        expect_failure = True,
+    )
+
+def _test_no_header_compiler_header_compilation_enabled_fails_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.contains("header compilation was requested but it is not supported by the " +
+                          "current Java toolchain"),
+    )
+
+def _test_no_header_compiler_direct_header_compilation_enabled_fails(name):
+    _declare_java_toolchain(
+        name = name,
+        header_compiler_direct = None,
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["a.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_no_header_compiler_direct_header_compilation_enabled_fails_impl,
+        target = name + "/a",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+            "//command_line_option:java_header_compilation": "true",
+        },
+        expect_failure = True,
+    )
+
+def _test_no_header_compiler_direct_header_compilation_enabled_fails_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.contains("header compilation was requested but it is not supported by the " +
+                          "current Java toolchain"),
+    )
+
+def _test_no_header_compiler_header_compilation_disabled_analyzes_successfully(name):
+    _declare_java_toolchain(
+        name = name,
+        header_compiler = None,
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["a.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_no_header_compiler_header_compilation_disabled_analyzes_successfully_impl,
+        target = name + "/a",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+            "//command_line_option:java_header_compilation": "false",
+        },
+    )
+
+def _test_no_header_compiler_header_compilation_disabled_analyzes_successfully_impl(
+        env,  # @unused
+        target):  # @unused
+    # Implicitly succeeds.
+    pass
+
 def java_toolchain_tests(name):
     test_suite(
         name = name,
@@ -230,5 +313,8 @@ def java_toolchain_tests(name):
             _test_timezone_data_is_correct,
             _test_java_binary_uses_timezone_data,
             _test_ijar_get_command_line,
+            _test_no_header_compiler_header_compilation_enabled_fails,
+            _test_no_header_compiler_direct_header_compilation_enabled_fails,
+            _test_no_header_compiler_header_compilation_disabled_analyzes_successfully,
         ],
     )
