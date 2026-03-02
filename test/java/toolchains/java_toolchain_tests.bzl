@@ -336,6 +336,85 @@ def _test_reduced_classpath_incompatible_processors(name):
 def _test_reduced_classpath_incompatible_processors_impl(env, target):
     java_toolchain_info_subject.from_target(env, target).reduced_classpath_incompatible_processors().contains_exactly(["IncompatibleProc1", "IncompatibleProc2"])
 
+def _test_location_expansion_in_jvm_opts(name):
+    _declare_java_toolchain(
+        name = name,
+        tools = [name + "/jsr305.jar", name + "/javac"],
+        jvm_opts = [
+            "--patch-module=jdk.compiler=$(location " + name + "/javac)",
+            "--patch-module=java.xml.ws.annotation=$(location " + name + "/jsr305.jar)",
+        ],
+        javabuilder_jvm_opts = ["-Xshare:auto"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["a.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_location_expansion_in_jvm_opts_impl,
+        target = name + "/lib",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+    )
+
+def _test_location_expansion_in_jvm_opts_impl(env, target):
+    assert_javac_action = env.expect.that_target(target).action_generating("{package}/lib{name}.jar")
+    assert_javac_action.argv().contains("--patch-module=jdk.compiler={package}/{test_name}/javac")
+    assert_javac_action.argv().contains("--patch-module=java.xml.ws.annotation={package}/{test_name}/jsr305.jar")
+    assert_javac_action.argv().contains("-Xshare:auto")
+    assert_javac_action.inputs().contains("{package}/{test_name}/jsr305.jar")
+
+def _test_location_expansion_with_multiple_artifacts_fails(name):
+    util.helper_target(
+        native.filegroup,
+        name = name + "/fg",
+        srcs = ["one", "two"],
+    )
+    _declare_java_toolchain(
+        name = name,
+        tools = [name + "/fg"],
+        javabuilder_jvm_opts = ["$(location " + name + "/fg)"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_location_expansion_with_multiple_artifacts_fails_impl,
+        target = name + "/java_toolchain",
+        expect_failure = True,
+    )
+
+def _test_location_expansion_with_multiple_artifacts_fails_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.contains("$(location) expression expands to more than one file"),
+    )
+
+def _test_timezone_data_with_multiple_artifacts_fails(name):
+    util.helper_target(
+        native.filegroup,
+        name = name + "/fg",
+        srcs = ["one", "two"],
+    )
+    _declare_java_toolchain(
+        name = name,
+        timezone_data = name + "/fg",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_timezone_data_with_multiple_artifacts_fails_impl,
+        target = name + "/java_toolchain",
+        expect_failure = True,
+    )
+
+def _test_timezone_data_with_multiple_artifacts_fails_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.contains("must produce a single file"),
+    )
+
 def java_toolchain_tests(name):
     test_suite(
         name = name,
@@ -352,5 +431,8 @@ def java_toolchain_tests(name):
             _test_no_header_compiler_header_compilation_disabled_analyzes_successfully,
             _test_header_compiler_builtin_processors,
             _test_reduced_classpath_incompatible_processors,
+            _test_location_expansion_in_jvm_opts,
+            _test_location_expansion_with_multiple_artifacts_fails,
+            _test_timezone_data_with_multiple_artifacts_fails,
         ],
     )
