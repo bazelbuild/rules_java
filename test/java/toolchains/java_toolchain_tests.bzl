@@ -527,6 +527,45 @@ def _test_java_compile_action_uses_tool_specific_jvm_opts_impl(env, target):
     header_action = env.expect.that_target(target).action_generating("{package}/lib{name}-hjar.jar")
     header_action.argv().contains("-DturbineFlag=1")
 
+def _test_javabuilder_location_expansion_with_multiple_artifacts(name):
+    util.helper_target(
+        native.filegroup,
+        name = name + "/fg1",
+        srcs = ["a", "b"],
+    )
+    util.helper_target(
+        native.filegroup,
+        name = name + "/fg2",
+        srcs = ["c", "d"],
+    )
+    _declare_java_toolchain(
+        name = name,
+        javabuilder_data = [name + "/fg1", name + "/fg2"],
+        javabuilder_jvm_opts = [
+            "$(locations " + name + "/fg1)",
+            "$(locations " + name + "/fg2)",
+        ],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_javabuilder_location_expansion_with_multiple_artifacts_impl,
+        target = name + "/java_toolchain",
+    )
+
+def _test_javabuilder_location_expansion_with_multiple_artifacts_impl(env, target):
+    assert_javabuilder = java_toolchain_info_subject.from_target(env, target).javabuilder()
+    assert_javabuilder.data().contains_exactly([
+        "{package}/a",
+        "{package}/b",
+        "{package}/c",
+        "{package}/d",
+    ]).in_order()
+    assert_javabuilder.jvm_opts().contains_exactly([
+        "{package}/a {package}/b",
+        "{package}/c {package}/d",
+    ]).in_order()
+
 def java_toolchain_tests(name):
     test_suite(
         name = name,
@@ -549,5 +588,6 @@ def java_toolchain_tests(name):
             _test_java_compile_action_target_gets_javacopts_from_toolchain,
             _test_java_compile_action_exec_gets_javacopts_from_toolchain,
             _test_java_compile_action_uses_tool_specific_jvm_opts,
+            _test_javabuilder_location_expansion_with_multiple_artifacts,
         ],
     )
