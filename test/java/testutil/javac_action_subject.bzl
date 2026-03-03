@@ -20,9 +20,7 @@ def _new_javac_action_subject(env, target, output):
 
     public = struct(
         direct_dependencies = lambda: _create_subject_for_flag("--direct_dependencies", self.parsed_flags, self.meta),
-        source = lambda: _create_subject_for_flag("-source", self.parsed_flags, self.meta),
-        target = lambda: _create_subject_for_flag("-target", self.parsed_flags, self.meta),
-        xmaxerrs = lambda: _create_subject_for_flag("-Xmaxerrs", self.parsed_flags, self.meta),
+        javacopts = lambda: _create_subject_for_flag("--javacopts", self.parsed_flags, self.meta),
         jar = lambda: _create_subject_for_flag("-jar", self.parsed_flags, self.meta),
         sources = lambda: _create_subject_for_flag("--sources", self.parsed_flags, self.meta),
         executable_file_name = lambda: subjects.str(action_subject.actual.argv[0], self.meta),
@@ -37,7 +35,12 @@ def _parse_flags(argv):
     for idx, arg in enumerate(argv):
         if idx == 0:
             continue  # java command
-        if arg.startswith("-"):
+
+        if current_flag_name == "--javacopts" and arg == "--":
+            current_flag_name = None
+            continue
+
+        if arg.startswith("-") and current_flag_name != "--javacopts":
             if "=" in arg:
                 parts = arg.split("=", 1)
                 flag_values.setdefault(parts[0], []).append(parts[1])

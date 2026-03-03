@@ -1,10 +1,11 @@
 """Tests for the java_toolchain rule"""
 
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
-load("@rules_testing//lib:truth.bzl", "matching")
+load("@rules_testing//lib:truth.bzl", "matching", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
+load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/toolchains:java_runtime.bzl", "java_runtime")
 load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
@@ -83,15 +84,19 @@ def _test_javac_gets_options(name):
 
 def _test_javac_gets_options_impl(env, targets):
     assert_javac_action = javac_action_subject.of(env, targets.a, "{package}/lib{name}.jar")
-    assert_javac_action.source().contains_exactly(["6"])
-    assert_javac_action.target().contains_exactly(["6"])
-    assert_javac_action.xmaxerrs().contains_exactly(["500"])
+    assert_javac_action.javacopts().contains_at_least([
+        "-source",
+        "6",
+        "-target",
+        "6",
+        "-Xlint:toto",
+        "-Xmaxerrs",
+        "500",
+    ])
     assert_javac_action.jar().contains_exactly(["{package}/JavaBuilder_deploy.jar"])
     assert_javac_action.inputs().contains("{package}/rt.jar")
 
-    assert_argv = assert_javac_action.argv()
-    assert_argv.contains("-Xlint:toto")
-    assert_argv.not_contains("-g")
+    assert_javac_action.javacopts().not_contains("-g")
 
     assert_header_action = javac_action_subject.of(env, targets.b, "{package}/lib{name}-hjar.jar")
     assert_header_action.argv().contains("{package}/turbine_direct")
@@ -415,6 +420,113 @@ def _test_timezone_data_with_multiple_artifacts_fails_impl(env, target):
         matching.contains("must produce a single file"),
     )
 
+def _test_java_compile_action_target_gets_javacopts_from_toolchain(name):
+    _declare_java_toolchain(
+        name = name,
+        javacopts = ["-XDtoolchainJavacFlag"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["a.java"],
+    )
+    analysis_test(
+        name = name,
+        impl = _test_java_compile_action_target_gets_javacopts_from_toolchain_impl,
+        target = name + "/lib",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+            "//command_line_option:javacopt": ["-XDcommandLineJavacFlag"],
+            "//command_line_option:host_javacopt": ["-XDhostCommandLineJavacFlag"],
+        },
+    )
+
+def _test_java_compile_action_target_gets_javacopts_from_toolchain_impl(env, target):
+    assert_javacopts = javac_action_subject.of(env, target, "{package}/lib{name}.jar").javacopts()
+    assert_javacopts.contains_exactly([
+        "-source",
+        "6",
+        "-target",
+        "6",
+        "-Xlint:toto",
+        "-XDtoolchainJavacFlag",
+        "-XDcommandLineJavacFlag",
+    ])
+
+def _test_java_compile_action_exec_gets_javacopts_from_toolchain(name):
+    _declare_java_toolchain(
+        name = name,
+        javacopts = ["-XDtoolchainJavacFlag"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["a.java"],
+    )
+    util.helper_target(
+        util.force_exec_config,
+        name = name + "/exec_lib",
+        tools = [name + "/lib"],
+    )
+    analysis_test(
+        name = name,
+        impl = _test_java_compile_action_exec_gets_javacopts_from_toolchain_impl,
+        target = name + "/exec_lib",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+            "//command_line_option:javacopt": ["-XDcommandLineJavacFlag"],
+            "//command_line_option:host_javacopt": ["-XDhostCommandLineJavacFlag"],
+        },
+    )
+
+def _test_java_compile_action_exec_gets_javacopts_from_toolchain_impl(env, target):
+    lib = env.expect.that_target(target).attr("tools", factory = subjects.collection).actual[0]
+    assert_javacopts = javac_action_subject.of(env, lib, "{package}/lib{name}.jar").javacopts()
+    assert_javacopts.contains_exactly([
+        "-source",
+        "6",
+        "-target",
+        "6",
+        "-Xlint:toto",
+        "-XDtoolchainJavacFlag",
+        "-XDhostCommandLineJavacFlag",
+    ])
+
+def _test_java_compile_action_uses_tool_specific_jvm_opts(name):
+    _declare_java_toolchain(
+        name = name,
+        jvm_opts = ["-Xbase"],
+        javabuilder_jvm_opts = ["-DjavabuilderFlag=1"],
+        turbine_jvm_opts = ["-DturbineFlag=1"],
+    )
+    util.helper_target(
+        java_plugin,
+        name = name + "/plugin",
+        processor_class = "Proc",
+        generates_api = True,
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["a.java"],
+        plugins = [name + "/plugin"],
+    )
+    analysis_test(
+        name = name,
+        impl = _test_java_compile_action_uses_tool_specific_jvm_opts_impl,
+        target = name + "/lib",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+    )
+
+def _test_java_compile_action_uses_tool_specific_jvm_opts_impl(env, target):
+    javac_action = javac_action_subject.of(env, target, "{package}/lib{name}.jar")
+    javac_action.argv().contains("-DjavabuilderFlag=1")
+
+    header_action = env.expect.that_target(target).action_generating("{package}/lib{name}-hjar.jar")
+    header_action.argv().contains("-DturbineFlag=1")
+
 def java_toolchain_tests(name):
     test_suite(
         name = name,
@@ -434,5 +546,8 @@ def java_toolchain_tests(name):
             _test_location_expansion_in_jvm_opts,
             _test_location_expansion_with_multiple_artifacts_fails,
             _test_timezone_data_with_multiple_artifacts_fails,
+            _test_java_compile_action_target_gets_javacopts_from_toolchain,
+            _test_java_compile_action_exec_gets_javacopts_from_toolchain,
+            _test_java_compile_action_uses_tool_specific_jvm_opts,
         ],
     )

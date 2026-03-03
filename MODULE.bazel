@@ -131,9 +131,9 @@ bazel_dep(name = "rules_shell", version = "0.2.0", dev_dependency = True)
 bazel_dep(name = "rules_testing", dev_dependency = True)
 archive_override(
     module_name = "rules_testing",
-    integrity = "sha256-TqwTCQnzt/hRKQtdJ7d8ebtZ8+I8IMgmWiEjOKvo6mI=",
-    strip_prefix = "rules_testing-f8e869d452507fa4a59748c9d69cfab63ec9385a",
-    urls = ["https://github.com/bazelbuild/rules_testing/archive/f8e869d452507fa4a59748c9d69cfab63ec9385a.tar.gz"],
+    integrity = "sha256-d/94Ix5IoGXk9rP1HjYKxPMH8ccwX5b1Qxs8BKg4WRg=",
+    strip_prefix = "rules_testing-ac97ba507116056cd489161b5e99dd8014685adc",
+    urls = ["https://github.com/bazelbuild/rules_testing/archive/ac97ba507116056cd489161b5e99dd8014685adc.tar.gz"],
 )
 
 test_repositories = use_extension("//test:repositories.bzl", "test_repositories_ext", dev_dependency = True)
