@@ -6,6 +6,7 @@ load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
+load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/toolchains:java_runtime.bzl", "java_runtime")
 load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
@@ -566,6 +567,34 @@ def _test_javabuilder_location_expansion_with_multiple_artifacts_impl(env, targe
         "{package}/c {package}/d",
     ]).in_order()
 
+def _no_toolchain_rule_impl(ctx):
+    java_common.pack_sources(
+        ctx.actions,
+        output_source_jar = "output_source_jar",
+        java_toolchain = "java_toolchain",
+    )
+
+_no_toolchain_rule = rule(
+    implementation = _no_toolchain_rule_impl,
+)
+
+def _test_java_common_without_toolchain_type_fails(name):
+    util.helper_target(
+        _no_toolchain_rule,
+        name = name + "/no_toolchain",
+    )
+    analysis_test(
+        name = name,
+        impl = _test_java_common_without_toolchain_type_fails_impl,
+        target = name + "/no_toolchain",
+        expect_failure = True,
+    )
+
+def _test_java_common_without_toolchain_type_fails_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("must declare *tools/jdk:toolchain_type' toolchain in order to use java_common"),
+    )
+
 def java_toolchain_tests(name):
     test_suite(
         name = name,
@@ -589,5 +618,6 @@ def java_toolchain_tests(name):
             _test_java_compile_action_exec_gets_javacopts_from_toolchain,
             _test_java_compile_action_uses_tool_specific_jvm_opts,
             _test_javabuilder_location_expansion_with_multiple_artifacts,
+            _test_java_common_without_toolchain_type_fails,
         ],
     )
