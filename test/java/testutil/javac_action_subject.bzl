@@ -22,6 +22,8 @@ def _new_javac_action_subject(env, target, output):
         direct_dependencies = lambda: _create_subject_for_flag("--direct_dependencies", self.parsed_flags, self.meta),
         javacopts = lambda: _create_subject_for_flag("--javacopts", self.parsed_flags, self.meta),
         jar = lambda: _create_subject_for_flag("-jar", self.parsed_flags, self.meta),
+        # An unset --strict_java_deps is equivalent to "OFF".
+        strict_java_deps = lambda: _create_subject_for_flag("--strict_java_deps", self.parsed_flags, self.meta, default = ["OFF"]),
         sources = lambda: _create_subject_for_flag("--sources", self.parsed_flags, self.meta),
         executable_file_name = lambda: subjects.str(action_subject.actual.argv[0], self.meta),
         inputs = action_subject.inputs,
@@ -56,9 +58,9 @@ def _parse_flags(argv):
 
     return flag_values
 
-def _create_subject_for_flag(flag_name, parsed_flags, meta):
+def _create_subject_for_flag(flag_name, parsed_flags, meta, default = None):
     """Helper to create a collection subject for a given flag."""
-    return subjects.collection(parsed_flags[flag_name], meta.derive(flag_name), format = True)
+    return subjects.collection(parsed_flags.get(flag_name, default), meta.derive(flag_name), format = True)
 
 javac_action_subject = struct(
     of = _new_javac_action_subject,

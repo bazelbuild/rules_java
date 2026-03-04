@@ -1,5 +1,6 @@
 """Tests for the java_library rule"""
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
@@ -9,6 +10,7 @@ load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
+load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 load("//test/java/testutil:rules/wrap_java_info.bzl", "JavaInfoWrappingInfo", "java_info_wrapping_rule")
@@ -309,15 +311,55 @@ def _test_exposes_native_library_info_impl(env, target):
 
     assert_lib.dynamic_library().basename().contains("mynativedep")
 
+def _test_strict_java_deps(name, strict_java_deps):
+    util.helper_target(
+        java_library,
+        name = name + "/jl",
+        srcs = ["A.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_strict_java_deps_impl,
+        target = name + "/jl",
+        config_settings = {"//command_line_option:experimental_strict_java_deps": strict_java_deps},
+        attrs = {"expected_strict_java_deps": attr.string()},
+        attr_values = {"expected_strict_java_deps": strict_java_deps},
+    )
+
+def _test_strict_java_deps_impl(env, target):
+    # Note that if --experimental_strict_java_deps=OFF, we may not set --strict_java_deps in the
+    # javac action's argv at all; the "OFF" value (which is equivalent to an unset flag) in that
+    # case is injected by javac_action_subject for convenience and canonicalization.
+    expect_that_javac_action = javac_action_subject.of(env, target, "{package}/lib{name}.jar")
+    expect_that_javac_action.strict_java_deps().contains_exactly([env.ctx.attr.expected_strict_java_deps])
+
+def _test_strict_java_deps_off(name):
+    _test_strict_java_deps(name, "OFF")
+
+def _test_strict_java_deps_warn(name):
+    _test_strict_java_deps(name, "WARN")
+
+def _test_strict_java_deps_error(name):
+    _test_strict_java_deps(name, "ERROR")
+
 def java_library_tests(name):
+    tests = [
+        _test_exposes_plugins,
+        _test_exposes_java_info,
+        _test_java_info_propagation,
+        _test_java_library_attributes,
+        _test_propagates_direct_native_libraries,
+        _test_exposes_native_library_info,
+    ]
+    if bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        tests += [
+            _test_strict_java_deps_off,
+            _test_strict_java_deps_warn,
+            _test_strict_java_deps_error,
+        ]
+
     test_suite(
         name = name,
-        tests = [
-            _test_exposes_plugins,
-            _test_exposes_java_info,
-            _test_java_info_propagation,
-            _test_java_library_attributes,
-            _test_propagates_direct_native_libraries,
-            _test_exposes_native_library_info,
-        ],
+        tests = tests,
     )
