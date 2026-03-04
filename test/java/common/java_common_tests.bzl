@@ -1,5 +1,6 @@
 """Tests for java_common APIs"""
 
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
@@ -11,6 +12,7 @@ load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//test/java/testutil:artifact_closure.bzl", "artifact_closure")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
+load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
 load("//test/java/testutil:rules/custom_library.bzl", "custom_library")
 load("//test/java/testutil:rules/custom_library_extended_compile_jdeps.bzl", "CompileJdepsInfo", "custom_library_extended_jdeps")
 load("//test/java/testutil:rules/custom_library_with_additional_inputs.bzl", "custom_library_with_additional_inputs")
@@ -788,6 +790,94 @@ def _test_compile_strict_deps_enum_impl(env, target):
         matching.str_matches("invalid value for strict_deps: FOO"),
     )
 
+def _test_java_library_collects_coverage_dependencies_from_resources(name):
+    util.helper_target(
+        cc_binary,
+        name = name + "/lib/jni.so",
+        srcs = [name + "/lib/jni.cc"],
+        linkshared = 1,
+        features = ["-supports_pic"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        resources = [name + "/lib/jni.so"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_library_collects_coverage_dependencies_from_resources_impl,
+        target = name + "/lib",
+        config_settings = {
+            "//command_line_option:collect_code_coverage": "true",
+            "//command_line_option:instrumentation_filter": "//test/...",
+        },
+    )
+
+def _test_java_library_collects_coverage_dependencies_from_resources_impl(env, target):
+    env.expect.that_target(target).provider(
+        InstrumentedFilesInfo,
+    ).instrumented_files().contains_exactly(["{package}/{name}/jni.cc"])
+
+    env.expect.that_target(target).provider(
+        InstrumentedFilesInfo,
+    ).metadata_files().contains_exactly(["{package}/_objs/{name}/jni.so/jni.gcno"])
+
+def _test_skip_annotation_processing(name):
+    util.helper_target(
+        java_plugin,
+        name = name + "/processor",
+        srcs = [name + "/processor.java"],
+        data = [name + "/processor_data.txt"],
+        generates_api = True,  # so Turbine would normally run it
+        processor_class = "Foo",
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/exports_processor",
+        exported_plugins = [":" + name + "/processor"],
+    )
+    util.helper_target(
+        custom_library,
+        name = name + "/custom",
+        srcs = [name + "/custom.java"],
+        plugins = [":" + name + "/processor"],
+        deps = [":" + name + "/exports_processor"],
+        enable_annotation_processing = False,
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/custom_noproc",
+        srcs = [name + "/custom.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_skip_annotation_processing_impl,
+        targets = {
+            "custom": ":" + name + "/custom",
+            "custom_noproc": ":" + name + "/custom_noproc",
+        },
+    )
+
+def _test_skip_annotation_processing_impl(env, targets):
+    javac_action = javac_action_subject.of(env, targets.custom, "{package}/lib{name}.jar")
+
+    javac_action.mnemonic().equals("Javac")
+    javac_action.argv().not_contains("--processors")
+    javac_action.argv().contains("--processorpath")
+    javac_action.inputs().contains_at_least_predicates([
+        matching.file_basename_equals("processor_data.txt"),
+    ])
+
+    turbine_action = javac_action_subject.of(env, targets.custom, "{package}/lib{name}-hjar.jar")
+    turbine_action.mnemonic().equals("JavacTurbine")
+    turbine_action.argv().not_contains("--processors")
+
+    turbine_action_noproc = javac_action_subject.of(env, targets.custom_noproc, "{package}/lib{name}-hjar.jar")
+    turbine_action_noproc.mnemonic().equals("Turbine")
+    turbine_action_noproc.argv().not_contains("--processors")
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -817,5 +907,7 @@ def java_common_tests(name):
             _test_compile_neverlink,
             _test_compile_strict_deps_case_sensitivity,
             _test_compile_strict_deps_enum,
+            _test_java_library_collects_coverage_dependencies_from_resources,
+            _test_skip_annotation_processing,
         ],
     )

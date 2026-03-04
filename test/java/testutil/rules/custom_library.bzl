@@ -21,6 +21,7 @@ def _custom_library_impl(ctx):
         plugins = [p[JavaPluginInfo] for p in ctx.attr.plugins],
         javac_opts = ctx.attr.javac_opts,
         java_toolchain = semantics.find_java_toolchain(ctx),
+        enable_annotation_processing = ctx.attr.enable_annotation_processing,
     )
     return [DefaultInfo(files = depset([output_jar])), compilation_provider]
 
@@ -35,6 +36,7 @@ custom_library = rule(
         "plugins": attr.label_list(),
         "javac_opts": attr.string_list(),
         "neverlink": attr.bool(),
+        "enable_annotation_processing": attr.bool(default = True),
     },
     toolchains = [semantics.JAVA_TOOLCHAIN_TYPE],
     fragments = ["java"],

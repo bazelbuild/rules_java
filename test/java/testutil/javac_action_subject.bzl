@@ -26,6 +26,7 @@ def _new_javac_action_subject(env, target, output):
         executable_file_name = lambda: subjects.str(action_subject.actual.argv[0], self.meta),
         inputs = action_subject.inputs,
         argv = action_subject.argv,
+        mnemonic = action_subject.mnemonic,
     )
     return public
 
