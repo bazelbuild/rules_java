@@ -9,6 +9,8 @@ load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_info.bzl", "JavaInfo")
+load("//test/java/common/rules:common_launcher_java_library_tests.bzl", "JAVA_LIBRARY_LAUNCHER_TESTS")
+load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
@@ -312,6 +314,10 @@ def _test_exposes_native_library_info_impl(env, target):
     assert_lib.dynamic_library().basename().contains("mynativedep")
 
 def _test_strict_java_deps(name, strict_java_deps):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        always_passes(name)
+        return
+
     util.helper_target(
         java_library,
         name = name + "/jl",
@@ -344,22 +350,31 @@ def _test_strict_java_deps_error(name):
     _test_strict_java_deps(name, "ERROR")
 
 def java_library_tests(name):
-    tests = [
-        _test_exposes_plugins,
-        _test_exposes_java_info,
-        _test_java_info_propagation,
-        _test_java_library_attributes,
-        _test_propagates_direct_native_libraries,
-        _test_exposes_native_library_info,
-    ]
-    if bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
-        tests += [
+    test_suite(
+        name = "_basic_" + name,
+        tests = [
+            _test_exposes_plugins,
+            _test_exposes_java_info,
+            _test_java_info_propagation,
+            _test_java_library_attributes,
+            _test_propagates_direct_native_libraries,
+            _test_exposes_native_library_info,
             _test_strict_java_deps_off,
             _test_strict_java_deps_warn,
             _test_strict_java_deps_error,
-        ]
+        ],
+    )
 
+    # TODO: unset --java_launcher explicitly
     test_suite(
+        name = "_jdk_launcher_" + name,
+        tests = JAVA_LIBRARY_LAUNCHER_TESTS,
+    )
+
+    native.test_suite(
         name = name,
-        tests = tests,
+        tests = [
+            "_basic_" + name,
+            "_jdk_launcher_" + name,
+        ],
     )

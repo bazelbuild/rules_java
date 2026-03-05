@@ -8,6 +8,7 @@ load("@rules_testing//lib:truth.bzl", "matching", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
+load("//test/java/common/rules:common_launcher_java_binary_tests.bzl", "JAVA_BINARY_LAUNCHER_TESTS")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
@@ -251,7 +252,7 @@ def _test_java_binary_can_set_transitive_validation_impl(env, targets):
 
 def java_binary_tests(name):
     test_suite(
-        name = name,
+        name = "_basic_" + name,
         tests = [
             _test_java_binary_provides_binary_java_info,
             _test_stamp_conversion_does_not_override_int,
@@ -259,5 +260,19 @@ def java_binary_tests(name):
             _test_java_binary_propagates_direct_native_libraries,
             _test_java_compile_only,
             _test_java_binary_can_set_transitive_validation,
+        ],
+    )
+
+    # TODO: unset --java_launcher explicitly
+    test_suite(
+        name = "_jdk_launcher_" + name,
+        tests = JAVA_BINARY_LAUNCHER_TESTS,
+    )
+
+    native.test_suite(
+        name = name,
+        tests = [
+            "_basic_" + name,
+            "_jdk_launcher_" + name,
         ],
     )
