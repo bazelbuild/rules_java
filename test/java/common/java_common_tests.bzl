@@ -28,6 +28,7 @@ load("//test/java/testutil:rules/custom_library_with_strict_deps.bzl", "custom_l
 load("//test/java/testutil:rules/custom_library_with_strict_java_deps_provider.bzl", "StrictJavaDepsInfo", "custom_library_with_strict_java_deps_provider")
 load("//test/java/testutil:rules/custom_library_with_wrong_java_toolchain_type.bzl", "custom_library_with_wrong_java_toolchain_type")
 load("//test/java/testutil:rules/custom_library_with_wrong_plugins_type.bzl", "custom_library_with_wrong_plugins_type")
+load("//test/java/testutil:rules/private_api_usage.bzl", "private_compile_api_usage", "private_merge_api_usage", "private_run_ijar_api_usage")
 
 def _test_compile_default_values(name):
     util.helper_target(custom_library, name = name + "/custom", srcs = ["Main.java"])
@@ -1071,6 +1072,52 @@ def _test_custom_library_with_wrong_java_toolchain_type_impl(env, target):
         matching.str_matches("got element of type ToolchainInfo, want JavaToolchainInfo"),
     )
 
+def _test_private_api(name, helper_rule, private_attr_name):
+    util.helper_target(
+        helper_rule,
+        name = name + "/custom",
+        private_attr_name = private_attr_name,
+    )
+
+    analysis_test(
+        name = name,
+        impl = lambda env, target: _test_private_api_impl(env, target, private_attr_name),
+        target = name + "/custom",
+        expect_failure = True,
+    )
+
+def _test_private_api_impl(env, target, private_attr_name):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.contains("got unexpected keyword argument: " + private_attr_name),
+    )
+
+def _test_compile_disabling_compile_jar_is_private_api(name):
+    _test_private_api(name, private_compile_api_usage, "enable_compile_jar_action")
+
+def _test_compile_classpath_resources_is_private_api(name):
+    _test_private_api(name, private_compile_api_usage, "classpath_resources")
+
+def _test_compile_injecting_rule_kind_is_private_api(name):
+    _test_private_api(name, private_compile_api_usage, "injecting_rule_kind")
+
+def _test_compile_enable_jspecify_is_private_api(name):
+    _test_private_api(name, private_compile_api_usage, "enable_jspecify")
+
+def _test_merge_java_outputs_is_private_api(name):
+    _test_private_api(name, private_merge_api_usage, "merge_java_outputs")
+
+def _test_merge_source_jars_is_private_api(name):
+    _test_private_api(name, private_merge_api_usage, "merge_source_jars")
+
+def _test_compile_include_compilation_info_is_private_api(name):
+    _test_private_api(name, private_compile_api_usage, "include_compilation_info")
+
+def _test_compile_resource_jars_is_private_api(name):
+    _test_private_api(name, private_compile_api_usage, "resource_jars")
+
+def _test_run_ijar_output_is_private_api(name):
+    _test_private_api(name, private_run_ijar_api_usage, "output")
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -1110,5 +1157,14 @@ def java_common_tests(name):
             _test_compile_output_jar_not_in_runtime_path_without_sources_defined,
             _test_java_runtime_provider_files,
             _test_custom_library_with_wrong_java_toolchain_type,
+            _test_compile_disabling_compile_jar_is_private_api,
+            _test_compile_classpath_resources_is_private_api,
+            _test_compile_injecting_rule_kind_is_private_api,
+            _test_compile_enable_jspecify_is_private_api,
+            _test_merge_java_outputs_is_private_api,
+            _test_merge_source_jars_is_private_api,
+            _test_compile_include_compilation_info_is_private_api,
+            _test_compile_resource_jars_is_private_api,
+            _test_run_ijar_output_is_private_api,
         ],
     )
