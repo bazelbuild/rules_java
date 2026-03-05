@@ -23,6 +23,11 @@ def _new_java_toolchain_info_subject(info, meta):
         header_compiler_builtin_processors = lambda: subjects.collection(info._header_compiler_builtin_processors.to_list(), meta.derive("_header_compiler_builtin_processors")),
         reduced_classpath_incompatible_processors = lambda: subjects.collection(info._reduced_classpath_incompatible_processors.to_list(), meta.derive("_reduced_classpath_incompatible_processors")),
         javabuilder = lambda: _new_java_builder_subject(info._javabuilder, meta.derive("_javabuilder")),
+        label = lambda: subjects.label(info.label, meta.derive("label")),
+        # TODO: hvd - Give label_subject predicate matching support so we don't need this str_subject variant.
+        label_str = lambda: subjects.str(str(info.label), meta.derive("label_str")),
+        default_javacopts = lambda: subjects.collection(info._javacopts_list, meta.derive("default_javacopts")),
+        default_javacopts_depset = lambda: subjects.collection(info._javacopts.to_list(), meta.derive("default_javacopts_depset")),
     )
     return public
 

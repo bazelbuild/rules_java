@@ -1,6 +1,8 @@
 """Tests for java_common APIs"""
 
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
@@ -10,6 +12,7 @@ load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
+load("//java/toolchains:java_runtime.bzl", "java_runtime")
 load("//test/java/testutil:artifact_closure.bzl", "artifact_closure")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
@@ -22,6 +25,8 @@ load("//test/java/testutil:rules/custom_library_with_exports.bzl", "custom_libra
 load("//test/java/testutil:rules/custom_library_with_named_outputs.bzl", "custom_library_with_named_outputs")
 load("//test/java/testutil:rules/custom_library_with_sourcepaths.bzl", "custom_library_with_sourcepaths")
 load("//test/java/testutil:rules/custom_library_with_strict_deps.bzl", "custom_library_with_strict_deps")
+load("//test/java/testutil:rules/custom_library_with_strict_java_deps_provider.bzl", "StrictJavaDepsInfo", "custom_library_with_strict_java_deps_provider")
+load("//test/java/testutil:rules/custom_library_with_wrong_java_toolchain_type.bzl", "custom_library_with_wrong_java_toolchain_type")
 load("//test/java/testutil:rules/custom_library_with_wrong_plugins_type.bzl", "custom_library_with_wrong_plugins_type")
 
 def _test_compile_default_values(name):
@@ -878,6 +883,194 @@ def _test_skip_annotation_processing_impl(env, targets):
     turbine_action_noproc.mnemonic().equals("Turbine")
     turbine_action_noproc.argv().not_contains("--processors")
 
+def _test_compile_direct_native_libraries(name):
+    target_name = name + "/custom"
+    util.helper_target(
+        cc_library,
+        name = target_name + "/native.so",
+        srcs = ["a.cc"],
+    )
+    util.helper_target(
+        custom_library,
+        name = target_name,
+        srcs = ["A.java"],
+        ccdeps = [target_name + "/native.so"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_direct_native_libraries_impl,
+        target = target_name,
+    )
+
+def _test_compile_direct_native_libraries_impl(env, target):
+    assert_native_libs = java_info_subject.from_target(env, target).transitive_native_libraries()
+    assert_native_libs.static_libraries().contains_exactly_predicates([
+        matching.any(
+            matching.str_matches("libnative.so.a"),  # linux / mac
+            matching.str_matches("native.so.lib"),  # windows
+        ),
+    ])
+
+def _test_strict_java_deps_default(name):
+    util.helper_target(
+        custom_library,
+        name = name + "/unused",
+    )
+    analysis_test(
+        name = name,
+        target = name + "/unused",  # analysis_test requires setting a target.
+        impl = _test_strict_java_deps_default_impl,
+        fragments = ["java"],
+    )
+
+def _test_strict_java_deps_default_impl(env, _unused):
+    env.expect.that_str(env.ctx.fragments.java.strict_java_deps).equals("default")
+
+def _test_strict_java_deps_error(name):
+    util.helper_target(
+        custom_library_with_strict_java_deps_provider,
+        name = name + "_strict_java_deps_provider",
+    )
+
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        analysis_test(
+            name = name,
+            impl = lambda env, target: env.expect.that_bool(True).equals(True),
+            target = name + "_strict_java_deps_provider",
+        )
+    else:
+        analysis_test(
+            name = name,
+            target = name + "_strict_java_deps_provider",
+            impl = _test_strict_java_deps_error_impl,
+            fragments = ["java"],
+            config_settings = {"//command_line_option:experimental_strict_java_deps": "error"},
+        )
+
+def _test_strict_java_deps_error_impl(env, target):
+    env.expect.that_str(target[StrictJavaDepsInfo].strict_java_deps).equals("error")
+
+def _test_compile_output_jar_has_manifest_proto(name):
+    util.helper_target(
+        custom_library,
+        name = name + "/custom",
+        srcs = ["Main.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_output_jar_has_manifest_proto_impl,
+        target = name + "/custom",
+    )
+
+def _test_compile_output_jar_has_manifest_proto_impl(env, target):
+    java_info_subject.from_target(env, target).java_outputs().singleton().manifest_proto().short_path_equals(
+        "{package}/lib{name}.jar_manifest_proto",
+    )
+
+def _test_compile_with_neverlink_deps(name):
+    target_name = name + "/custom"
+    util.helper_target(
+        java_library,
+        name = target_name + "/neverlink_dep",
+        srcs = ["B.java"],
+        neverlink = True,
+    )
+    util.helper_target(
+        custom_library,
+        name = target_name,
+        srcs = ["A.java"],
+        deps = [target_name + "/neverlink_dep"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_with_neverlink_deps_impl,
+        target = target_name,
+    )
+
+def _test_compile_with_neverlink_deps_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.compilation_args().transitive_runtime_jars().contains_exactly([
+        "{package}/lib{name}.jar",
+    ])
+    assert_java_info.transitive_source_jars().contains_exactly([
+        "{package}/lib{name}-src.jar",
+        "{package}/lib{name}/neverlink_dep-src.jar",
+    ])
+    assert_java_info.compilation_args().transitive_compile_time_jars().contains_exactly([
+        "{package}/lib{name}-hjar.jar",
+        "{package}/lib{name}/neverlink_dep-hjar.jar",
+    ])
+
+def _test_compile_output_jar_not_in_runtime_path_without_sources_defined(name):
+    target_name = name + "/custom"
+    util.helper_target(
+        java_library,
+        name = target_name + "/export_dep",
+        srcs = ["B.java"],
+    )
+    util.helper_target(
+        custom_library,
+        name = target_name,
+        srcs = [],
+        exports = [target_name + "/export_dep"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_output_jar_not_in_runtime_path_without_sources_defined_impl,
+        target = target_name,
+    )
+
+def _test_compile_output_jar_not_in_runtime_path_without_sources_defined_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.compilation_args().transitive_runtime_jars().contains_exactly([
+        "{package}/lib{name}/export_dep.jar",
+    ])
+    assert_java_info.compilation_args().transitive_compile_time_jars().contains_exactly([
+        "{package}/lib{name}/export_dep-hjar.jar",
+    ])
+    assert_java_info.java_outputs().singleton().class_jar().short_path_equals("{package}/lib{name}.jar")
+    assert_java_info.java_outputs().singleton().compile_jar().equals(None)
+
+def _test_java_runtime_provider_files(name):
+    # Create a rule that extracts JavaRuntimeInfo.files
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        srcs = ["a.txt"],
+        java_home = "foo/bar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_runtime_provider_files_impl,
+        target = name + "/jvm",
+    )
+
+def _test_java_runtime_provider_files_impl(env, target):
+    env.expect.that_target(target).default_outputs().contains_exactly(["{package}/a.txt"])
+
+def _test_custom_library_with_wrong_java_toolchain_type(name):
+    util.helper_target(
+        custom_library_with_wrong_java_toolchain_type,
+        name = name + "/custom",
+        srcs = ["a.java"],
+    )
+    analysis_test(
+        name = name,
+        impl = _test_custom_library_with_wrong_java_toolchain_type_impl,
+        target = name + "/custom",
+        expect_failure = True,
+    )
+
+def _test_custom_library_with_wrong_java_toolchain_type_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("got element of type ToolchainInfo, want JavaToolchainInfo"),
+    )
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -909,5 +1102,13 @@ def java_common_tests(name):
             _test_compile_strict_deps_enum,
             _test_java_library_collects_coverage_dependencies_from_resources,
             _test_skip_annotation_processing,
+            _test_compile_direct_native_libraries,
+            _test_strict_java_deps_default,
+            _test_strict_java_deps_error,
+            _test_compile_output_jar_has_manifest_proto,
+            _test_compile_with_neverlink_deps,
+            _test_compile_output_jar_not_in_runtime_path_without_sources_defined,
+            _test_java_runtime_provider_files,
+            _test_custom_library_with_wrong_java_toolchain_type,
         ],
     )

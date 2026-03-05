@@ -13,6 +13,7 @@ load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:java_toolchain_info_subject.bzl", "java_toolchain_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
+load("//toolchains:java_toolchain_alias.bzl", "java_toolchain_alias")
 
 def _declare_java_toolchain(*, name, **kwargs):
     java_runtime_name = name + "/runtime"
@@ -595,6 +596,86 @@ def _test_java_common_without_toolchain_type_fails_impl(env, target):
         matching.str_matches("must declare *tools/jdk:toolchain_type' toolchain in order to use java_common"),
     )
 
+def _test_java_toolchain_flag_default(name):
+    util.helper_target(
+        java_toolchain_alias,
+        name = name + "/toolchain_alias",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_toolchain_flag_default_impl,
+        target = name + "/toolchain_alias",
+    )
+
+def _test_java_toolchain_flag_default_impl(env, target):
+    assert_toolchain = java_toolchain_info_subject.from_target(env, target)
+    assert_toolchain.label_str().matches(
+        matching.any(
+            matching.str_endswith("jdk:remote_toolchain"),
+            matching.str_endswith("jdk:toolchain"),
+            matching.str_endswith("jdk:toolchain_host"),
+            # buildifier: disable=canonical-repository
+            matching.str_startswith("@@//toolchains:toolchain_java"),
+        ),
+    )
+
+def _test_java_toolchain_flag_set(name):
+    _declare_java_toolchain(name = name)
+    util.helper_target(
+        java_toolchain_alias,
+        name = name + "/toolchain_alias",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_toolchain_flag_set_impl,
+        targets = {
+            "alias": name + "/toolchain_alias",
+            "toolchain": name + "/java_toolchain",
+        },
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+    )
+
+def _test_java_toolchain_flag_set_impl(env, targets):
+    assert_toolchain = java_toolchain_info_subject.from_target(env, targets.alias)
+    assert_toolchain.label().equals(targets.toolchain.label)
+
+def _test_default_javac_opts_depset(name):
+    _declare_java_toolchain(name = name)
+
+    analysis_test(
+        name = name,
+        impl = _test_default_javac_opts_depset_impl,
+        target = name + "/java_toolchain",
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_default_javac_opts_depset_impl(env, target):
+    java_toolchain_info_subject.from_target(env, target).default_javacopts_depset().contains_exactly(
+        ["-source 6 -target 6 -Xlint:toto -Xmaxerrs 500"],
+    )
+
+def _test_default_javac_opts(name):
+    _declare_java_toolchain(name = name)
+
+    analysis_test(
+        name = name,
+        impl = _test_default_javac_opts_impl,
+        target = name + "/java_toolchain",
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_default_javac_opts_impl(env, target):
+    java_toolchain_info_subject.from_target(env, target).default_javacopts().contains_at_least([
+        "-source",
+        "6",
+        "-target",
+        "6",
+    ]).in_order()
+
 def java_toolchain_tests(name):
     test_suite(
         name = name,
@@ -619,5 +700,9 @@ def java_toolchain_tests(name):
             _test_java_compile_action_uses_tool_specific_jvm_opts,
             _test_javabuilder_location_expansion_with_multiple_artifacts,
             _test_java_common_without_toolchain_type_fails,
+            _test_java_toolchain_flag_default,
+            _test_java_toolchain_flag_set,
+            _test_default_javac_opts_depset,
+            _test_default_javac_opts,
         ],
     )

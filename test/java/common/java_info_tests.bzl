@@ -1390,6 +1390,34 @@ def _java_common_compile_native_libraries_propagate_test_impl(env, target):
         matching.str_matches("*native_dep*"),
     ])
 
+def _test_merge_runtime_output_jars(name):
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["A.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/b",
+        srcs = ["B.java"],
+    )
+    util.helper_target(
+        java_info_merge_rule,
+        name = name + "/merged",
+        deps = [name + "/a", name + "/b"],
+    )
+    analysis_test(
+        name = name,
+        impl = _test_merge_runtime_output_jars_impl,
+        target = name + "/merged",
+    )
+
+def _test_merge_runtime_output_jars_impl(env, target):
+    java_info_subject.from_target(env, target).runtime_output_jars().contains_exactly([
+        "{package}/lib{test_name}/a.jar",
+        "{package}/lib{test_name}/b.jar",
+    ])
+
 def java_info_tests(name):
     test_suite(
         name = name,
@@ -1438,5 +1466,6 @@ def java_info_tests(name):
             _java_common_merge_with_neverlink_test,
             _java_common_compile_with_neverlink_test,
             _java_common_compile_native_libraries_propagate_test,
+            _test_merge_runtime_output_jars,
         ],
     )

@@ -6,3 +6,5 @@ package(default_applicable_licenses = ["@rules_java//:license"])
 java_runtime_tests(name = "java_runtime_tests")
 
 java_toolchain_tests(name = "java_toolchain_tests")
+
+exports_files(["java_runtime.src"])
