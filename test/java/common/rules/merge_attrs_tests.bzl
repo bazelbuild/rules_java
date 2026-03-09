@@ -1,4 +1,4 @@
-"""Tests for merge_attrsfunction"""
+"""Tests for merge_attrs function"""
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "unittest")
 load(

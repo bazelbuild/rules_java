@@ -1,5 +1,6 @@
 """Tests for the java_runtime rule"""
 
+load("@rules_cc//cc:defs.bzl", "cc_import")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
@@ -353,6 +354,71 @@ def _test_java_home_generated_impl(env, target):
         "{gendir}/{package}/generated_java_home",
     )
 
+def _test_hermetic_static_libs(name):
+    util.helper_target(
+        cc_import,
+        name = name + "/libs",
+        static_library = "libStatic.a",
+    )
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        lib_modules = name + "/gen_lib_modules",
+        hermetic_srcs = [name + "/hermetic.properties"],
+        hermetic_static_libs = [name + "/libs"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_hermetic_static_libs_impl,
+        target = name + "/jvm",
+    )
+
+def _test_hermetic_static_libs_impl(env, target):
+    cc_info = java_runtime_info_subject.from_target(env, target).hermetic_static_libs().singleton()
+    cc_info.linking_context().static_library_files().contains_exactly(["{package}/libStatic.a"])
+
+def _test_implicit_lib_ct_sym(name):
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        srcs = [
+            name + "/java",
+            name + "/jvm/implicit/lib/ct.sym",
+        ],
+    )
+    analysis_test(
+        name = name,
+        impl = _test_implicit_lib_ct_sym_impl,
+        target = name + "/jvm",
+    )
+
+def _test_implicit_lib_ct_sym_impl(env, target):
+    java_runtime_info_subject.from_target(env, target).lib_ct_sym().short_path_equals(
+        "{package}/{name}/implicit/lib/ct.sym",
+    )
+
+def _test_explicit_lib_ct_sym(name):
+    util.helper_target(
+        java_runtime,
+        name = name + "/jvm",
+        srcs = [
+            name + "/java",
+            name + "/jvm/implicit/lib/ct.sym",
+        ],
+        lib_ct_sym = name + "/jvm/explicit/lib/ct.sym",
+    )
+    analysis_test(
+        name = name,
+        impl = _test_explicit_lib_ct_sym_impl,
+        target = name + "/jvm",
+    )
+
+def _test_explicit_lib_ct_sym_impl(env, target):
+    java_runtime_info_subject.from_target(env, target).lib_ct_sym().short_path_equals(
+        "{package}/{name}/explicit/lib/ct.sym",
+    )
+
 def java_runtime_tests(name):
     test_suite(
         name = name,
@@ -371,5 +437,8 @@ def java_runtime_tests(name):
             _test_make_variables,
             _test_no_srcs,
             _test_java_home_generated,
+            _test_hermetic_static_libs,
+            _test_implicit_lib_ct_sym,
+            _test_explicit_lib_ct_sym,
         ],
     )

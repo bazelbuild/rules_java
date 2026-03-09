@@ -22,6 +22,7 @@ def _new_cc_info_linking_context_subject(cc_info, meta):
     public = struct(
         equals = lambda other: _cc_info_linking_context_equals(self.actual, other, self.meta),
         library_files = lambda: _new_library_files_subject(self.actual, self.meta),
+        static_library_files = lambda: _new_static_library_files_subject(self.actual, self.meta),
     )
     return public
 
@@ -41,6 +42,17 @@ def _new_library_files_subject(linking_context, meta):
     return subjects.depset_file(
         depset(libs),
         meta = meta.derive("library_files"),
+    )
+
+def _new_static_library_files_subject(linking_context, meta):
+    static_libraries = []
+    for input in linking_context.linker_inputs.to_list():
+        for lib in input.libraries:
+            if lib.static_library:
+                static_libraries.append(lib.static_library)
+    return subjects.depset_file(
+        depset(static_libraries),
+        meta = meta.derive("static_library_files"),
     )
 
 def _cc_info_linking_context_equals(actual, expected, meta):
@@ -87,6 +99,7 @@ def _get_singleton(seq):
     return seq[0]
 
 cc_info_subject = struct(
+    new_from_cc_info = _new_cc_info_subject,
     new_from_java_info = lambda java_info, meta: _new_cc_info_subject(java_info.cc_link_params_info, meta.derive("cc_link_params_info")),
     libraries_to_link = _new_cc_info_libraries_to_link_subject,
 )
