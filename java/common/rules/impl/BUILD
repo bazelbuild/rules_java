@@ -29,7 +29,7 @@ bzl_library(
 bzl_library(
     name = "java_helper_bzl",
     srcs = ["java_helper.bzl"],
-    visibility = ["//java:__subpackages__"],
+    visibility = ["//visibility:private"],
     deps = [
         "//java/common:semantics_bzl",
         "//java/common/rules:java_helper_bzl",
