@@ -68,6 +68,53 @@ def _test_incompatible_language_version_bootclasspath_enabled_unversioned_impl(e
     system_path = target[java_common.BootClassPathInfo]._system_path
     env.expect.that_str(system_path).contains("local_jdk")
 
+def _test_jdk8_uses_tree_artifact(name):
+    analysis_test(
+        name = name,
+        impl = _test_jdk8_uses_tree_artifact_impl,
+        target = Label("//toolchains:platformclasspath"),
+        config_settings = {
+            "//command_line_option:tool_java_runtime_version": "remotejdk_8",
+        },
+    )
+
+def _test_jdk8_uses_tree_artifact_impl(env, target):
+    env.expect.that_target(target).action_named(
+        "JavaToolchainCompileClasses",
+    ).argv().contains_at_least([
+        "-d",
+        "{bindir}/{package}/{name}_classes",
+        "toolchains/DumpPlatformClassPath.java",
+    ]).in_order()
+    env.expect.that_target(target).action_named(
+        "JavaToolchainCompileBootClasspath",
+    ).argv().contains_at_least([
+        "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+        "-cp",
+        "{bindir}/{package}/{name}_classes",
+        "DumpPlatformClassPath",
+        "{bindir}/{package}/{name}_unstripped.jar",
+    ]).in_order()
+
+def _test_jdk11_uses_source_launcher(name):
+    analysis_test(
+        name = name,
+        impl = _test_jdk11_uses_source_launcher_impl,
+        target = Label("//toolchains:platformclasspath"),
+        config_settings = {
+            "//command_line_option:tool_java_runtime_version": "remotejdk_11",
+        },
+    )
+
+def _test_jdk11_uses_source_launcher_impl(env, target):
+    env.expect.that_target(target).action_named(
+        "JavaToolchainCompileBootClasspath",
+    ).argv().contains_at_least([
+        "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+        "toolchains/DumpPlatformClassPath.java",
+        "{bindir}/{package}/{name}_unstripped.jar",
+    ]).in_order()
+
 def bootclasspath_tests(name):
     test_suite(
         name = name,
@@ -76,5 +123,7 @@ def bootclasspath_tests(name):
             _test_incompatible_language_version_bootclasspath_disabled,
             _test_incompatible_language_version_bootclasspath_enabled_versioned,
             _test_incompatible_language_version_bootclasspath_enabled_unversioned,
+            _test_jdk8_uses_tree_artifact,
+            _test_jdk11_uses_source_launcher,
         ],
     )
