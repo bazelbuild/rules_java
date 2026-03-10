@@ -15,6 +15,8 @@
 
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
+load("//java/common:java_semantics.bzl", "semantics")
+load("//java/common/rules/impl:java_helper.bzl", "helper")
 
 # copybara: default visibility
 
@@ -69,8 +71,15 @@ def _bazel_java_single_jar_impl(ctx):
     else:
         fail("\"compress\" attribute (%s) must be: yes, no, preserve." % ctx.attr.compress)
 
+    if ctx.attr.exclude_build_data and ctx.attr.stamp == 1:
+        fail("Enabling stamping has not effect with exclude_build_data enabled")
+
+    build_info_files = []
     if ctx.attr.exclude_build_data:
         args.add("--exclude_build_data")
+    else:
+        build_info_files = helper.get_build_info(ctx, ctx.attr.stamp)
+        args.add_all(build_info_files, before_each = "--build_info_file")
     if ctx.attr.multi_release:
         args.add("--multi_release")
 
@@ -78,7 +87,7 @@ def _bazel_java_single_jar_impl(ctx):
         args.add("--exclude_pattern", ctx.attr.exclude_pattern)
 
     ctx.actions.run(
-        inputs = inputs,
+        inputs = depset(build_info_files, transitive = [inputs]),
         outputs = [ctx.outputs.output],
         arguments = [args],
         progress_message = "Merging into %s" % ctx.outputs.output.short_path,
@@ -138,6 +147,20 @@ bazel_java_single_jar = rule(
             executable = True,
         ),
         "output": attr.output(),
+        "stamp": attr.int(
+            doc = """
+              Whether to embed extra Bazel build information into the build_data.properties file:
+                * `stamp = 1`: Always embed Bazel build information, even in `--nostamp` builds.
+                * `stamp = 0`: Embed Bazel build information with constant values, even in `--stamp` builds.
+                * `stamp = -1`: Embedding of Bazel build information is controlled by the `--[no]stamp` flag.
+
+                Note: whether the output contains the build_data.properties file is controlled
+                 by the `exclude_build_data` attribute.
+                """,
+            default = 0,
+            values = [-1, 0, 1],
+        ),
+        "_build_info_translator": attr.label(default = semantics.BUILD_INFO_TRANSLATOR_LABEL),
     },
     implementation = _bazel_java_single_jar_impl,
     doc = """

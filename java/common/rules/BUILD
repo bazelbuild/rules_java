@@ -35,7 +35,11 @@ bzl_library(
     name = "java_single_jar_bzl",
     srcs = ["java_single_jar.bzl"],
     visibility = ["//java:__subpackages__"],
-    deps = ["//java/common"],
+    deps = [
+        "//java/common",
+        "//java/common:semantics_bzl",
+        "//java/common/rules/impl:java_helper_bzl",
+    ],
 )
 
 bzl_library(

@@ -241,6 +241,15 @@ def _is_stamping_enabled(ctx, stamp):
     # stamp == -1 / auto
     return int(ctx.configuration.stamp_binaries())
 
+def _get_build_info(ctx, stamp):
+    if helper.is_stamping_enabled(ctx, stamp):
+        # Makes the target depend on BUILD_INFO_KEY, which helps to discover stamped targets
+        # See b/326620485 for more details.
+        ctx.version_file  # buildifier: disable=no-effect
+        return ctx.attr._build_info_translator[OutputGroupInfo].non_redacted_build_info_files.to_list()
+    else:
+        return ctx.attr._build_info_translator[OutputGroupInfo].redacted_build_info_files.to_list()
+
 helper = struct(
     collect_all_targets_as_deps = _collect_all_targets_as_deps,
     filter_launcher_for_target = _filter_launcher_for_target,
@@ -265,6 +274,7 @@ helper = struct(
     detokenize_javacopts = _loading_phase_helper.detokenize_javacopts,
     tokenize_javacopts = _loading_phase_helper.tokenize_javacopts,
     is_stamping_enabled = _is_stamping_enabled,
+    get_build_info = _get_build_info,
     get_relative = _loading_phase_helper.get_relative,
     has_target_constraints = _loading_phase_helper.has_target_constraints,
 )

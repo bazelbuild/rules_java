@@ -36,9 +36,7 @@ bzl_library(
     name = "semantics_bzl",
     srcs = ["java_semantics.bzl"],
     visibility = ["//visibility:public"],
-    deps = [
-        "@rules_cc//cc/common",
-    ],
+    deps = ["@rules_cc//cc/common:cc_helper_bzl"],
 )
 
 bzl_library(
