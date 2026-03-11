@@ -8,6 +8,8 @@ load("@rules_testing//lib:truth.bzl", "matching", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_test.bzl", "java_test")
+load("//java/common:java_info.bzl", "JavaInfo")
+load("//java/common:java_semantics.bzl", "semantics")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 
@@ -228,6 +230,43 @@ def _test_stamp_values_impl(env, targets):
     env.expect.that_target(targets.defaultstamp).attr("stamp", factory = subjects.int).equals(0)
     env.expect.that_target(targets.autostamp).attr("stamp", factory = subjects.int).equals(-1)
 
+def _test_add_test_support_to_compile_time_deps_flag(name):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        always_passes(name)
+        return
+    util.helper_target(
+        rule = java_test,
+        name = name + "/test",
+        srcs = [name + "/Test.java"],
+    )
+
+    analysis_test(
+        name = name,
+        targets = {
+            "add_support": name + "/test",
+            "no_add_support": name + "/test",
+        },
+        attrs = {
+            "test_runner": attr.label(default = semantics.JAVA_TEST_RUNNER_LABEL),
+            "add_support": {
+                "@config_settings": {
+                    "//command_line_option:experimental_add_test_support_to_compile_time_deps": True,
+                },
+            },
+            "no_add_support": {
+                "@config_settings": {
+                    "//command_line_option:experimental_add_test_support_to_compile_time_deps": False,
+                },
+            },
+        },
+        impl = _test_add_test_support_to_compile_time_deps_flag_impl,
+    )
+
+def _test_add_test_support_to_compile_time_deps_flag_impl(env, targets):
+    compile_jars = env.ctx.attr.test_runner[JavaInfo].compile_jars
+    env.expect.that_target(targets.add_support).action_named("Javac").inputs().contains_at_least(compile_jars.to_list())
+    env.expect.that_target(targets.no_add_support).action_named("Javac").inputs().contains_none_of(compile_jars.to_list())
+
 def java_test_tests(name):
     test_suite(
         name = name,
@@ -238,5 +277,6 @@ def java_test_tests(name):
             _test_java_test_propagates_direct_native_libraries,
             _test_coverage_uses_coverage_runner_for_main,
             _test_stamp_values,
+            _test_add_test_support_to_compile_time_deps_flag,
         ],
     )
