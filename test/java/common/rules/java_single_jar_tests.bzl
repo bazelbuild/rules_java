@@ -6,15 +6,6 @@ load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_single_jar.bzl", "java_single_jar")
 load("//java/common:java_semantics.bzl", "semantics")
 
-def _label_to_bin_path(label):
-    segments = ["{bindir}"]
-    if label.repo_name:
-        segments.extend(["external", label.repo_name])
-    segments.append(label.package)
-    return "/".join(segments)
-
-_BUILD_INFO_PATH = _label_to_bin_path(Label(semantics.BUILD_INFO_TRANSLATOR_LABEL))
-
 def _test_java_single_jar_basic(name):
     util.helper_target(
         java_single_jar,
@@ -53,14 +44,17 @@ def _test_java_single_jar_force_enable_stamping(name):
     analysis_test(
         name = name,
         impl = _test_java_single_jar_force_enable_stamping_impl,
-        target = name + "/jar",
+        targets = {
+            "jar": name + "/jar",
+            "build_info": semantics.BUILD_INFO_TRANSLATOR_LABEL,
+        },
     )
 
-def _test_java_single_jar_force_enable_stamping_impl(env, target):
-    assert_that_action = env.expect.that_target(target).action_named("JavaSingleJar")
+def _test_java_single_jar_force_enable_stamping_impl(env, targets):
+    assert_that_action = env.expect.that_target(targets.jar).action_named("JavaSingleJar")
     assert_that_action.contains_flag_values([
-        ("--build_info_file", _BUILD_INFO_PATH + "/non_volatile_file.properties"),
-        ("--build_info_file", _BUILD_INFO_PATH + "/volatile_file.properties"),
+        ("--build_info_file", f.path)
+        for f in targets.build_info[OutputGroupInfo].non_redacted_build_info_files.to_list()
     ])
 
 def _test_java_single_jar_force_disable_stamping(name):
@@ -74,13 +68,17 @@ def _test_java_single_jar_force_disable_stamping(name):
     analysis_test(
         name = name,
         impl = _test_java_single_jar_force_disable_stamping_impl,
-        target = name + "/jar",
+        targets = {
+            "jar": name + "/jar",
+            "build_info": semantics.BUILD_INFO_TRANSLATOR_LABEL,
+        },
     )
 
-def _test_java_single_jar_force_disable_stamping_impl(env, target):
-    assert_that_action = env.expect.that_target(target).action_named("JavaSingleJar")
+def _test_java_single_jar_force_disable_stamping_impl(env, targets):
+    assert_that_action = env.expect.that_target(targets.jar).action_named("JavaSingleJar")
     assert_that_action.contains_flag_values([
-        ("--build_info_file", _BUILD_INFO_PATH + "/redacted_file.properties"),
+        ("--build_info_file", f.path)
+        for f in targets.build_info[OutputGroupInfo].redacted_build_info_files.to_list()
     ])
 
 def _test_java_single_jar_stamping_enabled_build_data_excluded_fails(name):
@@ -114,17 +112,20 @@ def _test_java_single_jar_stamp_attr_auto_stamp_flag_enabled(name):
     analysis_test(
         name = name,
         impl = _test_java_single_jar_stamp_attr_auto_stamp_flag_enabled_impl,
-        target = name + "/jar",
+        targets = {
+            "jar": name + "/jar",
+            "build_info": semantics.BUILD_INFO_TRANSLATOR_LABEL,
+        },
         config_settings = {
             "//command_line_option:stamp": True,
         },
     )
 
-def _test_java_single_jar_stamp_attr_auto_stamp_flag_enabled_impl(env, target):
-    assert_that_action = env.expect.that_target(target).action_named("JavaSingleJar")
+def _test_java_single_jar_stamp_attr_auto_stamp_flag_enabled_impl(env, targets):
+    assert_that_action = env.expect.that_target(targets.jar).action_named("JavaSingleJar")
     assert_that_action.contains_flag_values([
-        ("--build_info_file", _BUILD_INFO_PATH + "/non_volatile_file.properties"),
-        ("--build_info_file", _BUILD_INFO_PATH + "/volatile_file.properties"),
+        ("--build_info_file", f.path)
+        for f in targets.build_info[OutputGroupInfo].non_redacted_build_info_files.to_list()
     ])
 
 def _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled(name):
@@ -138,16 +139,20 @@ def _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled(name):
     analysis_test(
         name = name,
         impl = _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled_impl,
-        target = name + "/jar",
+        targets = {
+            "jar": name + "/jar",
+            "build_info": semantics.BUILD_INFO_TRANSLATOR_LABEL,
+        },
         config_settings = {
             "//command_line_option:stamp": False,
         },
     )
 
-def _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled_impl(env, target):
-    assert_that_action = env.expect.that_target(target).action_named("JavaSingleJar")
+def _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled_impl(env, targets):
+    assert_that_action = env.expect.that_target(targets.jar).action_named("JavaSingleJar")
     assert_that_action.contains_flag_values([
-        ("--build_info_file", _BUILD_INFO_PATH + "/redacted_file.properties"),
+        ("--build_info_file", f.path)
+        for f in targets.build_info[OutputGroupInfo].redacted_build_info_files.to_list()
     ])
 
 def java_single_jar_tests(name):
