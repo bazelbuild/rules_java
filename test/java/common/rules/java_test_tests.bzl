@@ -10,6 +10,8 @@ load("//java:java_library.bzl", "java_library")
 load("//java:java_test.bzl", "java_test")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
+load("//test/java/common/testutil:mock_cc_toolchain.bzl", "mock_cc_toolchain")
+load("//test/java/common/testutil:mock_test_toolchain.bzl", "mock_test_toolchains")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 
@@ -267,6 +269,52 @@ def _test_add_test_support_to_compile_time_deps_flag_impl(env, targets):
     env.expect.that_target(targets.add_support).action_named("Javac").inputs().contains_at_least(compile_jars.to_list())
     env.expect.that_target(targets.no_add_support).action_named("Javac").inputs().contains_none_of(compile_jars.to_list())
 
+def _test_mac_requires_darwin_for_execution(name):
+    util.helper_target(
+        rule = native.platform,
+        name = name + "/darwin_x86_64",
+        constraint_values = [
+            "@platforms//os:macos",
+            "@platforms//cpu:x86_64",
+        ],
+    )
+
+    util.helper_target(
+        rule = java_test,
+        name = name + "/test",
+        srcs = [name + "/Test.java"],
+        use_launcher = False,
+        use_testrunner = 0,
+    )
+
+    util.helper_target(
+        rule = mock_cc_toolchain,
+        name = name + "/cc_toolchain",
+        cpu = "x86_64",
+        os = "macos",
+    )
+
+    toolchains = [Label(name + "/cc_toolchain")] + mock_test_toolchains(
+        name = name + "/test_toolchain",
+        cpu = "x86_64",
+        os = "macos",
+    )
+
+    analysis_test(
+        name = name,
+        target = name + "/test",
+        config_settings = {
+            "//command_line_option:platforms": [Label(name + "/darwin_x86_64")],
+            "//command_line_option:extra_toolchains": toolchains,
+        },
+        impl = _test_mac_requires_darwin_for_execution_impl,
+    )
+
+def _test_mac_requires_darwin_for_execution_impl(env, target):
+    env.expect.that_target(target).provider(testing.ExecutionInfo).requirements().contains_at_least(
+        {"requires-darwin": ""},
+    )
+
 def java_test_tests(name):
     test_suite(
         name = name,
@@ -278,5 +326,6 @@ def java_test_tests(name):
             _test_coverage_uses_coverage_runner_for_main,
             _test_stamp_values,
             _test_add_test_support_to_compile_time_deps_flag,
+            _test_mac_requires_darwin_for_execution,
         ],
     )
