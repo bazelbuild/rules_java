@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Definition of  the java_single_jar rule."""
+"""Definition of the java_single_jar rule."""
 
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
