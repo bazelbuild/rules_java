@@ -130,4 +130,4 @@ archive_override(
 )
 
 test_repositories = use_extension("//test:repositories.bzl", "test_repositories_ext", dev_dependency = True)
-use_repo(test_repositories, "guava", "truth")
+use_repo(test_repositories, "guava", "other_repo", "truth")
