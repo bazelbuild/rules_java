@@ -160,7 +160,8 @@ def basic_java_library(
 
     validation_outputs = []
 
-    if ctx.fragments.java.run_android_lint:
+    # Validation actions don't run in the exec config, so no need to create them.
+    if ctx.fragments.java.run_android_lint and not ctx.configuration.is_tool_configuration():
         generated_source_jars = [
             output.generated_source_jar
             for output in java_info.java_outputs
