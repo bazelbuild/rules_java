@@ -10,9 +10,9 @@ load("//java:java_library.bzl", "java_library")
 load("//java:java_test.bzl", "java_test")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
-load("//test/java/common/testutil:mock_cc_toolchain.bzl", "mock_cc_toolchain")
-load("//test/java/common/testutil:mock_test_toolchain.bzl", "mock_test_toolchains")
 load("//test/java/testutil:helper.bzl", "always_passes")
+load("//test/java/testutil:mock_cc_toolchain.bzl", "mock_cc_toolchain")
+load("//test/java/testutil:mock_test_toolchain.bzl", "mock_test_toolchains")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 
 def _test_java_test_is_test_only(name):
