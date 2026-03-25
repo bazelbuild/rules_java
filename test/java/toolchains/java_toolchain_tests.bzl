@@ -7,58 +7,24 @@ load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_common.bzl", "java_common")
-load("//java/common:java_semantics.bzl", "semantics")
-load("//java/toolchains:java_runtime.bzl", "java_runtime")
-load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:java_toolchain_info_subject.bzl", "java_toolchain_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
+load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_toolchain")
 load("//toolchains:java_toolchain_alias.bzl", "java_toolchain_alias")
 
-def _declare_java_toolchain(*, name, **kwargs):
-    java_runtime_name = name + "/runtime"
-    java_runtime(name = java_runtime_name)
-    toolchain_attrs = {
-        "source_version": "6",
-        "target_version": "6",
-        "bootclasspath": ["rt.jar"],
-        "xlint": ["toto"],
-        "javacopts": ["-Xmaxerrs 500"],
-        "compatible_javacopts": {
-            "android": ["-XDandroidCompatible"],
-            "testonly": ["-XDtestOnly"],
-            "public_visibility": ["-XDpublicVisibility"],
-        },
-        "tools": [":javac_canary.jar"],
-        "javabuilder": ":JavaBuilder_deploy.jar",
-        "header_compiler": ":turbine_canary_deploy.jar",
-        "header_compiler_direct": ":turbine_direct",
-        "singlejar": "singlejar",
-        "ijar": "ijar",
-        "genclass": "GenClass_deploy.jar",
-        "timezone_data": "tzdata.jar",
-        "header_compiler_builtin_processors": ["BuiltinProc1", "BuiltinProc2"],
-        "reduced_classpath_incompatible_processors": [
-            "IncompatibleProc1",
-            "IncompatibleProc2",
-        ],
-        "java_runtime": java_runtime_name,
-    }
-    toolchain_attrs.update(kwargs)
-    util.helper_target(
-        java_toolchain,
-        name = name + "/java_toolchain",
-        **toolchain_attrs
-    )
-    util.helper_target(
-        native.toolchain,
-        name = name + "/toolchain",
-        toolchain = name + "/java_toolchain",
-        toolchain_type = semantics.JAVA_TOOLCHAIN_TYPE,
-    )
-
 def _test_javac_gets_options(name):
-    _declare_java_toolchain(name = name)
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        javabuilder = name + "/JavaBuilder_deploy.jar",
+        header_compiler_direct = name + "/turbine_direct",
+        bootclasspath = [name + "/rt.jar"],
+        source_version = "6",
+        target_version = "6",
+        xlint = ["toto"],
+        javacopts = ["-Xmaxerrs 500"],
+    )
     util.helper_target(
         java_library,
         name = name + "/b",
@@ -95,24 +61,31 @@ def _test_javac_gets_options_impl(env, targets):
         "-Xmaxerrs",
         "500",
     ])
-    assert_javac_action.jar().contains_exactly(["{package}/JavaBuilder_deploy.jar"])
-    assert_javac_action.inputs().contains("{package}/rt.jar")
+    assert_javac_action.jar().contains_exactly(["{package}/{test_name}/JavaBuilder_deploy.jar"])
+    assert_javac_action.inputs().contains("{package}/{test_name}/rt.jar")
 
     assert_javac_action.javacopts().not_contains("-g")
 
     assert_header_action = javac_action_subject.of(env, targets.b, "{package}/lib{name}-hjar.jar")
-    assert_header_action.argv().contains("{package}/turbine_direct")
+    assert_header_action.argv().contains("{package}/{test_name}/turbine_direct")
 
 def _test_jacocorunner(name):
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
         jacocorunner = "myjacocorunner.jar",
     )
-
+    util.helper_target(
+        java_toolchain_alias,
+        name = name + "/alias",
+    )
     analysis_test(
         name = name,
         impl = _test_jacocorunner_impl,
-        target = name + "/java_toolchain",
+        target = name + "/alias",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
     )
 
 def _test_jacocorunner_impl(env, target):
@@ -121,7 +94,10 @@ def _test_jacocorunner_impl(env, target):
     assert_toolchain.jacocorunner().short_path_equals("{package}/myjacocorunner.jar")
 
 def _test_singlejar_get_command_line(name):
-    _declare_java_toolchain(name = name)
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+    )
     util.helper_target(
         java_binary,
         name = name + "/a",
@@ -144,7 +120,11 @@ def _test_singlejar_get_command_line_impl(env, target):
     assert_javac_action.executable_file_name().equals(target.label.package + "/singlejar")
 
 def _test_genclass_get_command_line(name):
-    _declare_java_toolchain(name = name)
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        genclass = name + "/GenClass_deploy.jar",
+    )
     util.helper_target(
         java_library,
         name = name + "/a",
@@ -164,15 +144,26 @@ def _test_genclass_get_command_line(name):
 def _test_genclass_get_command_line_impl(env, target):
     assert_javac_action = javac_action_subject.of(env, target, "{package}/lib{name}-gen.jar")
 
-    assert_javac_action.jar().contains_exactly(["{package}/GenClass_deploy.jar"])
+    assert_javac_action.jar().contains_exactly(["{package}/{test_name}/GenClass_deploy.jar"])
 
 def _test_timezone_data_is_correct(name):
-    _declare_java_toolchain(name = name)
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        timezone_data = "tzdata.jar",
+    )
+    util.helper_target(
+        java_toolchain_alias,
+        name = name + "/alias",
+    )
 
     analysis_test(
         name = name,
         impl = _test_timezone_data_is_correct_impl,
-        target = name + "/java_toolchain",
+        target = name + "/alias",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
     )
 
 def _test_timezone_data_is_correct_impl(env, target):
@@ -181,7 +172,11 @@ def _test_timezone_data_is_correct_impl(env, target):
     )
 
 def _test_java_binary_uses_timezone_data(name):
-    _declare_java_toolchain(name = name)
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        timezone_data = name + "/tzdata.jar",
+    )
     util.helper_target(
         java_binary,
         name = name + "/a",
@@ -199,11 +194,14 @@ def _test_java_binary_uses_timezone_data(name):
 
 def _test_java_binary_uses_timezone_data_impl(env, target):
     assert_action = javac_action_subject.of(env, target, "{package}/{name}.jar")
-    assert_action.sources().contains("{package}/tzdata.jar")
+    assert_action.sources().contains("{package}/{test_name}/tzdata.jar")
     assert_action.inputs().contains_predicate(matching.file_basename_equals("tzdata.jar"))
 
 def _test_ijar_get_command_line(name):
-    _declare_java_toolchain(name = name)
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+    )
     util.helper_target(
         java_library,
         name = name + "/a",
@@ -227,8 +225,9 @@ def _test_ijar_get_command_line_impl(env, target):
     )
 
 def _test_no_header_compiler_header_compilation_enabled_fails(name):
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
         header_compiler = None,
     )
     util.helper_target(
@@ -255,8 +254,9 @@ def _test_no_header_compiler_header_compilation_enabled_fails_impl(env, target):
     )
 
 def _test_no_header_compiler_direct_header_compilation_enabled_fails(name):
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
         header_compiler_direct = None,
     )
     util.helper_target(
@@ -283,8 +283,9 @@ def _test_no_header_compiler_direct_header_compilation_enabled_fails_impl(env, t
     )
 
 def _test_no_header_compiler_header_compilation_disabled_analyzes_successfully(name):
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
         header_compiler = None,
     )
     util.helper_target(
@@ -311,41 +312,60 @@ def _test_no_header_compiler_header_compilation_disabled_analyzes_successfully_i
 
 def _test_header_compiler_builtin_processors(name):
     util.helper_target(
-        java_toolchain,
-        name = name + "/java_toolchain",
+        mock_java_toolchain,
+        name = name + "/toolchain",
         header_compiler_builtin_processors = ["BuiltinProc1", "BuiltinProc2"],
-        singlejar = "singlejar",
+    )
+    util.helper_target(
+        java_toolchain_alias,
+        name = name + "/alias",
     )
 
     analysis_test(
         name = name,
         impl = _test_header_compiler_builtin_processors_impl,
-        target = name + "/java_toolchain",
+        target = name + "/alias",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
     )
 
 def _test_header_compiler_builtin_processors_impl(env, target):
-    java_toolchain_info_subject.from_target(env, target).header_compiler_builtin_processors().contains_exactly(["BuiltinProc1", "BuiltinProc2"])
+    java_toolchain_info_subject.from_target(env, target).header_compiler_builtin_processors().contains_exactly([
+        "BuiltinProc1",
+        "BuiltinProc2",
+    ])
 
 def _test_reduced_classpath_incompatible_processors(name):
     util.helper_target(
-        java_toolchain,
-        name = name + "/java_toolchain",
+        mock_java_toolchain,
+        name = name + "/toolchain",
         reduced_classpath_incompatible_processors = ["IncompatibleProc1", "IncompatibleProc2"],
-        singlejar = "singlejar",
+    )
+    util.helper_target(
+        java_toolchain_alias,
+        name = name + "/alias",
     )
 
     analysis_test(
         name = name,
         impl = _test_reduced_classpath_incompatible_processors_impl,
-        target = name + "/java_toolchain",
+        target = name + "/alias",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
     )
 
 def _test_reduced_classpath_incompatible_processors_impl(env, target):
-    java_toolchain_info_subject.from_target(env, target).reduced_classpath_incompatible_processors().contains_exactly(["IncompatibleProc1", "IncompatibleProc2"])
+    java_toolchain_info_subject.from_target(env, target).reduced_classpath_incompatible_processors().contains_exactly([
+        "IncompatibleProc1",
+        "IncompatibleProc2",
+    ])
 
 def _test_location_expansion_in_jvm_opts(name):
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
         tools = [name + "/jsr305.jar", name + "/javac"],
         jvm_opts = [
             "--patch-module=jdk.compiler=$(location " + name + "/javac)",
@@ -381,8 +401,9 @@ def _test_location_expansion_with_multiple_artifacts_fails(name):
         name = name + "/fg",
         srcs = ["one", "two"],
     )
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
         tools = [name + "/fg"],
         javabuilder_jvm_opts = ["$(location " + name + "/fg)"],
     )
@@ -390,7 +411,7 @@ def _test_location_expansion_with_multiple_artifacts_fails(name):
     analysis_test(
         name = name,
         impl = _test_location_expansion_with_multiple_artifacts_fails_impl,
-        target = name + "/java_toolchain",
+        target = name + "/toolchain_java",  # the underlying java_toolchain
         expect_failure = True,
     )
 
@@ -405,15 +426,16 @@ def _test_timezone_data_with_multiple_artifacts_fails(name):
         name = name + "/fg",
         srcs = ["one", "two"],
     )
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
         timezone_data = name + "/fg",
     )
 
     analysis_test(
         name = name,
         impl = _test_timezone_data_with_multiple_artifacts_fails_impl,
-        target = name + "/java_toolchain",
+        target = name + "/toolchain_java",  # the underlying java_toolchain
         expect_failure = True,
     )
 
@@ -423,8 +445,12 @@ def _test_timezone_data_with_multiple_artifacts_fails_impl(env, target):
     )
 
 def _test_java_compile_action_target_gets_javacopts_from_toolchain(name):
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        source_version = "6",
+        target_version = "6",
+        xlint = ["toto"],
         javacopts = ["-XDtoolchainJavacFlag"],
     )
     util.helper_target(
@@ -456,8 +482,12 @@ def _test_java_compile_action_target_gets_javacopts_from_toolchain_impl(env, tar
     ])
 
 def _test_java_compile_action_exec_gets_javacopts_from_toolchain(name):
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        source_version = "6",
+        target_version = "6",
+        xlint = ["toto"],
         javacopts = ["-XDtoolchainJavacFlag"],
     )
     util.helper_target(
@@ -495,8 +525,9 @@ def _test_java_compile_action_exec_gets_javacopts_from_toolchain_impl(env, targe
     ])
 
 def _test_java_compile_action_uses_tool_specific_jvm_opts(name):
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
         jvm_opts = ["-Xbase"],
         javabuilder_jvm_opts = ["-DjavabuilderFlag=1"],
         turbine_jvm_opts = ["-DturbineFlag=1"],
@@ -540,19 +571,27 @@ def _test_javabuilder_location_expansion_with_multiple_artifacts(name):
         name = name + "/fg2",
         srcs = ["c", "d"],
     )
-    _declare_java_toolchain(
-        name = name,
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
         javabuilder_data = [name + "/fg1", name + "/fg2"],
         javabuilder_jvm_opts = [
             "$(locations " + name + "/fg1)",
             "$(locations " + name + "/fg2)",
         ],
     )
+    util.helper_target(
+        java_toolchain_alias,
+        name = name + "/alias",
+    )
 
     analysis_test(
         name = name,
         impl = _test_javabuilder_location_expansion_with_multiple_artifacts_impl,
-        target = name + "/java_toolchain",
+        target = name + "/alias",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
     )
 
 def _test_javabuilder_location_expansion_with_multiple_artifacts_impl(env, target):
@@ -621,7 +660,10 @@ def _test_java_toolchain_flag_default_impl(env, target):
     )
 
 def _test_java_toolchain_flag_set(name):
-    _declare_java_toolchain(name = name)
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+    )
     util.helper_target(
         java_toolchain_alias,
         name = name + "/toolchain_alias",
@@ -632,7 +674,7 @@ def _test_java_toolchain_flag_set(name):
         impl = _test_java_toolchain_flag_set_impl,
         targets = {
             "alias": name + "/toolchain_alias",
-            "toolchain": name + "/java_toolchain",
+            "toolchain": name + "/toolchain_java",  # the underlying java_toolchain
         },
         config_settings = {
             "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
@@ -644,13 +686,27 @@ def _test_java_toolchain_flag_set_impl(env, targets):
     assert_toolchain.label().equals(targets.toolchain.label)
 
 def _test_default_javac_opts_depset(name):
-    _declare_java_toolchain(name = name)
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        source_version = "6",
+        target_version = "6",
+        xlint = ["toto"],
+        javacopts = ["-Xmaxerrs 500"],
+    )
+    util.helper_target(
+        java_toolchain_alias,
+        name = name + "/alias",
+    )
 
     analysis_test(
         name = name,
         impl = _test_default_javac_opts_depset_impl,
-        target = name + "/java_toolchain",
+        target = name + "/alias",
         attr_values = {"tags": ["min_bazel_8"]},
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
     )
 
 def _test_default_javac_opts_depset_impl(env, target):
@@ -659,12 +715,24 @@ def _test_default_javac_opts_depset_impl(env, target):
     )
 
 def _test_default_javac_opts(name):
-    _declare_java_toolchain(name = name)
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        source_version = "6",
+        target_version = "6",
+    )
+    util.helper_target(
+        java_toolchain_alias,
+        name = name + "/alias",
+    )
 
     analysis_test(
         name = name,
         impl = _test_default_javac_opts_impl,
-        target = name + "/java_toolchain",
+        target = name + "/alias",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
         attr_values = {"tags": ["min_bazel_8"]},
     )
 

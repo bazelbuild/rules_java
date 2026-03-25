@@ -4,16 +4,16 @@ load("@rules_cc//cc:defs.bzl", "cc_import")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
-load("//java/common:java_semantics.bzl", "semantics")
 load("//java/toolchains:java_runtime.bzl", "java_runtime")
 load("//test/java/testutil:java_runtime_info_subject.bzl", "java_runtime_info_subject")
+load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_runtime_toolchain")
 load("//test/java/testutil:rules/forward_java_runtime_info.bzl", "java_runtime_info_forwarding_rule")
 load("//toolchains:java_toolchain_alias.bzl", "java_runtime_alias")
 
 def _test_with_absolute_java_home(name):
     util.helper_target(
-        java_runtime,
-        name = name + "/jvm",
+        mock_java_runtime_toolchain,
+        name = name + "/java_runtime_toolchain",
         srcs = [],
         java_home = "/foo/bar",
     )
@@ -25,12 +25,6 @@ def _test_with_absolute_java_home(name):
         java_runtime_info_forwarding_rule,
         name = name + "/r",
         java_runtime = name + "/alias",
-    )
-    util.helper_target(
-        native.toolchain,
-        name = name + "/java_runtime_toolchain",
-        toolchain = name + "/jvm",
-        toolchain_type = semantics.JAVA_RUNTIME_TOOLCHAIN_TYPE,
     )
 
     analysis_test(
@@ -52,8 +46,8 @@ def _test_with_absolute_java_home_impl(env, target):
 
 def _test_with_hermetic_java_home(name):
     util.helper_target(
-        java_runtime,
-        name = name + "/jvm",
+        mock_java_runtime_toolchain,
+        name = name + "/java_runtime_toolchain",
         srcs = [],
         java_home = "foo/bar",
     )
@@ -65,12 +59,6 @@ def _test_with_hermetic_java_home(name):
         java_runtime_info_forwarding_rule,
         name = name + "/r",
         java_runtime = name + "/alias",
-    )
-    util.helper_target(
-        native.toolchain,
-        name = name + "/java_runtime_toolchain",
-        toolchain = name + "/jvm",
-        toolchain_type = semantics.JAVA_RUNTIME_TOOLCHAIN_TYPE,
     )
 
     analysis_test(
@@ -99,8 +87,8 @@ def _test_with_generated_java_executable(name):
         output_to_bindir = True,
     )
     util.helper_target(
-        java_runtime,
-        name = name + "/jvm",
+        mock_java_runtime_toolchain,
+        name = name + "/java_runtime_toolchain",
         srcs = [],
         java = "foo/bar/bin/java",
     )
@@ -112,12 +100,6 @@ def _test_with_generated_java_executable(name):
         java_runtime_info_forwarding_rule,
         name = name + "/r",
         java_runtime = name + "/alias",
-    )
-    util.helper_target(
-        native.toolchain,
-        name = name + "/java_runtime_toolchain",
-        toolchain = name + "/jvm",
-        toolchain_type = semantics.JAVA_RUNTIME_TOOLCHAIN_TYPE,
     )
 
     analysis_test(
