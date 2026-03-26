@@ -18,7 +18,7 @@ load("//java/common/rules:java_helper.bzl", "helper")
 load("//java/private:boot_class_path_info.bzl", "BootClassPathInfo")
 load("//java/private:native.bzl", "get_internal_java_common")
 
-# copybara: default visibility
+# copybara: rules_java visibility
 
 JavaPackageConfigurationInfo = provider(
     "A provider for Java per-package configuration",
