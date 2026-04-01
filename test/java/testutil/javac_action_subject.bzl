@@ -25,6 +25,7 @@ def _new_javac_action_subject(env, target, output):
         # An unset --strict_java_deps is equivalent to "OFF".
         strict_java_deps = lambda: _create_subject_for_flag("--strict_java_deps", self.parsed_flags, self.meta, default = ["OFF"]),
         sources = lambda: _create_subject_for_flag("--sources", self.parsed_flags, self.meta),
+        classpath = lambda: _create_subject_for_flag("--classpath", self.parsed_flags, self.meta),
         executable_file_name = lambda: subjects.str(action_subject.actual.argv[0], self.meta),
         inputs = action_subject.inputs,
         argv = action_subject.argv,
