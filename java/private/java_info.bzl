@@ -16,7 +16,6 @@
 Definition of JavaInfo and JavaPluginInfo provider.
 """
 
-load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load(":native.bzl", "get_internal_java_common")
@@ -175,7 +174,7 @@ def merge(
     }
 
     if get_internal_java_common().google_legacy_api_enabled():
-        cc_info = semantics.minimize_cc_info(cc_common.merge_cc_infos(cc_infos = [p.cc_link_params_info for p in providers]))
+        cc_info = semantics.minimize_cc_info(semantics.merge_cc_infos(cc_infos = [p.cc_link_params_info for p in providers]))
         result.update(
             cc_link_params_info = cc_info,
             transitive_native_libraries =
@@ -677,7 +676,7 @@ def _javainfo_init_base(
     if get_internal_java_common().google_legacy_api_enabled():
         transitive_cc_infos = [dep.cc_link_params_info for dep in concatenated_deps.runtimedeps_exports_deps]
         transitive_cc_infos.extend(native_libraries)
-        cc_info = semantics.minimize_cc_info(cc_common.merge_cc_infos(cc_infos = transitive_cc_infos))
+        cc_info = semantics.minimize_cc_info(semantics.merge_cc_infos(cc_infos = transitive_cc_infos))
         result.update(
             cc_link_params_info = cc_info,
             transitive_native_libraries =
@@ -686,7 +685,7 @@ def _javainfo_init_base(
     else:
         transitive_native_libraries = []
         if native_libraries:
-            merged_cc_info = cc_common.merge_cc_infos(cc_infos = native_libraries)
+            merged_cc_info = semantics.merge_cc_infos(cc_infos = native_libraries)
             if hasattr(merged_cc_info, "_legacy_transitive_native_libraries"):
                 transitive_native_libraries = [merged_cc_info._legacy_transitive_native_libraries]
             else:

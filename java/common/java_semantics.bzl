@@ -13,6 +13,7 @@
 # limitations under the License.
 """Bazel Java Semantics"""
 
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_helper.bzl", "cc_helper")
 
 # copybara: default visibility
@@ -40,6 +41,10 @@ def _check_java_info_opens_exports():
 
 def _minimize_cc_info(cc_info):
     return cc_info
+
+def _merge_cc_infos(*args, **kwargs):
+    # TODO: b/483025864 - use https://github.com/bazelbuild/rules_cc/commit/011d6d9e7fae71d43df2d4d83c577f2cef2aa52e
+    return cc_common.merge_cc_infos(*args, **kwargs)
 
 _DOCS = struct(
     ATTRS = {
@@ -112,6 +117,7 @@ semantics = struct(
         for_attribute = lambda name: _DOCS.ATTRS.get(name, ""),
     ),
     minimize_cc_info = _minimize_cc_info,
+    merge_cc_infos = _merge_cc_infos,
     tokenize_javacopts = _tokenize_javacopts,
     PLATFORMS_ROOT = "@platforms//",
     INCOMPATIBLE_DISABLE_NON_EXECUTABLE_JAVA_BINARY = False,  # Flip when java_single_jar is feature complete
