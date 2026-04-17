@@ -22,7 +22,18 @@ def _tokenize_opts(opts_depset):
     opts = reversed(opts_depset.to_list())
     return semantics.tokenize_javacopts(opts)
 
-def _android_lint_action(ctx, source_files, source_jars, compilation_info, is_library):
+def _flags_from_disable_lint_checks(args, disable_lint_checks):
+    invalid_ids = [check for check in disable_lint_checks if not _check_id_is_valid(check)]
+    if invalid_ids:
+        fail("Found not allowed character in disabled check ID(s) %s" % str(invalid_ids))
+    args.add_joined("--disable", disable_lint_checks, join_with = ",")
+
+# Returns whether the passed Android Lint check ID is valid
+def _check_id_is_valid(check):
+    # We want to prevent whitespace so that extra flags can't be 'injected' into Android Lint
+    return check.replace(".", "").replace("_", "").isalnum()
+
+def _android_lint_action(ctx, source_files, source_jars, compilation_info, is_library, disable_lint_checks = []):
     """
     Creates an action that runs Android lint against Java source files.
 
@@ -43,6 +54,7 @@ def _android_lint_action(ctx, source_files, source_jars, compilation_info, is_li
         source files. It should also include generated source jars.
       compilation_info: (struct) Information about compilation.
       is_library: (bool) Whether the target is a library.
+      disable_lint_checks: (list[str]) A list of AndroidLint checks to be skipped.
 
     Returns:
       (None|File) The Android lint output file or None if no source files were
@@ -112,6 +124,7 @@ def _android_lint_action(ctx, source_files, source_jars, compilation_info, is_li
 
     args.add("--lintopts")
     args.add_all(linter.lint_opts)
+    _flags_from_disable_lint_checks(args, disable_lint_checks)
 
     for package_config in linter.package_config:
         if package_config.matches(package_config.package_specs, ctx.label):

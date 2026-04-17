@@ -35,7 +35,8 @@ def bazel_java_library_rule(
         add_exports = [],
         add_opens = [],
         bootclasspath = None,
-        javabuilder_jvm_flags = None):
+        javabuilder_jvm_flags = None,
+        disable_lint_checks = []):
     """Implements java_library.
 
     Use this call when you need to produce a fully fledged java_library from
@@ -58,6 +59,7 @@ def bazel_java_library_rule(
       add_opens: (list[str]) Allow this library to reflectively access the given <module>/<package>.
       bootclasspath: (Target) The JDK APIs to compile this library against.
       javabuilder_jvm_flags: (list[str]) Additional JVM flags to pass to JavaBuilder.
+      disable_lint_checks: (list[str]) A list of AndroidLint checks to be skipped.
     Returns:
       (dict[str, provider]) A list containing DefaultInfo, JavaInfo,
         InstrumentedFilesInfo, OutputGroupsInfo, ProguardSpecProvider providers.
@@ -83,6 +85,7 @@ def bazel_java_library_rule(
         add_opens = add_opens,
         bootclasspath = bootclasspath,
         javabuilder_jvm_flags = javabuilder_jvm_flags,
+        disable_lint_checks = disable_lint_checks,
     )
 
     target["DefaultInfo"] = construct_defaultinfo(
