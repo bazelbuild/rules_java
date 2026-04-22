@@ -12,6 +12,7 @@ load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:mock_cc_toolchain.bzl", "mock_cc_toolchain")
+load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_runtime_toolchain")
 load("//test/java/testutil:mock_test_toolchain.bzl", "mock_test_toolchains")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 
@@ -315,6 +316,42 @@ def _test_mac_requires_darwin_for_execution_impl(env, target):
         {"requires-darwin": ""},
     )
 
+def _test_java_test_sets_securiry_manager_property_jdk17(name):
+    util.helper_target(
+        java_test,
+        name = name + "/test",
+        srcs = ["FooTest.java"],
+        test_class = "FooTest",
+    )
+    util.helper_target(
+        mock_java_runtime_toolchain,
+        name = name + "/toolchain",
+        version = 17,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_test_sets_securiry_manager_property_jdk17_impl,
+        target = name + "/test",
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+    )
+
+def _test_java_test_sets_securiry_manager_property_jdk17_impl(env, target):
+    executable = env.expect.that_target(target).executable().actual.short_path
+    assert_action = env.expect.that_target(target).action_generating(executable)
+    if assert_action.actual.substitutions:
+        # TemplateExpansion action on linux/mac
+        assert_action.substitutions().get("%jvm_flags%", factory = subjects.str).contains(
+            "-Djava.security.manager=allow",
+        )
+    else:
+        # windows
+        assert_action.argv().contains_predicate(
+            matching.str_matches("-Djava.security.manager=allow"),
+        )
+
 def java_test_tests(name):
     test_suite(
         name = name,
@@ -327,5 +364,6 @@ def java_test_tests(name):
             _test_stamp_values,
             _test_add_test_support_to_compile_time_deps_flag,
             _test_mac_requires_darwin_for_execution,
+            _test_java_test_sets_securiry_manager_property_jdk17,
         ],
     )

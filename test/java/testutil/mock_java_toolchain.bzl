@@ -46,12 +46,14 @@ def mock_java_runtime_toolchain(
         srcs = [],
         java_home = None,
         java = None,
+        version = None,
         **kwargs):
     _java_runtime_rule(
         name = name + "_runtime",
         srcs = srcs,
         java_home = java_home,
         java = java,
+        version = version,
         **kwargs
     )
     native.toolchain(
