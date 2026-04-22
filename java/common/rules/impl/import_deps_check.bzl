@@ -57,6 +57,7 @@ def import_deps_check(
     args.add("--jdeps_output", jdeps_output)
     args.add("--rule_label", ctx.label)
 
+    semantics.update_args_for_import_deps(ctx, args)
     inputs = depset(
         jars_to_check,
         transitive = [

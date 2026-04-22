@@ -24,6 +24,9 @@ def _find_java_toolchain(ctx):
 def _find_java_runtime_toolchain(ctx):
     return ctx.toolchains["@bazel_tools//tools/jdk:runtime_toolchain_type"].java_runtime
 
+def _update_args_for_import_deps(*_args):
+    pass
+
 def _get_default_resource_path(path, segment_extractor):
     # Look for src/.../resources to match Maven repository structure.
     segments = path.split("/")
@@ -121,5 +124,6 @@ semantics = struct(
     tokenize_javacopts = _tokenize_javacopts,
     PLATFORMS_ROOT = "@platforms//",
     INCOMPATIBLE_DISABLE_NON_EXECUTABLE_JAVA_BINARY = False,  # Flip when java_single_jar is feature complete
+    update_args_for_import_deps = _update_args_for_import_deps,
     expand_javacopts_make_variables = True,
 )
