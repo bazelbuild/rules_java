@@ -97,6 +97,27 @@ def _test_java_binary_javacopts_location_expansion_impl(env, target):
         "-XepOpt:foo={package}/A.java",
     )
 
+def _test_java_binary_resource_strip_prefix(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Foo.java"],
+        main_class = "Foo",
+        resource_strip_prefix = native.package_name() + "/path/to/strip",
+        resources = ["path/to/strip/bar.props"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_resource_strip_prefix_impl,
+        target = name + "/bin",
+    )
+
+def _test_java_binary_resource_strip_prefix_impl(env, target):
+    env.expect.that_target(target).action_generating("{package}/{name}.jar").contains_flag_values([
+        ("--resources", "{package}/path/to/strip/bar.props:bar.props"),
+    ])
+
 def java_binary_tests(name):
     test_suite(
         name = name,
@@ -104,5 +125,6 @@ def java_binary_tests(name):
             _test_java_binary_cross_compilation_to_unix,
             _test_java_binary_javacopts_make_variable_expansion,
             _test_java_binary_javacopts_location_expansion,
+            _test_java_binary_resource_strip_prefix,
         ],
     )
