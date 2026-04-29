@@ -13,6 +13,7 @@ load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
+load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_toolchain")
 load("//test/java/testutil:rules/custom_library_with_bootclasspath.bzl", "custom_bootclasspath")
 
 def _test_java_library_rule_outputs(name):
@@ -632,6 +633,230 @@ def _test_java_library_fix_deps_tool_written_to_params_file_impl(env, target):
         "fixer",
     ]).in_order()
 
+def _test_java_library_compilation_info_provider(name):
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        bootclasspath = [name + "/boot.jar"],
+    )
+
+    util.helper_target(
+        java_library,
+        name = name + "/test_lib",
+        srcs = ["A.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_library_compilation_info_provider_impl,
+        config_settings = {
+            "//command_line_option:extra_toolchains": [
+                native.package_relative_label(name + "/toolchain"),
+            ],
+        },
+        target = name + "/test_lib",
+    )
+
+def _test_java_library_compilation_info_provider_impl(env, target):
+    java_info_subject.from_target(env, target).compilation_info().boot_classpath().contains_exactly([
+        "{package}/{test_name}/boot.jar",
+    ])
+
+def _test_java_library_native_header_outputs(name):
+    util.helper_target(
+        java_library,
+        name = name + "/jni",
+        srcs = [
+            "Bar.java",
+            "Foo.java",
+        ],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_library_native_header_outputs_impl,
+        target = name + "/jni",
+    )
+
+def _test_java_library_native_header_outputs_impl(env, target):
+    javac_action = javac_action_subject.of(env, target, "{package}/lib{name}.jar")
+    javac_action.native_header_output().contains_exactly([
+        "{bin_path}/{package}/lib{name}-native-header.jar",
+    ])
+    javac_action.outputs().contains("{package}/lib{name}-native-header.jar")
+    java_info_subject.from_target(env, target).outputs().native_headers().contains_exactly([
+        "{package}/lib{name}-native-header.jar",
+    ])
+
+def _test_java_library_module_javacopts(name):
+    analysis_test(
+        name = name,
+        impl = _test_java_library_module_javacopts_impl,
+        target = "//test/java/common/rules:module_javacopts_helper",
+    )
+
+def _test_java_library_module_javacopts_impl(env, target):
+    javac_action = javac_action_subject.of(env, target, "{package}/lib{name}.jar")
+    javac_action.javacopts().contains_at_least([
+        "--add-exports=export/one=ALL-UNNAMED",
+        "--add-exports=export/two=ALL-UNNAMED",
+    ])
+
+    java_info = java_info_subject.from_target(env, target)
+    java_info.module_flags().add_exports().contains_exactly([
+        "export/one",
+        "export/two",
+    ])
+    java_info.module_flags().add_opens().contains_exactly([
+        "open/one",
+        "open/two",
+    ])
+
+def _test_java_library_forwarded_deps(name):
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["a.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/b1",
+        exports = [name + "/a"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/b2",
+        exports = [name + "/a"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/c1",
+        srcs = ["c1.java"],
+        deps = [name + "/b1"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/c2",
+        srcs = ["c2.java"],
+        deps = [name + "/b2"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_library_forwarded_deps_impl,
+        targets = {
+            "a": name + "/a",
+            "c1": name + "/c1",
+            "c2": name + "/c2",
+        },
+    )
+
+def _test_java_library_forwarded_deps_impl(env, targets):
+    a_info = java_info_subject.from_target(env, targets.a)
+    c1_info = java_info_subject.from_target(env, targets.c1)
+    c2_info = java_info_subject.from_target(env, targets.c2)
+
+    a_jars = a_info.compilation_args().actual.compile_jars.to_list()
+    c1_info.compilation_info().compilation_classpath().contains_at_least(a_jars)
+    c2_info.compilation_info().compilation_classpath().contains_at_least(a_jars)
+
+# Regression test for b/5773894
+def _test_java_library_transitive_strict_deps(name):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_library,
+        name = name + "/c",
+        srcs = ["C.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/b",
+        srcs = ["B.java"],
+        deps = [name + "/c"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        exports = [name + "/b"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_library_transitive_strict_deps_impl,
+        config_settings = {
+            "//command_line_option:experimental_strict_java_deps": "ERROR",
+        },
+        target = name + "/a",
+    )
+
+def _test_java_library_transitive_strict_deps_impl(env, target):
+    a_info = java_info_subject.from_target(env, target)
+    a_info.compilation_args().compile_jars().contains_exactly([
+        "{package}/lib{test_name}/b-hjar.jar",
+    ])
+
+def _test_java_library_emit_output_deps(name):
+    util.helper_target(
+        java_library,
+        name = name + "/b",
+        srcs = ["B.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        exports = [name + "/b"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_library_emit_output_deps_impl,
+        config_settings = {
+            "//command_line_option:java_deps": True,
+        },
+        targets = {
+            "a": name + "/a",
+            "b": name + "/b",
+        },
+    )
+
+def _test_java_library_emit_output_deps_impl(env, targets):
+    javac_action_subject.of(env, targets.b, "{package}/lib{name}.jar").outputs().contains(
+        "{package}/lib{name}.jdeps",
+    )
+
+    javac_action_subject.of(env, targets.a, "{package}/lib{name}.jar").outputs().contains_exactly([
+        "{package}/lib{name}.jar",
+        "{package}/lib{name}-native-header.jar",
+        "{package}/lib{name}.jar_manifest_proto",
+    ])
+
+def _test_java_library_deps_without_srcs(name):
+    util.helper_target(
+        java_library,
+        name = name + "/b",
+        srcs = ["B.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        deps = [name + "/b"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_library_deps_without_srcs_impl,
+        target = name + "/a",
+        expect_failure = True,
+    )
+
+def _test_java_library_deps_without_srcs_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.contains("deps not allowed without srcs"),
+    )
+
 JAVA_LIBRARY_LAUNCHER_TESTS = [
     _test_java_library_rule_outputs,
     _test_java_library_action_graph,
@@ -651,4 +876,11 @@ JAVA_LIBRARY_LAUNCHER_TESTS = [
     _test_java_library_source_jars_with_source_jars,
     _test_java_library_should_set_bootclasspath,
     _test_java_library_command_line_contains_target_label_and_rule_kind,
+    _test_java_library_compilation_info_provider,
+    _test_java_library_native_header_outputs,
+    _test_java_library_module_javacopts,
+    _test_java_library_forwarded_deps,
+    _test_java_library_transitive_strict_deps,
+    _test_java_library_emit_output_deps,
+    _test_java_library_deps_without_srcs,
 ]

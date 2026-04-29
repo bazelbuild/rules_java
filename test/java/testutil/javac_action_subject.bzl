@@ -37,6 +37,7 @@ def _new_javac_action_subject(env, target, output):
         outputs = lambda: subjects.collection([o.short_path for o in action_subject.actual.outputs.to_list()], self.meta.derive("outputs()"), format = True),
         argv = action_subject.argv,
         mnemonic = action_subject.mnemonic,
+        native_header_output = lambda: _create_subject_for_flag("--native_header_output", self.parsed_flags, self.meta),
     )
     return public
 

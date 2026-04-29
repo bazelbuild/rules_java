@@ -1,3 +1,5 @@
+load("@rules_testing//lib:util.bzl", "util")
+load("//java:java_library.bzl", "java_library")
 load(":add_exports_tests.bzl", "add_exports_tests")
 load(":deploy_archive_builder_tests.bzl", "deploy_archive_builder_test_suite")
 load(":java_binary_tests.bzl", "java_binary_tests")
@@ -30,3 +32,22 @@ java_single_jar_tests(name = "java_single_jar_tests")
 java_test_tests(name = "java_test_tests")
 
 add_exports_tests(name = "add_exports_tests")
+
+# Used for tests.
+util.helper_target(
+    java_library,
+    name = "module_javacopts_helper",
+    srcs = [
+        "InputFile.java",
+        "InputFile2.java",
+    ],
+    add_exports = [
+        "export/one",
+        "export/two",
+    ],
+    add_opens = [
+        "open/one",
+        "open/two",
+    ],
+    visibility = ["//test/java:__subpackages__"],
+)
