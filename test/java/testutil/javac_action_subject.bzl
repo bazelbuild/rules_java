@@ -25,9 +25,16 @@ def _new_javac_action_subject(env, target, output):
         # An unset --strict_java_deps is equivalent to "OFF".
         strict_java_deps = lambda: _create_subject_for_flag("--strict_java_deps", self.parsed_flags, self.meta, default = ["OFF"]),
         sources = lambda: _create_subject_for_flag("--sources", self.parsed_flags, self.meta),
+        resources = lambda: _create_subject_for_flag("--resources", self.parsed_flags, self.meta),
         classpath = lambda: _create_subject_for_flag("--classpath", self.parsed_flags, self.meta),
+        bootclasspath = lambda: _create_subject_for_flag("--bootclasspath", self.parsed_flags, self.meta),
+        system = lambda: _create_subject_for_flag("--system", self.parsed_flags, self.meta),
+        generated_sources_output = lambda: _create_subject_for_flag("--generated_sources_output", self.parsed_flags, self.meta),
+        processorpath = lambda: _create_subject_for_flag("--processorpath", self.parsed_flags, self.meta),
+        target_label = lambda: _create_subject_for_flag("--target_label", self.parsed_flags, self.meta),
         executable_file_name = lambda: subjects.str(action_subject.actual.argv[0], self.meta),
         inputs = action_subject.inputs,
+        outputs = lambda: subjects.collection([o.short_path for o in action_subject.actual.outputs.to_list()], self.meta.derive("outputs()"), format = True),
         argv = action_subject.argv,
         mnemonic = action_subject.mnemonic,
     )
