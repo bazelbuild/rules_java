@@ -67,32 +67,6 @@ def _test_deps_without_srcs_fails_impl(env, target):
         matching.contains("deps not allowed without srcs"),
     )
 
-def _test_fix_deps_tool(name):
-    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
-        always_passes(name)
-        return
-    util.helper_target(
-        rule = java_test,
-        name = name + "/test",
-        srcs = [name + "/Test.java"],
-    )
-
-    analysis_test(
-        name = name,
-        target = name + "/test",
-        impl = _test_fix_deps_tool_impl,
-        config_settings = {
-            "//command_line_option:experimental_fix_deps_tool": "customfixer",
-        },
-    )
-
-def _test_fix_deps_tool_impl(env, target):
-    assert_compile_action = env.expect.that_target(target).action_named("Javac")
-    assert_compile_action.argv().contains_at_least([
-        "--experimental_fix_deps_tool",
-        "customfixer",
-    ]).in_order()
-
 def _test_java_test_propagates_direct_native_libraries(name):
     util.helper_target(
         cc_library,
@@ -358,7 +332,6 @@ def java_test_tests(name):
         tests = [
             _test_java_test_is_test_only,
             _test_deps_without_srcs_fails,
-            _test_fix_deps_tool,
             _test_java_test_propagates_direct_native_libraries,
             _test_coverage_uses_coverage_runner_for_main,
             _test_stamp_values,

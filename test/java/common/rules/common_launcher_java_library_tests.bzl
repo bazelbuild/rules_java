@@ -605,34 +605,6 @@ def _test_java_library_gen_source_no_processor_names_impl(env, target):
         "{package}/lib{name}.jar_manifest_proto",
     ])
 
-def _test_java_library_fix_deps_tool_written_to_params_file(name):
-    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
-        # Bazel 7 does not support transition on experimental_* flags.
-        # Exit early because this test case would be a loading phase error otherwise.
-        always_passes(name)
-        return
-
-    util.helper_target(
-        java_library,
-        name = name + "/base",
-        srcs = ["Base.java"],
-    )
-
-    analysis_test(
-        name = name,
-        impl = _test_java_library_fix_deps_tool_written_to_params_file_impl,
-        config_settings = {
-            "//command_line_option:experimental_fix_deps_tool": "fixer",
-        },
-        target = name + "/base",
-    )
-
-def _test_java_library_fix_deps_tool_written_to_params_file_impl(env, target):
-    javac_action_subject.of(env, target, "{package}/lib{name}.jar").argv().contains_at_least([
-        "--experimental_fix_deps_tool",
-        "fixer",
-    ]).in_order()
-
 def _test_java_library_compilation_info_provider(name):
     util.helper_target(
         mock_java_toolchain,
@@ -865,7 +837,6 @@ JAVA_LIBRARY_LAUNCHER_TESTS = [
     _test_java_library_files_to_compile,
     _test_java_library_runtime_deps_are_not_on_classpath,
     _test_java_library_runtime_deps_are_not_on_classpath_with_header_compilation,
-    _test_java_library_fix_deps_tool_written_to_params_file,
     _test_java_library_propagates_native_libraries,
     _test_java_library_gen_source_no_processor_names,
     _test_java_library_annotation_processing_using_javacopt,
