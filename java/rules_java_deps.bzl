@@ -159,6 +159,15 @@ def bazel_skylib_repo():
         ],
     )
 
+def rules_runfiles_group_repo():
+    maybe(
+        http_archive,
+        name = "rules_runfiles_group",
+        sha256 = "a2e1d6121419ce57f3a22a12a71cbfc985fbdd983242f680801510ba2a482650",
+        strip_prefix = "rules_runfiles_group-0.1.0",
+        urls = ["https://github.com/bazel-contrib/rules_runfiles_group/releases/download/v0.1.0/rules_runfiles_group-v0.1.0.tar.gz"],
+    )
+
 def platforms_repo():
     maybe(
         http_archive,
@@ -231,6 +240,7 @@ def rules_java_dependencies():
     """
     compatibility_proxy_repo()
     bazel_skylib_repo()
+    rules_runfiles_group_repo()
     rules_cc_repo()
     protobuf_repo()
     platforms_repo()
