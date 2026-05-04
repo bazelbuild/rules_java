@@ -20,6 +20,7 @@ def _new_javac_action_subject(env, target, output):
 
     public = struct(
         direct_dependencies = lambda: _create_subject_for_flag("--direct_dependencies", self.parsed_flags, self.meta),
+        deps_artifacts = lambda: _create_subject_for_flag("--deps_artifacts", self.parsed_flags, self.meta),
         javacopts = lambda: _create_subject_for_flag("--javacopts", self.parsed_flags, self.meta),
         jar = lambda: _create_subject_for_flag("-jar", self.parsed_flags, self.meta),
         # An unset --strict_java_deps is equivalent to "OFF".
@@ -31,6 +32,7 @@ def _new_javac_action_subject(env, target, output):
         system = lambda: _create_subject_for_flag("--system", self.parsed_flags, self.meta),
         generated_sources_output = lambda: _create_subject_for_flag("--generated_sources_output", self.parsed_flags, self.meta),
         processorpath = lambda: _create_subject_for_flag("--processorpath", self.parsed_flags, self.meta),
+        processors = lambda: _create_subject_for_flag("--processors", self.parsed_flags, self.meta, default = []),
         target_label = lambda: _create_subject_for_flag("--target_label", self.parsed_flags, self.meta),
         executable_file_name = lambda: subjects.str(action_subject.actual.argv[0], self.meta),
         inputs = action_subject.inputs,

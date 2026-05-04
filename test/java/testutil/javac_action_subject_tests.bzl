@@ -35,6 +35,12 @@ def _parse_flags_test_impl(ctx):
         "--classpath",
         "pkg/bar-hjar.jar",
         "other/pkg/baz.jar",
+        "--processors",
+        "com.example.process.stuff",
+        "com.example.process.other",
+        "--deps_artifacts",
+        "pkg/dep1.jdeps",
+        "pkg/dep2.jdeps",
     ])
     asserts.equals(env, {
         "-Xmx1g": [],
@@ -64,6 +70,8 @@ def _parse_flags_test_impl(ctx):
         ],
         "--strict_java_deps": ["ERROR"],
         "--classpath": ["pkg/bar-hjar.jar", "other/pkg/baz.jar"],
+        "--processors": ["com.example.process.stuff", "com.example.process.other"],
+        "--deps_artifacts": ["pkg/dep1.jdeps", "pkg/dep2.jdeps"],
     }, flags)
     return unittest.end(env)
 

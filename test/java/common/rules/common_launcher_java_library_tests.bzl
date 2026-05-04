@@ -317,7 +317,7 @@ def _test_java_library_plugin_with_runtime_deps(name):
         java_plugin,
         name = name + "/plugin",
         srcs = ["Plugin.java"],
-        processor_class = "com.google.process.stuff",
+        processor_class = "com.example.process.stuff",
         deps = [name + "/lib"],
     )
     util.helper_target(
@@ -829,6 +829,273 @@ def _test_java_library_deps_without_srcs_impl(env, target):
         matching.contains("deps not allowed without srcs"),
     )
 
+def _test_dependency_artifacts_with_exports(name):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_library,
+        name = name + "/e",
+        srcs = ["E.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/d",
+        srcs = ["D.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/c",
+        srcs = ["C.java"],
+        exports = [name + "/e"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/b",
+        exports = [name + "/d"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["A.java"],
+        deps = [
+            name + "/b",
+            name + "/c",
+            name + "/d",
+        ],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_dependency_artifacts_with_exports_impl,
+        target = name + "/a",
+        config_settings = {
+            "//command_line_option:experimental_java_classpath": "javabuilder",
+        },
+    )
+
+def _test_dependency_artifacts_with_exports_impl(env, target):
+    javac_action = javac_action_subject.of(env, target, "{package}/lib{name}.jar")
+    javac_action.deps_artifacts().contains_exactly([
+        "{bin_path}/{package}/lib{test_name}/c-hjar.jdeps",
+        "{bin_path}/{package}/lib{test_name}/d-hjar.jdeps",
+        "{bin_path}/{package}/lib{test_name}/e-hjar.jdeps",
+    ])
+
+def _test_exports_are_indirect_not_direct(name):
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["a.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/b",
+        srcs = ["b.java"],
+        exports = [name + "/a"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/c",
+        srcs = ["c.java"],
+        deps = [name + "/b"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_exports_are_indirect_not_direct_impl,
+        targets = {
+            "b": name + "/b",
+            "c": name + "/c",
+        },
+    )
+
+def _test_exports_are_indirect_not_direct_impl(env, targets):
+    b_info = java_info_subject.from_target(env, targets.b)
+    c_info = java_info_subject.from_target(env, targets.c)
+
+    b_info.compilation_info().compilation_classpath().contains_exactly([])
+
+    c_info.compilation_info().compilation_classpath().contains_at_least_predicates([
+        matching.file_basename_equals("a-hjar.jar"),
+        matching.file_basename_equals("b-hjar.jar"),
+    ])
+
+def _test_exports_runfiles(name):
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["a.java"],
+        data = ["data.txt"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/b",
+        srcs = ["b.java"],
+        exports = [name + "/a"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_exports_runfiles_impl,
+        target = name + "/b",
+    )
+
+def _test_exports_runfiles_impl(env, target):
+    env.expect.that_target(target).runfiles().contains_exactly([
+        "{workspace}/{package}/data.txt",
+        "{workspace}/{package}/lib{test_name}/a.jar",
+        "{workspace}/{package}/lib{test_name}/b.jar",
+    ])
+
+def _test_exports_collect_source_jars(name):
+    util.helper_target(
+        java_library,
+        name = name + "/exp",
+        srcs = ["C.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["B.java"],
+        exports = [name + "/exp"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = ["A.java"],
+        deps = [name + "/lib"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_exports_collect_source_jars_impl,
+        target = name + "/a",
+    )
+
+def _test_exports_collect_source_jars_impl(env, target):
+    java_info_subject.from_target(env, target).transitive_source_jars().contains_exactly([
+        "{package}/lib{test_name}/a-src.jar",
+        "{package}/lib{test_name}/lib-src.jar",
+        "{package}/lib{test_name}/exp-src.jar",
+    ])
+
+def _test_exported_plugins_are_inherited(name):
+    util.helper_target(
+        java_plugin,
+        name = name + "/plugin",
+        srcs = ["Plugin.java"],
+        processor_class = "com.example.process.stuff",
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/exporting_lib",
+        srcs = ["ExportingLib.java"],
+        exported_plugins = [name + "/plugin"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/consuming_lib",
+        srcs = ["ConsumingLib.java"],
+        deps = [name + "/exporting_lib"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/leaf_lib",
+        srcs = ["LeafLib.java"],
+        deps = [name + "/consuming_lib"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_exported_plugins_are_inherited_impl,
+        targets = {
+            "consuming": name + "/consuming_lib",
+            "leaf": name + "/leaf_lib",
+        },
+    )
+
+def _test_exported_plugins_are_inherited_impl(env, targets):
+    # libconsuming_lib should include the plugin, since it directly depends on exporting_lib
+    javac_action_subject.of(
+        env,
+        targets.consuming,
+        "{package}/lib{test_name}/consuming_lib.jar",
+    ).processors().contains_exactly(["com.example.process.stuff"])
+
+    # but libleaf_lib should not, because its dependency is transitive.
+    javac_action_subject.of(
+        env,
+        targets.leaf,
+        "{package}/lib{test_name}/leaf_lib.jar",
+    ).processors().contains_exactly([])
+
+def _test_exported_plugins_are_propagated_through_exports(name):
+    util.helper_target(
+        java_plugin,
+        name = name + "/plugin",
+        srcs = ["Plugin.java"],
+        processor_class = "com.example.process.stuff",
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/exporting_plugins_lib",
+        srcs = ["ExportingLib.java"],
+        exported_plugins = [name + "/plugin"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/exporting_lib",
+        srcs = ["ExportingLib.java"],
+        exports = [name + "/exporting_plugins_lib"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/consuming_lib",
+        srcs = ["ConsumingLib.java"],
+        exports = [name + "/exporting_lib"],
+        deps = [name + "/exporting_lib"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/leaf_lib",
+        srcs = ["LeafLib.java"],
+        deps = [name + "/consuming_lib"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_exported_plugins_are_propagated_through_exports_impl,
+        targets = {
+            "exporting": name + "/exporting_lib",
+            "consuming": name + "/consuming_lib",
+            "leaf": name + "/leaf_lib",
+        },
+    )
+
+def _test_exported_plugins_are_propagated_through_exports_impl(env, targets):
+    # libexporting_lib should not include the plugin, only export it further.
+    javac_action_subject.of(
+        env,
+        targets.exporting,
+        "{package}/lib{test_name}/exporting_lib.jar",
+    ).processors().contains_exactly([])
+
+    # libconsuming_lib should pick up the plugin through the export on exporting_lib.
+    javac_action_subject.of(
+        env,
+        targets.consuming,
+        "{package}/lib{test_name}/consuming_lib.jar",
+    ).processors().contains_exactly(["com.example.process.stuff"])
+
+    # libleaf_lib should pick up the plugin through the (transitive) export on exporting_lib.
+    javac_action_subject.of(
+        env,
+        targets.leaf,
+        "{package}/lib{test_name}/leaf_lib.jar",
+    ).processors().contains_exactly(["com.example.process.stuff"])
+
 JAVA_LIBRARY_LAUNCHER_TESTS = [
     _test_java_library_rule_outputs,
     _test_java_library_action_graph,
@@ -854,4 +1121,10 @@ JAVA_LIBRARY_LAUNCHER_TESTS = [
     _test_java_library_transitive_strict_deps,
     _test_java_library_emit_output_deps,
     _test_java_library_deps_without_srcs,
+    _test_dependency_artifacts_with_exports,
+    _test_exports_are_indirect_not_direct,
+    _test_exports_runfiles,
+    _test_exports_collect_source_jars,
+    _test_exported_plugins_are_inherited,
+    _test_exported_plugins_are_propagated_through_exports,
 ]
