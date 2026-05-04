@@ -2,6 +2,12 @@ build:bzlmod --experimental_enable_bzlmod
 
 common --incompatible_disallow_empty_glob
 
+# rules_runfiles_group (loaded by the java rule implementations) must be excluded
+# from autoloads to avoid a load cycle in WORKSPACE mode on Bazel 8. On Bazel
+# 8.0.0-8.3.0 the same applies to bazel_features' generated repos.
+# https://github.com/bazelbuild/bazel/issues/23043
+common --repositories_without_autoloads=rules_runfiles_group,bazel_features_version,bazel_features_globals
+
 # Enable modern C++ features, for compiling java_tools from source
 build --cxxopt=-std=c++17
 build --host_cxxopt=-std=c++17

@@ -17,9 +17,12 @@ Definition of java_import rule.
 """
 
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
+load("@rules_runfiles_group//runfiles_group:lib.bzl", "runfiles_groups")
+load("@rules_runfiles_group//runfiles_group:providers.bzl", "RunfilesGroupInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules/impl:basic_java_library_impl.bzl", "construct_defaultinfo")
 load("//java/common/rules/impl:import_deps_check.bzl", "import_deps_check")
+load("//java/common/rules/impl:runfiles_group_support.bzl", "MERGE_AFFINITY", "collect_entries", "runfiles_groups_enabled")
 load("//java/private:java_common.bzl", "java_common")
 load("//java/private:java_common_internal.bzl", _run_ijar_private_for_builtins = "run_ijar")
 load("//java/private:java_info.bzl", "JavaInfo")
@@ -85,7 +88,8 @@ def bazel_java_import_rule(
         add_exports = [],
         add_opens = [],
         permit_exports = True,
-        skip_incomplete_deps_check = True):
+        skip_incomplete_deps_check = True,
+        runfiles_weight = 0):
     """Implements java_import.
 
     This rule allows the use of precompiled .jar files as libraries in other Java rules.
@@ -103,6 +107,7 @@ def bazel_java_import_rule(
       add_opens: (list[str]) Allow this library to reflectively access the given <module>/<package>.
       permit_exports: (bool) Allow using exports
       skip_incomplete_deps_check: (bool) If this target is allowed to have incomplete deps
+      runfiles_weight: (int) Weight hint for the target's runfiles group entry. If > 0, set as weight.
 
     Returns:
       (list[provider]) A list containing DefaultInfo, JavaInfo,
@@ -182,4 +187,26 @@ def bazel_java_import_rule(
             "_hidden_top_level_INTERNAL_": target["ProguardSpecProvider"].specs,
         }
     )
+
+    if not neverlink:
+        _add_runfiles_group_provider(target, ctx, collected_jars, deps, exports, runtime_deps, runfiles_weight = runfiles_weight)
+
     return target
+
+def _add_runfiles_group_provider(target, ctx, own_jars, deps, exports, runtime_deps, runfiles_weight = 0):
+    if not runfiles_groups_enabled(ctx):
+        return
+
+    target["RunfilesGroupInfo"] = RunfilesGroupInfo(entries = collect_entries(
+        ctx,
+        deps = [deps, exports, runtime_deps],
+        data = [getattr(ctx.attr, "data", [])],
+        own = [runfiles_groups.entry(
+            name = ctx.label,
+            content = depset(own_jars),
+            kind = "third_party",
+            rank = runfiles_groups.RANK_SHARED_DEPS,
+            weight = runfiles_weight if runfiles_weight > 0 else None,
+            merge_affinity = MERGE_AFFINITY,
+        )],
+    ))

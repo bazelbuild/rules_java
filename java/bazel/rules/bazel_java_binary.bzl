@@ -16,6 +16,8 @@
 load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "use_cc_toolchain")
+load("@rules_runfiles_group//runfiles_group:lib.bzl", "runfiles_groups")
+load("@rules_runfiles_group//runfiles_group:providers.bzl", "RunfilesGroupInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load(
     "//java/common/rules:android_lint.bzl",
@@ -26,6 +28,16 @@ load("//java/common/rules:rule_util.bzl", "merge_attrs")
 load("//java/common/rules/impl:java_binary_deploy_jar.bzl", "create_deploy_archives")
 load("//java/common/rules/impl:java_binary_impl.bzl", "basic_java_binary", "binary_provider_helper")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
+load(
+    "//java/common/rules/impl:runfiles_group_support.bzl",
+    "BINARY_GROUP",
+    "JAVA_RUNTIME_GROUP",
+    "MERGE_AFFINITY",
+    "RUNFILES_GROUP_ATTRS",
+    "collect_entries",
+    "own_kind",
+    "runfiles_groups_enabled",
+)
 load("//java/private:java_info.bzl", "JavaInfo")
 
 def _bazel_java_binary_impl(ctx):
@@ -100,9 +112,11 @@ def bazel_base_binary_impl(ctx, is_test_rule_class):
 
     runfiles = default_info.runfiles
 
+    toolchain_files = depset()
     if executable:
         runtime_toolchain = semantics.find_java_runtime_toolchain(ctx)
-        runfiles = runfiles.merge(ctx.runfiles(transitive_files = runtime_toolchain.files))
+        toolchain_files = runtime_toolchain.files
+        runfiles = runfiles.merge(ctx.runfiles(transitive_files = toolchain_files))
 
     test_support = helper.get_test_support(ctx)
     if test_support:
@@ -113,6 +127,8 @@ def bazel_base_binary_impl(ctx, is_test_rule_class):
         runfiles = runfiles,
         executable = default_info.executable,
     )
+
+    _add_runfiles_group_provider(providers, ctx, java_attrs, executable, toolchain_files, test_support)
 
     info = providers.pop("InternalDeployJarInfo")
     create_deploy_archives(
@@ -127,6 +143,52 @@ def bazel_base_binary_impl(ctx, is_test_rule_class):
     )
 
     return providers.values()
+
+def _add_runfiles_group_provider(providers, ctx, java_attrs, executable, toolchain_files, test_support):
+    if not runfiles_groups_enabled(ctx):
+        return
+
+    own = [runfiles_groups.entry(
+        name = ctx.label,
+        content = java_attrs.runtime_jars,
+        kind = own_kind(ctx.label),
+        rank = runfiles_groups.RANK_EXECUTABLE,
+        merge_affinity = MERGE_AFFINITY,
+    )]
+
+    executable_group = None
+    if executable:
+        # toolchain_files is only populated for a target with an executable.
+        own.append(runfiles_groups.entry(
+            name = JAVA_RUNTIME_GROUP,
+            content = toolchain_files,
+            kind = "foundation",
+            rank = runfiles_groups.RANK_FOUNDATION,
+            do_not_merge = True,
+            merge_affinity = MERGE_AFFINITY,
+        ))
+        own.append(runfiles_groups.entry(
+            name = BINARY_GROUP,
+            content = depset([executable]),
+            kind = own_kind(ctx.label),
+            rank = runfiles_groups.RANK_EXECUTABLE,
+            merge_affinity = MERGE_AFFINITY,
+        ))
+        executable_group = BINARY_GROUP
+
+    deps = [ctx.attr.deps, ctx.attr.runtime_deps]
+    if test_support:
+        deps.append(test_support)
+
+    providers["RunfilesGroupInfo"] = RunfilesGroupInfo(
+        entries = collect_entries(
+            ctx,
+            deps = deps,
+            data = [getattr(ctx.attr, "data", [])],
+            own = own,
+        ),
+        executable_group = executable_group,
+    )
 
 def _get_coverage_runner(ctx):
     if ctx.configuration.coverage_enabled and ctx.attr.create_executable:
@@ -370,6 +432,7 @@ logic as the Java package of source files. For example, a source file at
             executable = True,
         ),
     } if not bazel_features.rules._has_launcher_maker_toolchain else {},
+    RUNFILES_GROUP_ATTRS,
 )
 
 def make_java_binary(executable):
