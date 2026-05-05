@@ -15,11 +15,19 @@ def mock_java_toolchain(
         ijar = "ijar",
         genclass = "genclass",
         java_runtime = None,
+        oneversion = None,
+        oneversion_allowlist = None,
+        oneversion_allowlist_for_tests = None,
         tags = None,  # for util.helper_target
         **kwargs):
     if not java_runtime:
         java_runtime = name + "_runtime"
         _java_runtime_rule(name = java_runtime)
+    one_version_args = {
+        "oneversion": oneversion,
+        "oneversion_allowlist": oneversion_allowlist,
+        "oneversion_allowlist_for_tests": oneversion_allowlist_for_tests,
+    } if semantics.java_toolchain_supports_one_version else {}
     java_toolchain(
         name = name + "_java",
         javabuilder = javabuilder,
@@ -30,7 +38,7 @@ def mock_java_toolchain(
         java_runtime = java_runtime,
         genclass = genclass,
         tags = tags,
-        **kwargs
+        **(kwargs | one_version_args)
     )
     native.toolchain(
         name = name,

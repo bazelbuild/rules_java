@@ -1,6 +1,7 @@
 """Tests for the java_binary rule"""
 
 load("@bazel_features//:features.bzl", "bazel_features")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
@@ -8,9 +9,12 @@ load("@rules_testing//lib:truth.bzl", "matching", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
+load("//java/common:java_semantics.bzl", "semantics")
+load("//java/common/rules:java_helper.bzl", "helper")
 load("//test/java/common/rules:common_launcher_java_binary_tests.bzl", "JAVA_BINARY_LAUNCHER_TESTS")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
+load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_toolchain")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 
@@ -250,6 +254,158 @@ def _test_java_binary_can_set_transitive_validation_impl(env, targets):
     # ensure they don't propagate to `bin` because they're a part of the `deploy_env`
     env.expect.that_target(targets.bin).output_group("_validation").contains_exactly([])
 
+def _test_one_version_check_action(name):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        # exit early because this test case would be a loading phase error otherwise
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_library,
+        name = name + "/c",
+        srcs = [name + "/c.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/a",
+        srcs = [name + "/a.java"],
+        deps = [name + "/c"],
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/b",
+        srcs = [name + "/b.java"],
+        deps = [name + "/a"],
+    )
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        oneversion = "one_version_tool",
+        oneversion_allowlist = "one_version_allowlist",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_one_version_check_action_impl,
+        target = name + "/b",
+        config_settings = {
+            "//command_line_option:experimental_one_version_enforcement": "ERROR",
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+        attrs = {
+            "_windows_constraints": attr.label_list(
+                default = [paths.join(semantics.PLATFORMS_ROOT, "os:windows")],
+            ),
+        },
+    )
+
+def _test_one_version_check_action_impl(env, target):
+    assert_target = env.expect.that_target(target)
+    assert_target.default_outputs().contains_exactly([
+        "{package}/{test_name}/b.jar",
+        "{package}/{test_name}/b" + (".exe" if helper.is_target_platform_windows(env.ctx) else ""),
+    ])
+    assert_target.output_group("_validation").contains(
+        "{package}/{name}-one-version.txt",
+    )
+    assert_action = assert_target.action_generating("{package}/{name}-one-version.txt")
+    assert_action.mnemonic().equals("JavaOneVersion")
+    assert_action.inputs().contains_at_least([
+        "{package}/{test_name}/b.jar",
+        "{package}/lib{test_name}/a.jar",
+        "{package}/lib{test_name}/c.jar",
+    ])
+    tool = [f for f in assert_action.actual.inputs.to_list() if f.short_path.endswith("one_version_tool")][0]
+    assert_action.argv().contains_exactly([
+        tool.path,
+        "--output",
+        "{bindir}/{package}/{name}-one-version.txt",
+        "--allowlist",
+        "{package}/one_version_allowlist",
+        "--inputs",
+        "{bindir}/{package}/{test_name}/b.jar,//{package}:{test_name}/b",
+        "{bindir}/{package}/lib{test_name}/a.jar,//{package}:{test_name}/a",
+        "{bindir}/{package}/lib{test_name}/c.jar,//{package}:{test_name}/c",
+    ]).in_order()
+
+def _test_one_version_check_violations_allowed(name):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        # exit early because this test case would be a loading phase error otherwise
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_binary,
+        name = name + "/foo",
+        srcs = [name + "/foo.java"],
+    )
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        oneversion = "one_version_tool",
+        oneversion_allowlist = "one_version_allowlist",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_one_version_check_violations_allowed_impl,
+        target = name + "/foo",
+        config_settings = {
+            "//command_line_option:experimental_one_version_enforcement": "WARNING",
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+    )
+
+def _test_one_version_check_violations_allowed_impl(env, target):
+    assert_action = env.expect.that_target(target).action_generating(
+        "{package}/{name}-one-version.txt",
+    )
+    env.expect.that_target(target).output_group("_validation").contains(
+        "{package}/{name}-one-version.txt",
+    )
+    tool = [f for f in assert_action.actual.inputs.to_list() if f.short_path.endswith("one_version_tool")][0]
+    assert_action.argv().contains_exactly([
+        tool.path,
+        "--output",
+        "{bindir}/{package}/{name}-one-version.txt",
+        "--allowlist",
+        "{package}/one_version_allowlist",
+        "--succeed_on_found_violations",
+        "--inputs",
+        "{bindir}/{package}/{test_name}/foo.jar,//{package}:{test_name}/foo",
+    ]).in_order()
+
+def _test_one_version_check_disabled(name):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        # exit early because this test case would be a loading phase error otherwise
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_binary,
+        name = name + "/foo",
+        srcs = [name + "/foo.java"],
+    )
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        oneversion = "one_version_tool",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_one_version_check_disabled_impl,
+        target = name + "/foo",
+        config_settings = {
+            "//command_line_option:experimental_one_version_enforcement": "OFF",
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+    )
+
+def _test_one_version_check_disabled_impl(env, target):
+    action_mnemonics = [a.mnemonic for a in env.expect.that_target(target).actual.actions]
+    env.expect.that_collection(action_mnemonics).not_contains("JavaOneVersion")
+
 def java_binary_tests(name):
     test_suite(
         name = "_basic_" + name,
@@ -260,6 +416,9 @@ def java_binary_tests(name):
             _test_java_binary_propagates_direct_native_libraries,
             _test_java_compile_only,
             _test_java_binary_can_set_transitive_validation,
+            _test_one_version_check_action,
+            _test_one_version_check_violations_allowed,
+            _test_one_version_check_disabled,
         ],
     )
 

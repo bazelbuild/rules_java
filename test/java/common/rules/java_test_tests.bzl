@@ -1,18 +1,21 @@
 """Tests for the java_test rule"""
 
 load("@bazel_features//:features.bzl", "bazel_features")
+load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
+load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_test.bzl", "java_test")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_semantics.bzl", "semantics")
+load("//java/common/rules:java_helper.bzl", "helper")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:mock_cc_toolchain.bzl", "mock_cc_toolchain")
-load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_runtime_toolchain")
+load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_runtime_toolchain", "mock_java_toolchain")
 load("//test/java/testutil:mock_test_toolchain.bzl", "mock_test_toolchains")
 load("//test/java/testutil:rules/custom_java_info_rule.bzl", "custom_java_info_rule")
 
@@ -326,6 +329,111 @@ def _test_java_test_sets_securiry_manager_property_jdk17_impl(env, target):
             matching.str_matches("-Djava.security.manager=allow"),
         )
 
+def _test_one_version_check_java_test(name):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        # exit early because this test case would be a loading phase error otherwise
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_library,
+        name = name + "/foo",
+        srcs = [name + "/foo.java"],
+    )
+    util.helper_target(
+        java_test,
+        name = name + "/foo_test",
+        srcs = [name + "/foo_test.java"],
+        deps = [name + "/foo"],
+        use_testrunner = False,
+    )
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        oneversion = "one_version_tool",
+        oneversion_allowlist = "one_version_allowlist",
+        oneversion_allowlist_for_tests = "one_version_allowlist_for_tests",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_one_version_check_java_test_impl,
+        target = name + "/foo_test",
+        config_settings = {
+            "//command_line_option:experimental_one_version_enforcement": "ERROR",
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+        attrs = {
+            "_windows_constraints": attr.label_list(
+                default = [paths.join(semantics.PLATFORMS_ROOT, "os:windows")],
+            ),
+        },
+    )
+
+def _test_one_version_check_java_test_impl(env, target):
+    assert_target = env.expect.that_target(target)
+    assert_target.default_outputs().contains_exactly([
+        "{package}/{test_name}/foo_test.jar",
+        "{package}/{test_name}/foo_test" + (".exe" if helper.is_target_platform_windows(env.ctx) else ""),
+    ])
+    assert_action = assert_target.action_generating(
+        "{package}/{name}-one-version.txt",
+    )
+    tool = [f for f in assert_action.actual.inputs.to_list() if f.short_path.endswith("one_version_tool")][0]
+    assert_action.argv().contains_exactly([
+        tool.path,
+        "--output",
+        "{bindir}/{package}/{name}-one-version.txt",
+        "--allowlist",
+        "{package}/one_version_allowlist_for_tests",
+        "--inputs",
+        "{bindir}/{package}/{test_name}/foo_test.jar,//{package}:{test_name}/foo_test",
+        "{bindir}/{package}/lib{test_name}/foo.jar,//{package}:{test_name}/foo",
+    ]).in_order()
+
+def _test_one_version_check_disabled_for_java_test(name):
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        # exit early because this test case would be a loading phase error otherwise
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_test,
+        name = name + "/foo_test",
+        srcs = [name + "/foo.java"],
+        use_testrunner = False,
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/foo_binary",
+        srcs = [name + "/foo.java"],
+    )
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        oneversion = "one_version_tool",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_one_version_check_disabled_for_java_test_impl,
+        targets = {
+            "bin": name + "/foo_binary",
+            "test": name + "/foo_test",
+        },
+        config_settings = {
+            "//command_line_option:experimental_one_version_enforcement": "ERROR",
+            "//command_line_option:one_version_enforcement_on_java_tests": False,
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+    )
+
+def _test_one_version_check_disabled_for_java_test_impl(env, targets):
+    binary_action_mnemonics = [a.mnemonic for a in env.expect.that_target(targets.bin).actual.actions]
+    test_action_mnemonics = [a.mnemonic for a in env.expect.that_target(targets.test).actual.actions]
+    env.expect.that_collection(binary_action_mnemonics).contains("JavaOneVersion")
+    env.expect.that_collection(test_action_mnemonics).not_contains("JavaOneVersion")
+
 def java_test_tests(name):
     test_suite(
         name = name,
@@ -338,5 +446,7 @@ def java_test_tests(name):
             _test_add_test_support_to_compile_time_deps_flag,
             _test_mac_requires_darwin_for_execution,
             _test_java_test_sets_securiry_manager_property_jdk17,
+            _test_one_version_check_java_test,
+            _test_one_version_check_disabled_for_java_test,
         ],
     )

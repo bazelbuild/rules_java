@@ -13,6 +13,7 @@
 # limitations under the License.
 """Bazel Java Semantics"""
 
+load("@bazel_features//private:util.bzl", _bazel_version_ge = "ge")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_helper.bzl", "cc_helper")
 
@@ -126,4 +127,5 @@ semantics = struct(
     INCOMPATIBLE_DISABLE_NON_EXECUTABLE_JAVA_BINARY = False,  # Flip when java_single_jar is feature complete
     update_args_for_import_deps = _update_args_for_import_deps,
     expand_javacopts_make_variables = True,
+    java_toolchain_supports_one_version = _bazel_version_ge("8.0.0"),  # can be dropped once we no longer support Bazel 7
 )
