@@ -35,10 +35,25 @@ def _test_deduced_test_class_impl(env, target):
         matching.str_matches("-Dbazel.test_suite=bazel.rules.test_deduced_test_class.foo"),
     )
 
+# regression test for https://github.com/bazelbuild/bazel/issues/20378
+def _test_invalid_test_class_at_repo_root(name):
+    analysis_test(
+        name = name,
+        impl = _test_invalid_test_class_at_repo_root_impl,
+        target = "//:invalid_test_at_repo_root",
+        expect_failure = True,
+    )
+
+def _test_invalid_test_class_at_repo_root_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("cannot determine test class."),
+    )
+
 def java_test_tests(name):
     test_suite(
         name = name,
         tests = [
             _test_deduced_test_class,
+            _test_invalid_test_class_at_repo_root,
         ],
     )
