@@ -60,7 +60,9 @@ def compile_action(
         add_exports = [],
         add_opens = [],
         bootclasspath = None,
-        javabuilder_jvm_flags = None):
+        javabuilder_jvm_flags = None,
+        coverage_includes = [],
+        coverage_excludes = []):
     """
     Creates actions that compile Java sources, produce source jar, and produce header jar and returns JavaInfo.
 
@@ -123,6 +125,8 @@ def compile_action(
       add_opens: (list[str]) Allow this library to reflectively access the given <module>/<package>.
       bootclasspath: (BootClassPathInfo) The set of JDK APIs to compile this library against.
       javabuilder_jvm_flags: (list[str]) Additional JVM flags to pass to JavaBuilder.
+      coverage_includes: (list[str]) A list of patterns to include in code coverage.
+      coverage_excludes: (list[str]) A list of patterns to exclude from code coverage.
 
     Returns:
       ((JavaInfo, {files_to_build: list[File],
@@ -163,6 +167,8 @@ def compile_action(
         add_opens = add_opens,
         bootclasspath = bootclasspath,
         javabuilder_jvm_flags = javabuilder_jvm_flags,
+        coverage_includes = coverage_includes,
+        coverage_excludes = coverage_excludes,
     )
 
     compilation_info = struct(
