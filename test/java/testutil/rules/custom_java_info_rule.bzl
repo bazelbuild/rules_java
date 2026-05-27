@@ -61,6 +61,8 @@ def _impl(ctx):
             generated_source_jar = ctx.file.generated_source_jar,
             native_headers_jar = ctx.file.native_headers_jar,
             manifest_proto = ctx.file.manifest_proto,
+            add_exports = ctx.attr.add_exports,
+            add_opens = ctx.attr.add_opens,
         ),
     ]
 
@@ -86,6 +88,8 @@ custom_java_info_rule = rule(
         "pack_sources": attr.bool(default = False),
         "stamp_jar": attr.bool(default = False),
         "compile_jar": attr.label(allow_single_file = True),
+        "add_exports": attr.string_list(),
+        "add_opens": attr.string_list(),
     },
     toolchains = [semantics.JAVA_TOOLCHAIN_TYPE],
 )

@@ -17,3 +17,6 @@ build --host_cxxopt=-std=c++17
 # the latter are always enabled on Windows: https://github.com/bazelbuild/bazel/blob/1f5414408467171581b6142e93f67fe730d722cf/src/main/java/com/google/devtools/build/lib/rules/cpp/CcModule.java#L2430
 # we can't use a transition because toolchain deps exceed the default --analysis_testing_deps_limit.
 test --nointerface_shared_objects
+
+# For testing add_exports/add_opens module flags behavior.
+test --incompatible_java_info_merge_runtime_module_flags
