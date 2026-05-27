@@ -22,6 +22,7 @@ load("//java/common/rules:java_toolchain.bzl", "JavaToolchainInfo")
 load(":boot_class_path_info.bzl", "BootClassPathInfo")
 load(
     ":java_common_internal.bzl",
+    _compile_header_internal = "compile_header",
     _compile_internal = "compile",
     _run_ijar_internal = "run_ijar",
 )
@@ -86,6 +87,32 @@ def _compile(
         sourcepath = sourcepath,
         resources = resources,
         neverlink = neverlink,
+        enable_annotation_processing = enable_annotation_processing,
+    )
+
+def _compile_header(
+        ctx,
+        output,
+        java_toolchain,
+        source_jars = [],
+        source_files = [],
+        javac_opts = [],
+        deps = [],
+        plugins = [],
+        strict_deps = "ERROR",
+        bootclasspath = None,
+        enable_annotation_processing = True):
+    return _compile_header_internal(
+        ctx,
+        output = output,
+        java_toolchain = java_toolchain,
+        source_jars = source_jars,
+        source_files = source_files,
+        javac_opts = javac_opts,
+        deps = deps,
+        plugins = plugins,
+        strict_deps = strict_deps,
+        bootclasspath = bootclasspath,
         enable_annotation_processing = enable_annotation_processing,
     )
 
@@ -277,6 +304,7 @@ def _make_java_common():
     methods = {
         "provider": JavaInfo,
         "compile": _compile,
+        "compile_header": _compile_header,
         "run_ijar": _run_ijar,
         "stamp_jar": _stamp_jar,
         "pack_sources": _pack_sources,

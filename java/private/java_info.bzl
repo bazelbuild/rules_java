@@ -491,7 +491,7 @@ def java_info_for_compilation(
         runtime_output_jars = direct_runtime_jars,
         transitive_runtime_jars = transitive_runtime_jars,
         transitive_source_jars = depset(
-            direct = [source_jar],
+            direct = [source_jar] if source_jar else [],
             # only differs from the usual java_info.transitive_source_jars in the order of deps
             transitive = [dep.transitive_source_jars for dep in concatenated_deps.runtimedeps_exports_deps],
         ),
