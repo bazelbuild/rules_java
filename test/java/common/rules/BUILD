@@ -1,6 +1,8 @@
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load(":add_exports_tests.bzl", "add_exports_tests")
+load(":common_launcher_java_binary_tests.bzl", "java_binary_launcher_tests")
+load(":common_launcher_java_library_tests.bzl", "java_library_launcher_tests")
 load(":deploy_archive_builder_tests.bzl", "deploy_archive_builder_test_suite")
 load(":java_binary_tests.bzl", "java_binary_tests")
 load(":java_import_tests.bzl", "java_import_tests")
@@ -19,9 +21,13 @@ merge_attrs_test_suite(name = "merge_attrs_tests")
 
 java_binary_tests(name = "java_binary_tests")
 
+java_binary_launcher_tests(name = "java_binary_launcher_tests")
+
 java_plugin_tests(name = "java_plugin_tests")
 
 java_library_tests(name = "java_library_tests")
+
+java_library_launcher_tests(name = "java_library_launcher_tests")
 
 java_launcher_tests(name = "java_launcher_tests")
 

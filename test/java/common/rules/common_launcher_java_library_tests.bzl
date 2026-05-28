@@ -2,7 +2,7 @@
 
 load("@bazel_features//:features.bzl", "bazel_features")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("@rules_testing//lib:analysis_test.bzl", "analysis_test")
+load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_import.bzl", "java_import")
@@ -76,7 +76,7 @@ def _test_java_library_deps_of_genrule_are_not_on_classpath(name):
     util.helper_target(
         native.genrule,
         name = name + "/has_java_dep",
-        outs = ["foo.jar"],
+        outs = [name + "_foo.jar"],
         cmd = "echo NOT EXECUTED",
         tools = [name + "/root_dep"],
     )
@@ -99,7 +99,7 @@ def _test_java_library_deps_of_genrule_are_not_on_classpath(name):
     )
 
 def _test_java_library_deps_of_genrule_are_not_on_classpath_impl(env, target):
-    expected_classpath = "{bin_path}/{package}/_ijar/{test_name}/has_java_dep_import/{package}/foo-ijar.jar"
+    expected_classpath = "{bin_path}/{package}/_ijar/{test_name}/has_java_dep_import/{package}/{test_name}_foo-ijar.jar"
     javac_action_subject.of(env, target, "{package}/lib{name}.jar").classpath().contains_exactly([expected_classpath])
 
 def _test_java_library_compile_and_run_time_paths(name):
@@ -1096,35 +1096,39 @@ def _test_exported_plugins_are_propagated_through_exports_impl(env, targets):
         "{package}/lib{test_name}/leaf_lib.jar",
     ).processors().contains_exactly(["com.example.process.stuff"])
 
-JAVA_LIBRARY_LAUNCHER_TESTS = [
-    _test_java_library_rule_outputs,
-    _test_java_library_action_graph,
-    _test_java_library_deps_of_genrule_are_not_on_classpath,
-    _test_java_library_compile_and_run_time_paths,
-    _test_java_library_files_to_compile,
-    _test_java_library_runtime_deps_are_not_on_classpath,
-    _test_java_library_runtime_deps_are_not_on_classpath_with_header_compilation,
-    _test_java_library_propagates_native_libraries,
-    _test_java_library_gen_source_no_processor_names,
-    _test_java_library_annotation_processing_using_javacopt,
-    _test_java_library_javacopts_with_location_expansion,
-    _test_java_library_invalid_plugin,
-    _test_java_library_plugin_with_runtime_deps,
-    _test_java_library_source_jar_without_annotation_processing,
-    _test_java_library_source_jars_with_source_jars,
-    _test_java_library_should_set_bootclasspath,
-    _test_java_library_command_line_contains_target_label_and_rule_kind,
-    _test_java_library_compilation_info_provider,
-    _test_java_library_native_header_outputs,
-    _test_java_library_module_javacopts,
-    _test_java_library_forwarded_deps,
-    _test_java_library_transitive_strict_deps,
-    _test_java_library_emit_output_deps,
-    _test_java_library_deps_without_srcs,
-    _test_dependency_artifacts_with_exports,
-    _test_exports_are_indirect_not_direct,
-    _test_exports_runfiles,
-    _test_exports_collect_source_jars,
-    _test_exported_plugins_are_inherited,
-    _test_exported_plugins_are_propagated_through_exports,
-]
+def java_library_launcher_tests(name):
+    test_suite(
+        name = name,
+        tests = [
+            _test_java_library_rule_outputs,
+            _test_java_library_action_graph,
+            _test_java_library_deps_of_genrule_are_not_on_classpath,
+            _test_java_library_compile_and_run_time_paths,
+            _test_java_library_files_to_compile,
+            _test_java_library_runtime_deps_are_not_on_classpath,
+            _test_java_library_runtime_deps_are_not_on_classpath_with_header_compilation,
+            _test_java_library_propagates_native_libraries,
+            _test_java_library_gen_source_no_processor_names,
+            _test_java_library_annotation_processing_using_javacopt,
+            _test_java_library_javacopts_with_location_expansion,
+            _test_java_library_invalid_plugin,
+            _test_java_library_plugin_with_runtime_deps,
+            _test_java_library_source_jar_without_annotation_processing,
+            _test_java_library_source_jars_with_source_jars,
+            _test_java_library_should_set_bootclasspath,
+            _test_java_library_command_line_contains_target_label_and_rule_kind,
+            _test_java_library_compilation_info_provider,
+            _test_java_library_native_header_outputs,
+            _test_java_library_module_javacopts,
+            _test_java_library_forwarded_deps,
+            _test_java_library_transitive_strict_deps,
+            _test_java_library_emit_output_deps,
+            _test_java_library_deps_without_srcs,
+            _test_dependency_artifacts_with_exports,
+            _test_exports_are_indirect_not_direct,
+            _test_exports_runfiles,
+            _test_exports_collect_source_jars,
+            _test_exported_plugins_are_inherited,
+            _test_exported_plugins_are_propagated_through_exports,
+        ],
+    )

@@ -11,7 +11,6 @@ load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules:java_helper.bzl", "helper")
-load("//test/java/common/rules:common_launcher_java_binary_tests.bzl", "JAVA_BINARY_LAUNCHER_TESTS")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_toolchain")
@@ -408,7 +407,7 @@ def _test_one_version_check_disabled_impl(env, target):
 
 def java_binary_tests(name):
     test_suite(
-        name = "_basic_" + name,
+        name = name,
         tests = [
             _test_java_binary_provides_binary_java_info,
             _test_stamp_conversion_does_not_override_int,
@@ -419,19 +418,5 @@ def java_binary_tests(name):
             _test_one_version_check_action,
             _test_one_version_check_violations_allowed,
             _test_one_version_check_disabled,
-        ],
-    )
-
-    # TODO: unset --java_launcher explicitly
-    test_suite(
-        name = "_jdk_launcher_" + name,
-        tests = JAVA_BINARY_LAUNCHER_TESTS,
-    )
-
-    native.test_suite(
-        name = name,
-        tests = [
-            "_basic_" + name,
-            "_jdk_launcher_" + name,
         ],
     )

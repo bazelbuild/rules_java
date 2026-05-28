@@ -1,6 +1,6 @@
 """Parameterized tests for java_binary with --java_launcher"""
 
-load("@rules_testing//lib:analysis_test.bzl", "analysis_test")
+load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
 
@@ -23,6 +23,10 @@ def _test_java_binary_non_executable_rule_outputs_impl(env, target):
         "{package}/{name}.jar",
     ])
 
-JAVA_BINARY_LAUNCHER_TESTS = [
-    _test_java_binary_non_executable_rule_outputs,
-]
+def java_binary_launcher_tests(name):
+    test_suite(
+        name = name,
+        tests = [
+            _test_java_binary_non_executable_rule_outputs,
+        ],
+    )

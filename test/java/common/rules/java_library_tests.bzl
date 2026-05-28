@@ -9,7 +9,6 @@ load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_info.bzl", "JavaInfo")
-load("//test/java/common/rules:common_launcher_java_library_tests.bzl", "JAVA_LIBRARY_LAUNCHER_TESTS")
 load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
@@ -351,7 +350,7 @@ def _test_strict_java_deps_error(name):
 
 def java_library_tests(name):
     test_suite(
-        name = "_basic_" + name,
+        name = name,
         tests = [
             _test_exposes_plugins,
             _test_exposes_java_info,
@@ -362,19 +361,5 @@ def java_library_tests(name):
             _test_strict_java_deps_off,
             _test_strict_java_deps_warn,
             _test_strict_java_deps_error,
-        ],
-    )
-
-    # TODO: unset --java_launcher explicitly
-    test_suite(
-        name = "_jdk_launcher_" + name,
-        tests = JAVA_LIBRARY_LAUNCHER_TESTS,
-    )
-
-    native.test_suite(
-        name = name,
-        tests = [
-            "_basic_" + name,
-            "_jdk_launcher_" + name,
         ],
     )
