@@ -210,10 +210,10 @@ def _test_java_library_runtime_deps_are_not_on_classpath_with_header_compilation
 
     analysis_test(
         name = name,
-        impl = _test_java_library_runtime_deps_are_not_on_classpath_with_header_compilation_impl,
         config_settings = {
             "//command_line_option:java_header_compilation": True,
         },
+        impl = _test_java_library_runtime_deps_are_not_on_classpath_with_header_compilation_impl,
         target = name + "/depends_on_runtimedep",
     )
 
@@ -291,9 +291,9 @@ def _test_java_library_invalid_plugin(name):
 
     analysis_test(
         name = name,
+        expect_failure = True,
         impl = _test_java_library_invalid_plugin_impl,
         target = name + "/lib",
-        expect_failure = True,
     )
 
 def _test_java_library_invalid_plugin_impl(env, target):
@@ -437,12 +437,12 @@ def _test_java_library_should_set_bootclasspath(name):
 
     analysis_test(
         name = name,
-        impl = _test_java_library_should_set_bootclasspath_impl,
         config_settings = {
             "//command_line_option:extra_toolchains": [
                 native.package_relative_label(name + "/toolchain"),
             ],
         },
+        impl = _test_java_library_should_set_bootclasspath_impl,
         target = name + "/test_lib",
     )
 
@@ -450,7 +450,7 @@ def _test_java_library_should_set_bootclasspath_impl(env, target):
     javac_action = javac_action_subject.of(env, target, "{package}/lib{name}.jar")
 
     javac_action.bootclasspath().contains_exactly([
-        "{bin_path}/{package}/test_java_library_should_set_bootclasspath/boot.jar",
+        "{bin_path}/{package}/{test_name}/boot.jar",
     ])
 
 def _test_java_library_command_line_contains_target_label_and_rule_kind(name):
@@ -620,12 +620,12 @@ def _test_java_library_compilation_info_provider(name):
 
     analysis_test(
         name = name,
-        impl = _test_java_library_compilation_info_provider_impl,
         config_settings = {
             "//command_line_option:extra_toolchains": [
                 native.package_relative_label(name + "/toolchain"),
             ],
         },
+        impl = _test_java_library_compilation_info_provider_impl,
         target = name + "/test_lib",
     )
 
@@ -757,10 +757,10 @@ def _test_java_library_transitive_strict_deps(name):
 
     analysis_test(
         name = name,
-        impl = _test_java_library_transitive_strict_deps_impl,
         config_settings = {
             "//command_line_option:experimental_strict_java_deps": "ERROR",
         },
+        impl = _test_java_library_transitive_strict_deps_impl,
         target = name + "/a",
     )
 
@@ -784,10 +784,10 @@ def _test_java_library_emit_output_deps(name):
 
     analysis_test(
         name = name,
-        impl = _test_java_library_emit_output_deps_impl,
         config_settings = {
             "//command_line_option:java_deps": True,
         },
+        impl = _test_java_library_emit_output_deps_impl,
         targets = {
             "a": name + "/a",
             "b": name + "/b",
@@ -819,9 +819,9 @@ def _test_java_library_deps_without_srcs(name):
 
     analysis_test(
         name = name,
+        expect_failure = True,
         impl = _test_java_library_deps_without_srcs_impl,
         target = name + "/a",
-        expect_failure = True,
     )
 
 def _test_java_library_deps_without_srcs_impl(env, target):
@@ -868,11 +868,11 @@ def _test_dependency_artifacts_with_exports(name):
 
     analysis_test(
         name = name,
-        impl = _test_dependency_artifacts_with_exports_impl,
-        target = name + "/a",
         config_settings = {
             "//command_line_option:experimental_java_classpath": "javabuilder",
         },
+        impl = _test_dependency_artifacts_with_exports_impl,
+        target = name + "/a",
     )
 
 def _test_dependency_artifacts_with_exports_impl(env, target):
