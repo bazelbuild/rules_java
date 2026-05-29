@@ -10,7 +10,6 @@ build_targets: &build_targets
   - "@remote_java_tools//:singlejar_cc_bin"
   # can't build @remote_java_tools_X repos for other platforms
   - "-//toolchains/..."
-  - "-//java/docs/..."
 
 build_targets_integration: &build_targets_integration
   - "//..."

@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@rules_shell//shell:sh_test.bzl", "sh_test")
 load("//java:repositories.bzl", "JAVA_TOOLS_CONFIG", "REMOTE_JDK_CONFIGS")
 load(":check_remotejdk_configs_match.bzl", "validate_configs")
@@ -60,20 +59,6 @@ sh_test(
     ],
     data = ["//distro:relnotes.txt"],
     tags = ["manual"],  # explicitly tested only on Linux
-)
-
-diff_test(
-    name = "docs_up_to_date_test",
-    failure_message = """
-    Docs are no longer up to date. Regenerate them by running:
-
-    bazel build //java/docs:rules_docs && \
-    cp bazel-bin/java/docs/rules_docs.out java/docs/rules.md
-    """,
-    file1 = "//java/docs:rules.md",
-    file2 = "//java/docs:rules_docs",
-    # TODO: b/369123329 - re-enable docs after moving them out of https://bazel.build/reference/be/java
-    tags = ["manual"],
 )
 
 validate_configs()
