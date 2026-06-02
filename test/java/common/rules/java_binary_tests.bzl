@@ -405,6 +405,29 @@ def _test_one_version_check_disabled_impl(env, target):
     action_mnemonics = [a.mnemonic for a in env.expect.that_target(target).actual.actions]
     env.expect.that_collection(action_mnemonics).not_contains("JavaOneVersion")
 
+def _test_java_binary_no_launcher_dep_if_not_executable(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["bin.java"],
+        create_executable = False,
+    )
+    util.helper_target(
+        cc_binary,
+        name = name + "/broken",
+        srcs = ["launcher.cc"],
+        deps = [":doesnotexist"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = lambda *args, **kwargs: None,  # no error: good
+        target = name + "/bin",
+        config_settings = {
+            "//command_line_option:java_launcher": Label(name + "/broken"),
+        },
+    )
+
 def java_binary_tests(name):
     test_suite(
         name = name,
@@ -418,5 +441,6 @@ def java_binary_tests(name):
             _test_one_version_check_action,
             _test_one_version_check_violations_allowed,
             _test_one_version_check_disabled,
+            _test_java_binary_no_launcher_dep_if_not_executable,
         ],
     )
