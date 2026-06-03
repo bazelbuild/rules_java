@@ -133,8 +133,6 @@ java_runtime_files(
 #
 # See test_jni in third_party/bazel/src/test/shell/bazel/bazel_java_test.sh for
 # an example of using Bazel to build a Java program that calls a C function.
-#
-# TODO(ilist): use //src:condition:linux when released in Bazel
 cc_library(
     name = "jni",
     hdrs = [":jni_header"] + select({
