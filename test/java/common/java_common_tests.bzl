@@ -725,15 +725,10 @@ def _test_compile_neverlink(name):
     )
 
 def _test_compile_neverlink_impl(env, target):
-    java_source_basenames = [
-        f.basename
-        for f in artifact_closure.of_target(target)
-        if f.extension == "java"
-    ]
-    env.expect.that_collection(java_source_basenames).contains_exactly([
-        "Plugin.java",
-        "Dependency.java",
-        "EclipseDependency.java",
+    artifact_closure.of_target(env, target, extensions = ["java"]).contains_exactly([
+        "{package}/Plugin.java",
+        "{package}/Dependency.java",
+        "{package}/EclipseDependency.java",
     ])
     jars_in_runfiles = [
         f.basename
