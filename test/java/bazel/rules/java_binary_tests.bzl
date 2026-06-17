@@ -1,6 +1,7 @@
 """Tests for the Bazel java_binary rule"""
 
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
+load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
@@ -118,6 +119,19 @@ def _test_java_binary_resource_strip_prefix_impl(env, target):
         ("--resources", "{package}/path/to/strip/bar.props:bar.props"),
     ])
 
+def _test_java_binary_empty_srcs(name):
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_empty_srcs_impl,
+        target = "//test/bazel:bin_without_srcs",  # need a target not under a `/java/` segment
+        expect_failure = True,
+    )
+
+def _test_java_binary_empty_srcs_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(matching.str_matches(
+        "need at least one of 'main_class' or Java source files",
+    ))
+
 def java_binary_tests(name):
     test_suite(
         name = name,
@@ -126,5 +140,6 @@ def java_binary_tests(name):
             _test_java_binary_javacopts_make_variable_expansion,
             _test_java_binary_javacopts_location_expansion,
             _test_java_binary_resource_strip_prefix,
+            _test_java_binary_empty_srcs,
         ],
     )
