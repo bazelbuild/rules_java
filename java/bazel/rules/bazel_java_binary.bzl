@@ -87,7 +87,10 @@ def bazel_base_binary_impl(ctx, is_test_rule_class):
                  "rule or add a 'test_class' attribute.")
         jvm_flags.extend([
             "-ea",
-            "-Dbazel.test_suite=" + helper.shell_escape(test_class),
+            "-D{prop_name}={prop_value}".format(
+                prop_name = semantics.TEST_SUITE_PROPERTY_NAME,
+                prop_value = helper.shell_escape(test_class),
+            ),
         ])
 
     java_attrs = providers["InternalDeployJarInfo"].java_attrs
