@@ -428,6 +428,20 @@ def _test_java_binary_no_launcher_dep_if_not_executable(name):
         },
     )
 
+# regression test for #887069
+def _test_java_binary_java_package(name):
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_java_package_impl,
+        target = "//test/testdata:non_java",
+        expect_failure = True,
+    )
+
+def _test_java_binary_java_package_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(matching.str_matches(
+        "main_class was not provided and cannot be inferred",
+    ))
+
 def java_binary_tests(name):
     test_suite(
         name = name,
@@ -442,5 +456,6 @@ def java_binary_tests(name):
             _test_one_version_check_violations_allowed,
             _test_one_version_check_disabled,
             _test_java_binary_no_launcher_dep_if_not_executable,
+            _test_java_binary_java_package,
         ],
     )
