@@ -442,6 +442,20 @@ def _test_java_binary_java_package_impl(env, target):
         "main_class was not provided and cannot be inferred",
     ))
 
+# Regression test for CL 7314966.
+def _test_java_binary_rule_in_sub_directory(name):
+    util.helper_target(
+        java_binary,
+        name = "subdir/MyBinary",
+        srcs = ["subdir/MyBinary.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = lambda *args, **kwargs: None,  # should not be an error
+        target = "subdir/MyBinary",
+    )
+
 def java_binary_tests(name):
     test_suite(
         name = name,
@@ -457,5 +471,6 @@ def java_binary_tests(name):
             _test_one_version_check_disabled,
             _test_java_binary_no_launcher_dep_if_not_executable,
             _test_java_binary_java_package,
+            _test_java_binary_rule_in_sub_directory,
         ],
     )
