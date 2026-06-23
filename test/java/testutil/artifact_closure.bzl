@@ -4,8 +4,11 @@ load("@rules_testing//lib:truth.bzl", "subjects")
 
 # TODO: consider upstreaming this to @rules_testing
 
-def _compute(target):
-    to_process = target[DefaultInfo].files.to_list()
+def _compute(target, initial = None):
+    if not initial:
+        to_process = target[DefaultInfo].files.to_list()
+    else:
+        to_process = [initial]
     if _ArtifactActionMapInfo not in target:
         fail("Did you forget to add the aspect to analysis_test(extra_target_under_test_aspects = )?")
     map = target[_ArtifactActionMapInfo].map
@@ -51,13 +54,19 @@ def _aspect_impl(target, ctx):
 
 _aspect = aspect(_aspect_impl, attr_aspects = ["*"])
 
-def _of_target(env, target, as_paths = True, extensions = None):
+def _of_target(
+        env,
+        target,
+        initial = None,
+        as_paths = True,
+        extensions = None,
+        package_local_only = True):
     meta = env.expect.meta.derive(format_str_kwargs = {
         "name": target.label.name,
         "package": target.label.package,
     })
     result = subjects.collection(
-        _compute(target),
+        _compute(target, initial = initial),
         meta = meta,
         container_name = "artifact clousre of {}".format(target.label),
         format = True,
@@ -66,6 +75,11 @@ def _of_target(env, target, as_paths = True, extensions = None):
         result = result.transform(
             filter = lambda f: f.extension in extensions,
             desc = "with extensions: {exts}".format(exts = extensions),
+        )
+    if package_local_only:
+        result = result.transform(
+            filter = lambda f: f.short_path.startswith(target.label.package),
+            desc = "in package: {package}".format(package = target.label.package),
         )
     if as_paths:
         result = result.transform(

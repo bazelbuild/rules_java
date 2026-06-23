@@ -3,6 +3,9 @@
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
+load("//java:java_library.bzl", "java_library")
+load("//test/java/testutil:artifact_closure.bzl", "artifact_closure")
+load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_toolchain")
 
 def _test_java_binary_non_executable_rule_outputs(name):
     util.helper_target(
@@ -23,10 +26,61 @@ def _test_java_binary_non_executable_rule_outputs_impl(env, target):
         "{package}/{name}.jar",
     ])
 
+def _test_java_binary_resources_only(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        main_class = "doesnotmatter",
+        resources = [
+            "someFile.xml",
+            "someOtherFile.xml",
+        ],
+        runtime_deps = [name + "/lib"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["Xml.java"],
+    )
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+    )
+
+    analysis_test(
+        name = name,
+        attr_values = {"tags": ["min_bazel_8"]},  # the deploy jar was created by a separate rule in Bazel 7
+        config_settings = {
+            "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
+        },
+        extra_target_under_test_aspects = [artifact_closure.aspect],
+        impl = _test_java_binary_resources_only_impl,
+        target = name + "/bin",
+    )
+
+def _test_java_binary_resources_only_impl(env, target):
+    deploy_jar = env.expect.that_target(target).action_named("JavaDeployJar").actual.outputs.to_list()[0]
+    env.expect.that_file(deploy_jar).basename().equals("bin_deploy.jar")
+
+    # check that we do have a jar file build for bin, although
+    # it does not contain any source files
+    artifact_closure.of_target(env, target, extensions = ["jar"], initial = deploy_jar).contains_exactly([
+        "{package}/JavaBuilder_deploy.jar",
+        "{package}/lib{test_name}/lib.jar",
+        "{package}/{test_name}/bin-class.jar",
+        "{package}/{test_name}/bin.jar",
+        "{package}/{test_name}/bin_deploy.jar",
+    ])
+    artifact_closure.of_target(env, target, extensions = ["xml"], initial = deploy_jar).contains_exactly([
+        "{package}/someFile.xml",
+        "{package}/someOtherFile.xml",
+    ])
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
         tests = [
             _test_java_binary_non_executable_rule_outputs,
+            _test_java_binary_resources_only,
         ],
     )
