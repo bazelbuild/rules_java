@@ -20,6 +20,7 @@ load("//java/common/rules:java_helper.bzl", "helper")
 load("//java/common/rules:java_toolchain.bzl", "JavaToolchainInfo")
 load(
     ":java_info.bzl",
+    "JavaInfo",
     "JavaPluginInfo",
     "disable_plugin_info_annotation_processing",
     "java_info_for_compilation",
@@ -314,7 +315,36 @@ def compile(
     if uses_annotation_processing:
         generated_class_jar = _derive_output_file(ctx, output, name_suffix = "-gen")
         generated_source_jar = _derive_output_file(ctx, output, name_suffix = "-gensrc")
-    get_internal_java_common().create_compilation_action(
+
+    direct_dep_jars_to_verify = []
+    resolved_unused_deps_mode = "off"
+    internal_common = get_internal_java_common()
+    is_unused_deps_supported = hasattr(internal_common, "is_unused_deps_supported") and internal_common.is_unused_deps_supported()
+    repo_name = ctx.label.repo_name if hasattr(ctx.label, "repo_name") else ctx.label.workspace_name
+    if is_unused_deps_supported and not repo_name:
+        for package_config in java_toolchain._package_configuration:
+            matched = package_config.matches(package_config.package_specs, ctx.label)
+            if matched:
+                if hasattr(package_config, "unused_deps"):
+                    resolved_unused_deps_mode = package_config.unused_deps
+
+        if resolved_unused_deps_mode == "error" and hasattr(ctx.attr, "deps"):
+            for dep in ctx.attr.deps:
+                if JavaInfo in dep:
+                    if hasattr(dep[JavaInfo], "java_outputs"):
+                        for output_info in dep[JavaInfo].java_outputs:
+                            compile_jar = output_info.compile_jar if output_info.compile_jar else output_info.class_jar
+                            if compile_jar:
+                                direct_dep_jars_to_verify.append(struct(
+                                    jar = compile_jar,
+                                    label = str(dep.label),
+                                ))
+
+    additional_kwargs = {}
+    if is_unused_deps_supported:
+        additional_kwargs["direct_dep_jars_to_verify"] = direct_dep_jars_to_verify
+
+    internal_common.create_compilation_action(
         ctx,
         java_toolchain,
         output,
@@ -343,6 +373,7 @@ def compile(
         enable_direct_classpath,
         annotation_processor_additional_inputs,
         annotation_processor_additional_outputs,
+        **additional_kwargs
     )
 
     create_output_source_jar = len(source_files) > 0 or source_jars != [output_source_jar]
