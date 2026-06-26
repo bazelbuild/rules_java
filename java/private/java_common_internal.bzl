@@ -320,8 +320,8 @@ def compile(
     resolved_unused_deps_mode = "off"
     internal_common = get_internal_java_common()
     is_unused_deps_supported = hasattr(internal_common, "is_unused_deps_supported") and internal_common.is_unused_deps_supported()
-
-    if is_unused_deps_supported and not ctx.label.workspace_name:
+    repo_name = ctx.label.repo_name if hasattr(ctx.label, "repo_name") else ctx.label.workspace_name
+    if is_unused_deps_supported and not repo_name:
         for package_config in java_toolchain._package_configuration:
             matched = package_config.matches(package_config.package_specs, ctx.label)
             if matched:
