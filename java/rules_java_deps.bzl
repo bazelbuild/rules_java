@@ -3,6 +3,7 @@
 load("@bazel_features//private:util.bzl", _bazel_version_ge = "ge")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+load("//java_tools/buildjar:deps.bzl", "java_tools_deps")
 
 def _compatibility_proxy_repo_impl(rctx):
     if _bazel_version_ge("8.0.0"):
@@ -234,3 +235,4 @@ def rules_java_dependencies():
     absl_repo()
     rules_license_repo()
     re2_repo()
+    java_tools_deps()
