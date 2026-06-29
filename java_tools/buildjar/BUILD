@@ -30,6 +30,12 @@ alias(
 )
 
 alias(
+    name = "javabuilder_core",
+    actual = "//java_tools/buildjar/java/com/google/devtools/build/buildjar:javabuilder_core",
+    visibility = ["//visibility:public"],
+)
+
+alias(
     name = "VanillaJavaBuilder",
     actual = "//java_tools/buildjar/java/com/google/devtools/build/buildjar:VanillaJavaBuilder",
     visibility = ["//visibility:public"],

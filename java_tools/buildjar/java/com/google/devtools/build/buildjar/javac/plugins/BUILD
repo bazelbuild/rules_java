@@ -58,8 +58,21 @@ java_library(
 )
 
 java_library(
+    name = "javabuilder_errorprone_api",
+    srcs = ["errorprone/ErrorProneInvoker.java"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":plugins",
+    ],
+)
+
+java_library(
     name = "errorprone",
-    srcs = ["errorprone/ErrorPronePlugin.java"],
+    srcs = [
+        "errorprone/BazelScannerSuppliers.java",
+        "errorprone/ErrorProneInvokerImpl.java",
+        "errorprone/ErrorPronePlugin.java",
+    ],
     javacopts = [
         "-source 21",
         "-target 21",
@@ -69,7 +82,11 @@ java_library(
         "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
         "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
     ],
+    resources = ["errorprone/META-INF/services/com.google.devtools.build.buildjar.javac.plugins.errorprone.ErrorProneInvoker"],
+    resource_strip_prefix = "java_tools/buildjar/java/com/google/devtools/build/buildjar/javac/plugins/errorprone",
+    visibility = ["//visibility:public"],
     deps = [
+        ":javabuilder_errorprone_api",
         ":plugins",
         "//java_tools/buildjar/java/com/google/devtools/build/buildjar:invalid_command_line_exception",
         "//java_tools/buildjar/java/com/google/devtools/build/buildjar/javac/statistics",
@@ -108,7 +125,11 @@ filegroup(
         "dependency/DependencyModule.java",
         "dependency/ImplicitDependencyExtractor.java",
         "dependency/StrictJavaDepsPlugin.java",
+        "errorprone/BazelScannerSuppliers.java",
+        "errorprone/ErrorProneInvoker.java",
+        "errorprone/ErrorProneInvokerImpl.java",
         "errorprone/ErrorPronePlugin.java",
+        "errorprone/META-INF/services/com.google.devtools.build.buildjar.javac.plugins.errorprone.ErrorProneInvoker",
         "processing/AnnotationProcessingModule.java",
         "processing/AnnotationProcessingPlugin.java",
     ],

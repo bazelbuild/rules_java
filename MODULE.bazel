@@ -120,11 +120,13 @@ use_repo(
     "rules_java_auto_value_annotations",
     "rules_java_error_prone",
     "rules_java_error_prone_annotations",
+    "rules_java_error_prone_annotation",
     "rules_java_jacoco_core",
     "rules_java_caffeine",
     "rules_java_junit4",
     "rules_java_truth",
     "rules_java_error_prone_check_api",
+    "rules_java_javax_inject",
 )
 
 

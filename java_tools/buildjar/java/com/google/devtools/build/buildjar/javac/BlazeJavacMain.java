@@ -355,6 +355,32 @@ public class BlazeJavacMain {
   @Trusted
   private static class ClassloaderMaskingFileManager extends JavacFileManager {
 
+    private static final com.google.common.collect.ImmutableSet<String> CUSTOM_PLUGINS = getCustomPlugins();
+
+    private static com.google.common.collect.ImmutableSet<String> getCustomPlugins() {
+      com.google.common.collect.ImmutableSet.Builder<String> builder = com.google.common.collect.ImmutableSet.builder();
+      try {
+        java.util.Enumeration<URL> resources =
+            ClassLoader.getSystemResources("META-INF/services/com.google.errorprone.bugpatterns.BugChecker");
+        while (resources.hasMoreElements()) {
+          URL url = resources.nextElement();
+          try (java.io.BufferedReader reader =
+              new java.io.BufferedReader(new java.io.InputStreamReader(url.openStream(), UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+              line = line.trim();
+              if (!line.isEmpty() && !line.startsWith("#")) {
+                builder.add(line);
+              }
+            }
+          }
+        }
+      } catch (IOException e) {
+        // Ignore
+      }
+      return builder.build();
+    }
+
     public ClassloaderMaskingFileManager(Context context) {
       super(context, true, UTF_8);
     }
@@ -371,10 +397,27 @@ public class BlazeJavacMain {
                   || name.startsWith("com.google.common.base.")
                   || name.startsWith("com.google.common.regex.")
                   || name.startsWith("org.checkerframework.errorprone.dataflow.")
-                  || name.startsWith("com.google.devtools.build.buildjar.javac.statistics.")) {
+                  || name.startsWith("com.google.devtools.build.buildjar.javac.statistics.")
+                  || CUSTOM_PLUGINS.contains(name)) {
                 return Class.forName(name);
               }
               throw new ClassNotFoundException(name);
+            }
+
+            @Override
+            protected URL findResource(String name) {
+              if (name.equals("META-INF/services/com.google.errorprone.bugpatterns.BugChecker")) {
+                return ClassLoader.getSystemResource(name);
+              }
+              return super.findResource(name);
+            }
+
+            @Override
+            protected java.util.Enumeration<URL> findResources(String name) throws IOException {
+              if (name.equals("META-INF/services/com.google.errorprone.bugpatterns.BugChecker")) {
+                return ClassLoader.getSystemResources(name);
+              }
+              return super.findResources(name);
             }
           });
     }

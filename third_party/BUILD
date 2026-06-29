@@ -46,15 +46,27 @@ alias(
 java_library(
     name = "error_prone",
     exports = [
+        ":error_prone_annotation",
         ":error_prone_annotations",
+        ":javax_inject",
         "@rules_java_error_prone//jar",
         "@rules_java_error_prone_check_api//jar",
     ],
 )
 
 alias(
+    name = "javax_inject",
+    actual = "@rules_java_javax_inject//jar",
+)
+
+alias(
     name = "error_prone_annotations",
     actual = "@rules_java_error_prone_annotations//jar",
+)
+
+alias(
+    name = "error_prone_annotation",
+    actual = "@rules_java_error_prone_annotation//jar",
 )
 
 alias(

@@ -46,6 +46,12 @@ def java_tools_deps():
     )
     maybe(
         http_jar,
+        name = "rules_java_error_prone_annotation",
+        url = "https://repo1.maven.org/maven2/com/google/errorprone/error_prone_annotation/2.50.0/error_prone_annotation-2.50.0.jar",
+        sha256 = "aa9b67a3aa3418b366e26594e1ae35d100ad3369cd1010ae7d4782d984ea9aaf",
+    )
+    maybe(
+        http_jar,
         name = "rules_java_jacoco_core",
         url = "https://repo1.maven.org/maven2/org/jacoco/org.jacoco.core/0.8.14/org.jacoco.core-0.8.14.jar",
         sha256 = "28abbf0eea5a08e4f24097f2fbac663ca17c341c25c3a04d90d6cd325943c995",
@@ -73,6 +79,12 @@ def java_tools_deps():
         name = "rules_java_error_prone_check_api",
         url = "https://repo1.maven.org/maven2/com/google/errorprone/error_prone_check_api/2.50.0/error_prone_check_api-2.50.0.jar",
         sha256 = "ee935a4f42ac409fb0a471affea938c3050c6887dbaadb106868936d83d8c8f1",
+    )
+    maybe(
+        http_jar,
+        name = "rules_java_javax_inject",
+        url = "https://repo1.maven.org/maven2/javax/inject/javax.inject/1/javax.inject-1.jar",
+        sha256 = "91c77044a50c481636c32d916fd89c9118a72195390452c81065080f957de7ff",
     )
 
 

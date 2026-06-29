@@ -12,7 +12,7 @@ filegroup(
         "JarCreator.java",
         "JarHelper.java",
     ],
-    visibility = ["//java_tools/buildjar:__subpackages__"],
+    visibility = ["//visibility:public"],
 )
 
 java_library(
