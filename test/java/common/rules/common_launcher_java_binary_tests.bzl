@@ -76,11 +76,33 @@ def _test_java_binary_resources_only_impl(env, target):
         "{package}/someOtherFile.xml",
     ])
 
+def _test_java_binary_deploy_jar_coverage_setup(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/app",
+        main_class = "com.google.app",
+    )
+
+    analysis_test(
+        name = name,
+        attr_values = {"tags": ["min_bazel_8"]},  # the deploy jar was created by a separate rule in Bazel 7
+        config_settings = {
+            "//command_line_option:collect_code_coverage": True,
+        },
+        impl = _test_java_binary_deploy_jar_coverage_setup_impl,
+        target = name + "/app",
+    )
+
+def _test_java_binary_deploy_jar_coverage_setup_impl(env, target):
+    assert_that_action = env.expect.that_target(target).action_generating("{package}/{name}_deploy.jar")
+    assert_that_action.argv().contains("Coverage-Main-Class: com.google.app")
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
         tests = [
             _test_java_binary_non_executable_rule_outputs,
             _test_java_binary_resources_only,
+            _test_java_binary_deploy_jar_coverage_setup,
         ],
     )
