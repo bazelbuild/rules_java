@@ -97,6 +97,39 @@ def _test_java_binary_deploy_jar_coverage_setup_impl(env, target):
     assert_that_action = env.expect.that_target(target).action_generating("{package}/{name}_deploy.jar")
     assert_that_action.argv().contains("Coverage-Main-Class: com.google.app")
 
+def _test_java_binary_transitive_dependency_from_java_library(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/Binary",
+        srcs = ["Binary.java"],
+        deps = [name + "/somedep"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/somedep",
+        srcs = ["Dependency.java"],
+        deps = [name + "/otherdep"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/otherdep",
+        srcs = ["OtherDependency.java"],
+    )
+
+    analysis_test(
+        name = name,
+        extra_target_under_test_aspects = [artifact_closure.aspect],
+        impl = _test_java_binary_transitive_dependency_from_java_library_impl,
+        target = name + "/Binary",
+    )
+
+def _test_java_binary_transitive_dependency_from_java_library_impl(env, target):
+    artifact_closure.of_target(env, target, extensions = ["java"]).contains_exactly([
+        "{package}/Binary.java",
+        "{package}/Dependency.java",
+        "{package}/OtherDependency.java",
+    ])
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -104,5 +137,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_non_executable_rule_outputs,
             _test_java_binary_resources_only,
             _test_java_binary_deploy_jar_coverage_setup,
+            _test_java_binary_transitive_dependency_from_java_library,
         ],
     )
