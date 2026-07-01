@@ -5,6 +5,7 @@ load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
 load("//test/java/testutil:artifact_closure.bzl", "artifact_closure")
+load("//test/java/testutil:binary_executable_subject.bzl", "expect_that_executable")
 load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_toolchain")
 
 def _test_java_binary_non_executable_rule_outputs(name):
@@ -130,6 +131,24 @@ def _test_java_binary_transitive_dependency_from_java_library_impl(env, target):
         "{package}/OtherDependency.java",
     ])
 
+def _test_java_binary_explicit_main_class(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        main_class = "foo.bar.baz",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_explicit_main_class_impl,
+        target = name + "/bin",
+    )
+
+def _test_java_binary_explicit_main_class_impl(env, target):
+    expect_that_executable.of_target(env, target).java_start_class().equals(
+        "foo.bar.baz",
+    )
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -138,5 +157,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_resources_only,
             _test_java_binary_deploy_jar_coverage_setup,
             _test_java_binary_transitive_dependency_from_java_library,
+            _test_java_binary_explicit_main_class,
         ],
     )
