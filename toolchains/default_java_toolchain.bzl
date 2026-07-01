@@ -76,6 +76,7 @@ _DEFAULT_JAVA_LANGUAGE_VERSION = "11"
 
 # Default java_toolchain parameters
 _BASE_TOOLCHAIN_CONFIGURATION = dict(
+    deps_checker = Label("@remote_java_tools//:ImportDepsChecker"),
     forcibly_disable_header_compilation = False,
     genclass = Label("@remote_java_tools//:GenClass"),
     header_compiler = Label("@remote_java_tools//:TurbineDirect"),
