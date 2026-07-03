@@ -9,6 +9,7 @@ filegroup(
     name = "srcs",
     srcs = [
         "BUILD",
+        "deps.bzl",
         "//java_tools/buildjar/java/com/google/devtools/build/buildjar:srcs",
         "//java_tools/buildjar/java/com/google/devtools/build/java/turbine:srcs",
         "//java_tools/buildjar/javatests/com/google/devtools/build/buildjar:srcs",
@@ -54,3 +55,5 @@ filegroup(
     tags = ["manual"],
     visibility = ["//visibility:public"],
 )
+
+exports_files(["deps.bzl"])
