@@ -149,6 +149,24 @@ def _test_java_binary_explicit_main_class_impl(env, target):
         "foo.bar.baz",
     )
 
+def _test_java_binary_implicit_main_class(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/Binary",
+        srcs = ["Binary.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_implicit_main_class_impl,
+        target = name + "/Binary",
+    )
+
+def _test_java_binary_implicit_main_class_impl(env, target):
+    expect_that_executable.of_target(env, target).java_start_class().equals(
+        "common.rules.{test_name}.Binary".format(test_name = env.ctx.label.name),
+    )
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -158,5 +176,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_deploy_jar_coverage_setup,
             _test_java_binary_transitive_dependency_from_java_library,
             _test_java_binary_explicit_main_class,
+            _test_java_binary_implicit_main_class,
         ],
     )
