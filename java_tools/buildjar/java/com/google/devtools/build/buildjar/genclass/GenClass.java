@@ -104,7 +104,7 @@ public class GenClass {
                     // generated.
                     || !prefixesContains(userWrittenFilePrefixes, className)) {
                   try (InputStream is = jar.getInputStream(entry)) {
-                    classes.put(name, is.readAllBytes());
+                    classes.put(name, com.google.common.io.ByteStreams.toByteArray(is));
                   } catch (IOException e) {
                     throw new UncheckedIOException(e);
                   }

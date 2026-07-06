@@ -21,7 +21,7 @@ ready.
 
 load("@rules_java//java/common:java_common.bzl", "java_common")
 
-_JarsInfo = provider(fields = ["compile_time_jars", "runtime_jars"])
+_JarsInfo = provider("Information about jars", fields = ["compile_time_jars", "runtime_jars"])
 
 def _join_paths(separator, files):
     """Joins the paths of the files separated by the given separator.
@@ -33,22 +33,25 @@ def _join_paths(separator, files):
     return separator.join([f.path for f in files])
 
 def _java_library_impl(ctx):
-    javac_options = ctx.fragments.java.default_javac_flags
+    javac_options = [
+        opt
+        for opt in ctx.fragments.java.default_javac_flags
+        if not opt.startswith("-source") and not opt.startswith("-target") and not opt.startswith("--release")
+    ]
+
+    # Bootstrap compiler wrapper classes require Java 11 APIs (e.g. PackageTree).
+    javac_options.extend(["-source", "11", "-target", "11"])
     class_jar = ctx.outputs.class_jar
-    compile_time_jars = depset(order = "topological")
-    runtime_jars = depset(order = "topological")
+    transitive_compile_time_jars = []
+    transitive_runtime_jars = []
     for dep in ctx.attr.deps:
-        compile_time_jars = depset(
-            transitive = [compile_time_jars, dep[_JarsInfo].compile_time_jars],
-        )
-        runtime_jars = depset(
-            transitive = [runtime_jars, dep[_JarsInfo].runtime_jars],
-        )
+        transitive_compile_time_jars.append(dep[_JarsInfo].compile_time_jars)
+        transitive_runtime_jars.append(dep[_JarsInfo].runtime_jars)
 
     jars = ctx.files.jars
     neverlink_jars = ctx.files.neverlink_jars
-    compile_time_jars = depset(jars + neverlink_jars, transitive = [compile_time_jars])
-    runtime_jars = depset(jars, transitive = [runtime_jars])
+    compile_time_jars = depset(jars + neverlink_jars, transitive = transitive_compile_time_jars, order = "topological")
+    runtime_jars = depset(jars, transitive = transitive_runtime_jars, order = "topological")
     compile_time_jars_list = compile_time_jars.to_list()  # TODO: This is weird.
 
     build_output = class_jar.path + ".build_output"

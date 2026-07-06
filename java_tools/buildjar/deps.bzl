@@ -1,7 +1,10 @@
+"""Dependencies for java_tools."""
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 def java_tools_deps():
+    """Declares repository rules for java_tools dependencies."""
     maybe(
         http_jar,
         name = "rules_java_guava",
@@ -87,12 +90,7 @@ def java_tools_deps():
         sha256 = "91c77044a50c481636c32d916fd89c9118a72195390452c81065080f957de7ff",
     )
 
-
-
-
-
-
-def _java_tools_deps_impl(ctx):
+def _java_tools_deps_impl(_ctx):
     java_tools_deps()
 
 java_tools_deps_ext = module_extension(

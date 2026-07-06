@@ -1,5 +1,3 @@
-load("@rules_java//java:defs.bzl", "java_binary")
-
 package(
     default_applicable_licenses = ["@rules_java//:license"],
     default_visibility = [":buildjar_package_group"],

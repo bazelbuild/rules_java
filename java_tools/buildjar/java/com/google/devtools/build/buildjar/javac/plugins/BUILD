@@ -9,14 +9,17 @@ package(
 java_library(
     name = "plugins",
     srcs = ["BlazeJavaCompilerPlugin.java"],
-    javacopts = [
-        "-source 21",
-        "-target 21",
-    ],
     add_exports = [
         "jdk.compiler/com.sun.tools.javac.comp",
         "jdk.compiler/com.sun.tools.javac.main",
         "jdk.compiler/com.sun.tools.javac.util",
+    ],
+    javacopts = [
+        "-source 11",
+        "-target 11",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
     ],
     deps = [
         "//java_tools/buildjar/java/com/google/devtools/build/buildjar:invalid_command_line_exception",
@@ -32,10 +35,6 @@ java_library(
         "dependency/ImplicitDependencyExtractor.java",
         "dependency/StrictJavaDepsPlugin.java",
     ],
-    javacopts = [
-        "-source 21",
-        "-target 21",
-    ],
     add_exports = [
         "jdk.compiler/com.sun.tools.javac.comp",
         "jdk.compiler/com.sun.tools.javac.code",
@@ -44,6 +43,17 @@ java_library(
         "jdk.compiler/com.sun.tools.javac.resources",
         "jdk.compiler/com.sun.tools.javac.tree",
         "jdk.compiler/com.sun.tools.javac.util",
+    ],
+    javacopts = [
+        "-source 11",
+        "-target 11",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.resources=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
     ],
     deps = [
         ":plugins",
@@ -74,16 +84,16 @@ java_library(
         "errorprone/ErrorPronePlugin.java",
     ],
     javacopts = [
-        "-source 21",
-        "-target 21",
+        "-source 11",
+        "-target 11",
         "--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
         "--add-exports=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
         "--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
         "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
         "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
     ],
-    resources = ["errorprone/META-INF/services/com.google.devtools.build.buildjar.javac.plugins.errorprone.ErrorProneInvoker"],
     resource_strip_prefix = "java_tools/buildjar/java/com/google/devtools/build/buildjar/javac/plugins/errorprone",
+    resources = ["errorprone/META-INF/services/com.google.devtools.build.buildjar.javac.plugins.errorprone.ErrorProneInvoker"],
     visibility = ["//visibility:public"],
     deps = [
         ":javabuilder_errorprone_api",
@@ -101,14 +111,17 @@ java_library(
         "processing/AnnotationProcessingModule.java",
         "processing/AnnotationProcessingPlugin.java",
     ],
-    javacopts = [
-        "-source 21",
-        "-target 21",
-    ],
     add_exports = [
         "jdk.compiler/com.sun.tools.javac.comp",
         "jdk.compiler/com.sun.tools.javac.tree",
         "jdk.compiler/com.sun.tools.javac.util",
+    ],
+    javacopts = [
+        "-source 11",
+        "-target 11",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
     ],
     deps = [
         ":plugins",

@@ -19,6 +19,7 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.devtools.build.buildjar.javac.plugins.dependency.DependencyModule;
 import com.google.devtools.build.buildjar.javac.plugins.processing.AnnotationProcessingModule;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -32,7 +33,7 @@ public class JavacWorkDirStrippingTest {
 
   @Test
   public void stripWorkDir_stripsSandboxPrefix() {
-    Path workDir = Path.of("/exec/__sandbox/751/_main");
+    Path workDir = Paths.get("/exec/__sandbox/751/_main");
     Path source = workDir.resolve("src/com/example/Foo.java");
     assertThat(DependencyModule.stripWorkDir(workDir, source))
         .isEqualTo("src/com/example/Foo.java");
@@ -40,28 +41,28 @@ public class JavacWorkDirStrippingTest {
 
   @Test
   public void stripWorkDir_isDeterministicAcrossSlots() {
-    Path slot1 = Path.of("/exec/__sandbox/751/_main");
-    Path slot2 = Path.of("/exec/__sandbox/1088/_main");
+    Path slot1 = Paths.get("/exec/__sandbox/751/_main");
+    Path slot2 = Paths.get("/exec/__sandbox/1088/_main");
     assertThat(DependencyModule.stripWorkDir(slot1, slot1.resolve("libfoo.jar")))
         .isEqualTo(DependencyModule.stripWorkDir(slot2, slot2.resolve("libfoo.jar")));
   }
 
   @Test
   public void stripWorkDir_leavesPathOutsideWorkDirUnchanged() {
-    Path workDir = Path.of("/exec/__sandbox/751/_main");
-    Path outside = Path.of("/other/location/libfoo.jar");
+    Path workDir = Paths.get("/exec/__sandbox/751/_main");
+    Path outside = Paths.get("/other/location/libfoo.jar");
     assertThat(DependencyModule.stripWorkDir(workDir, outside)).isEqualTo(outside.toString());
   }
 
   @Test
   public void stripWorkDir_leavesPathUnchangedForEmptyWorkDir() {
-    Path path = Path.of("src/com/example/Foo.java");
-    assertThat(DependencyModule.stripWorkDir(Path.of(""), path)).isEqualTo(path.toString());
+    Path path = Paths.get("src/com/example/Foo.java");
+    assertThat(DependencyModule.stripWorkDir(Paths.get(""), path)).isEqualTo(path.toString());
   }
 
   @Test
   public void stripSourceRoot_stripsWorkDirPrefix() {
-    Path workDir = Path.of("/exec/__sandbox/751/_main");
+    Path workDir = Paths.get("/exec/__sandbox/751/_main");
     AnnotationProcessingModule module = module(workDir, workDir.resolve("_sourcegenfiles"));
     Path source = workDir.resolve("src/com/example/Foo.java");
     assertThat(module.stripSourceRoot(source).toString()).isEqualTo("src/com/example/Foo.java");
@@ -69,7 +70,7 @@ public class JavacWorkDirStrippingTest {
 
   @Test
   public void stripSourceRoot_stripsSourceGenDirForGeneratedFiles() {
-    Path workDir = Path.of("/exec/__sandbox/751/_main");
+    Path workDir = Paths.get("/exec/__sandbox/751/_main");
     Path sourceGenDir = workDir.resolve("_sourcegenfiles");
     AnnotationProcessingModule module = module(workDir, sourceGenDir);
     Path generated = sourceGenDir.resolve("com/example/Gen.java");
@@ -79,7 +80,7 @@ public class JavacWorkDirStrippingTest {
   private static AnnotationProcessingModule module(Path workDir, Path sourceGenDir) {
     AnnotationProcessingModule.Builder builder = AnnotationProcessingModule.builder();
     builder.setSourceGenDir(sourceGenDir);
-    builder.setManifestProtoPath(Path.of("/tmp/manifest.proto"));
+    builder.setManifestProtoPath(Paths.get("/tmp/manifest.proto"));
     builder.setWorkDir(workDir);
     return builder.build();
   }

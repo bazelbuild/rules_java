@@ -17,8 +17,6 @@ bazel_dep(name = "rules_license", version = "0.0.3")
 bazel_dep(name = "abseil-cpp", version = "20250814.1", repo_name = "com_google_absl")
 bazel_dep(name = "re2", version = "2025-11-05.bcr.1")
 
-
-
 register_toolchains("//toolchains:all")
 
 toolchains = use_extension("//java:extensions.bzl", "toolchains")
@@ -113,22 +111,21 @@ use_repo(compat, "compatibility_proxy")
 java_tools_deps = use_extension("//java_tools/buildjar:deps.bzl", "java_tools_deps_ext")
 use_repo(
     java_tools_deps,
-    "rules_java_guava",
-    "rules_java_jsr305",
-    "rules_java_gson",
     "rules_java_auto_value",
     "rules_java_auto_value_annotations",
-    "rules_java_error_prone",
-    "rules_java_error_prone_annotations",
-    "rules_java_error_prone_annotation",
-    "rules_java_jacoco_core",
     "rules_java_caffeine",
+    "rules_java_error_prone",
+    "rules_java_error_prone_annotation",
+    "rules_java_error_prone_annotations",
+    "rules_java_error_prone_check_api",
+    "rules_java_gson",
+    "rules_java_guava",
+    "rules_java_jacoco_core",
+    "rules_java_javax_inject",
+    "rules_java_jsr305",
     "rules_java_junit4",
     "rules_java_truth",
-    "rules_java_error_prone_check_api",
-    "rules_java_javax_inject",
 )
-
 
 # Dev dependencies
 bazel_dep(name = "rules_pkg", version = "0.9.1", dev_dependency = True)

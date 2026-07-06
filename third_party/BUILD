@@ -88,5 +88,3 @@ alias(
     name = "truth",
     actual = "@rules_java_truth//jar",
 )
-
-

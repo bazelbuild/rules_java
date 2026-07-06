@@ -9,8 +9,8 @@ proto_library(
 
 java_proto_library(
     name = "deps_java_proto",
-    deps = [":deps_proto"],
     visibility = ["//visibility:public"],
+    deps = [":deps_proto"],
 )
 
 proto_library(
@@ -21,8 +21,8 @@ proto_library(
 
 java_proto_library(
     name = "java_compilation_java_proto",
-    deps = [":java_compilation_proto"],
     visibility = ["//visibility:public"],
+    deps = [":java_compilation_proto"],
 )
 
 proto_library(
@@ -33,6 +33,6 @@ proto_library(
 
 java_proto_library(
     name = "worker_protocol_java_proto",
-    deps = [":worker_protocol_proto"],
     visibility = ["//visibility:public"],
+    deps = [":worker_protocol_proto"],
 )
