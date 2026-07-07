@@ -178,7 +178,7 @@ def _test_deps_impl(env, targets):
         "{package}/depjar.jar",
     ])
 
-# Regression test for https://github.com/bazelbuild/rules_java/issues/362: an import with deps
+# Regression test for https://github.com/bazelbuild/rules_java/issues/362: every java_import
 # records a jdeps proto as its compile_jdeps so that reduced classpaths of downstream compilations
 # are not missing its transitive dependencies.
 def _test_compile_jdeps_propagated_for_deps(name):
@@ -205,31 +205,49 @@ def _test_compile_jdeps_propagated_for_deps(name):
         name = name,
         impl = _test_compile_jdeps_propagated_for_deps_impl,
         targets = {
+            "incomplete_deps": name + "/incomplete-jar",
             "with_deps": name + "/import-jar",
             "without_deps": name + "/depjar",
         },
-        # Requires the rules_java Starlark implementation to be used.
-        attr_values = {"tags": ["min_bazel_9"]},
+        # The rules_java Starlark implementation is used from Bazel 8 on.
+        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_compile_jdeps_propagated_for_deps_impl(env, targets):
-    with_deps = [
-        f.basename
-        for f in targets.with_deps[JavaInfo]._compile_time_java_dependencies.to_list()
-    ]
-    env.expect.that_collection(with_deps).contains_exactly(["jdeps.proto"])
+    for target in [targets.with_deps, targets.incomplete_deps, targets.without_deps]:
+        assert_compilation_args = java_info_subject.from_target(env, target).compilation_args()
+        assert_compilation_args.compile_time_java_dependencies().contains_exactly([
+            "{package}/_java_import/{name}/jdeps.proto",
+        ])
 
-    incomplete_deps = [
-        f.basename
-        for f in targets.without_deps[JavaInfo]._compile_time_java_dependencies.to_list()
-    ]
-    env.expect.that_collection(incomplete_deps).contains_exactly(["jdeps.proto"])
+def _test_import_deps_checker_checking_mode(name):
+    util.helper_target(
+        java_import,
+        name = name + "/import-jar",
+        jars = ["import.jar"],
+        deps = [name + "/depjar"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/depjar",
+        jars = ["depjar.jar"],
+    )
 
-    without_deps = [
-        f.basename
-        for f in targets.without_deps[JavaInfo]._compile_time_java_dependencies.to_list()
-    ]
-    env.expect.that_collection(without_deps).contains_exactly(["jdeps.proto"])
+    analysis_test(
+        name = name,
+        impl = _test_import_deps_checker_checking_mode_impl,
+        target = name + "/import-jar",
+        # The rules_java Starlark implementation is used from Bazel 8 on.
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_import_deps_checker_checking_mode_impl(env, target):
+    # java_import only generates the jdeps proto, it never fails the build on incomplete deps.
+    assert_action = env.expect.that_target(target).action_named("ImportDepsChecker")
+    assert_action.contains_flag_values([
+        ("--checking_mode", "silence"),
+        ("--rule_label", "//{package}:{name}"),
+    ])
 
 # Regression test for b/262751943.
 def _test_commandline_contains_target_label(name):
@@ -1013,6 +1031,7 @@ def java_import_tests(name):
             _test_with_java_library,
             _test_deps,
             _test_compile_jdeps_propagated_for_deps,
+            _test_import_deps_checker_checking_mode,
             _test_commandline_contains_target_label,
             _test_java_library_allows_import_in_deps,
             _test_module_flags,

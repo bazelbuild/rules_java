@@ -115,7 +115,6 @@ def bazel_java_import_rule(
     collected_jars = _collect_jars(ctx, jars)
     all_deps = _filter_provider(JavaInfo, deps, exports)
 
-    jdeps_artifact = None
     merged_java_info = java_common.merge(all_deps)
 
     # import_deps_check is always run to generate the jdeps proto for downstream compile actions,
