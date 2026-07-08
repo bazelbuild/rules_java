@@ -316,7 +316,7 @@ def compile(
         generated_class_jar = _derive_output_file(ctx, output, name_suffix = "-gen")
         generated_source_jar = _derive_output_file(ctx, output, name_suffix = "-gensrc")
 
-    direct_dep_jars_to_verify = []
+    direct_dep_jars_to_verify = {}
     resolved_unused_deps_mode = "off"
     internal_common = get_internal_java_common()
     is_unused_deps_supported = hasattr(internal_common, "is_unused_deps_supported") and internal_common.is_unused_deps_supported()
@@ -335,10 +335,7 @@ def compile(
                         for output_info in dep[JavaInfo].java_outputs:
                             compile_jar = output_info.compile_jar if output_info.compile_jar else output_info.class_jar
                             if compile_jar:
-                                direct_dep_jars_to_verify.append(struct(
-                                    jar = compile_jar,
-                                    label = str(dep.label),
-                                ))
+                                direct_dep_jars_to_verify[compile_jar] = str(dep.label)
 
     additional_kwargs = {}
     if is_unused_deps_supported:
