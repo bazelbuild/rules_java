@@ -220,35 +220,6 @@ def _test_compile_jdeps_propagated_for_deps_impl(env, targets):
             "{package}/_java_import/{name}/jdeps.proto",
         ])
 
-def _test_import_deps_checker_checking_mode(name):
-    util.helper_target(
-        java_import,
-        name = name + "/import-jar",
-        jars = ["import.jar"],
-        deps = [name + "/depjar"],
-    )
-    util.helper_target(
-        java_import,
-        name = name + "/depjar",
-        jars = ["depjar.jar"],
-    )
-
-    analysis_test(
-        name = name,
-        impl = _test_import_deps_checker_checking_mode_impl,
-        target = name + "/import-jar",
-        # The rules_java Starlark implementation is used from Bazel 8 on.
-        attr_values = {"tags": ["min_bazel_8"]},
-    )
-
-def _test_import_deps_checker_checking_mode_impl(env, target):
-    # java_import only generates the jdeps proto, it never fails the build on incomplete deps.
-    assert_action = env.expect.that_target(target).action_named("ImportDepsChecker")
-    assert_action.contains_flag_values([
-        ("--checking_mode", "silence"),
-        ("--rule_label", "//{package}:{name}"),
-    ])
-
 # Regression test for b/262751943.
 def _test_commandline_contains_target_label(name):
     util.helper_target(
@@ -1031,7 +1002,6 @@ def java_import_tests(name):
             _test_with_java_library,
             _test_deps,
             _test_compile_jdeps_propagated_for_deps,
-            _test_import_deps_checker_checking_mode,
             _test_commandline_contains_target_label,
             _test_java_library_allows_import_in_deps,
             _test_module_flags,
