@@ -24,6 +24,10 @@ def _toolchain_config_impl(ctx):
     ctx.file("WORKSPACE", "workspace(name = \"{name}\")\n".format(name = ctx.name))
     ctx.file("BUILD.bazel", ctx.attr.build_file)
 
+    # rules_java supports Bazel versions without repository_ctx.repo_metadata.
+    if hasattr(ctx, "repo_metadata"):
+        return ctx.repo_metadata(reproducible = True)
+
 _toolchain_config = repository_rule(
     local = True,
     implementation = _toolchain_config_impl,
