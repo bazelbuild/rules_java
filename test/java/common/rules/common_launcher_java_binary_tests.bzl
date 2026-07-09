@@ -185,6 +185,23 @@ def _test_java_test_main_class_impl(env, target):
         "common.rules.{test_name}.Test".format(test_name = env.ctx.label.name),
     )
 
+def _test_java_test_main_class_with_dot(name):
+    util.helper_target(
+        java_test,
+        name = name + "/withdot.Test",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_test_main_class_with_dot_impl,
+        target = name + "/withdot.Test",
+    )
+
+def _test_java_test_main_class_with_dot_impl(env, target):
+    expect_that_executable.of_target(env, target).test_suite().equals(
+        "common.rules.{test_name}.withdot.Test".format(test_name = env.ctx.label.name),
+    )
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -196,5 +213,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_explicit_main_class,
             _test_java_binary_implicit_main_class,
             _test_java_test_main_class,
+            _test_java_test_main_class_with_dot,
         ],
     )
