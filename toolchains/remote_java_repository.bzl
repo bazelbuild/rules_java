@@ -23,6 +23,9 @@ load("//toolchains:jdk_build_file.bzl", "JDK_BUILD_TEMPLATE")
 def _toolchain_config_impl(ctx):
     ctx.file("WORKSPACE", "workspace(name = \"{name}\")\n".format(name = ctx.name))
     ctx.file("BUILD.bazel", ctx.attr.build_file)
+    if hasattr(ctx, "repo_metadata"):
+        return ctx.repo_metadata(reproducible = True)
+    return None
 
 _toolchain_config = repository_rule(
     local = True,
