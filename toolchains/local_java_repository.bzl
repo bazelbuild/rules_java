@@ -176,6 +176,10 @@ def _local_java_repository_impl(repository_ctx):
       repository_ctx: repository context
     """
 
+    repository_metadata = None
+    if hasattr(repository_ctx, "repo_metadata"):
+        repository_metadata = repository_ctx.repo_metadata(reproducible = True)
+
     java_home = _determine_java_home(repository_ctx)
 
     local_java_runtime_name = repository_ctx.attr.runtime_name
@@ -198,7 +202,7 @@ def _local_java_repository_impl(repository_ctx):
                       "either correct your JAVA_HOME, PATH or specify Java from " +
                       "remote repository (e.g. --java_runtime_version=remotejdk_11)",
         )
-        return
+        return repository_metadata
 
     # Detect version
     version = repository_ctx.attr.version if repository_ctx.attr.version != "" else _detect_java_version(repository_ctx, java_bin)
@@ -211,7 +215,7 @@ def _local_java_repository_impl(repository_ctx):
             message = "Cannot detect Java version of {java_binary} in {java_home}; " +
                       "make sure it points to a valid Java executable",
         )
-        return
+        return repository_metadata
 
     # Prepare BUILD file using "local_java_runtime" macro
     if repository_ctx.attr.build_file_content and repository_ctx.attr.build_file:
@@ -246,6 +250,8 @@ local_java_runtime(
     # Symlink all files
     for file in repository_ctx.path(java_home).readdir():
         repository_ctx.symlink(file, file.basename)
+
+    return repository_metadata
 
 # Build file template, when JDK could not be detected
 _AUTO_CONFIG_ERROR_BUILD_TPL = '''load("@rules_java//toolchains:fail_rule.bzl", "fail_rule")
