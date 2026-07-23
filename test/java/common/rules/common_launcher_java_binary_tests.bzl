@@ -202,6 +202,21 @@ def _test_java_test_main_class_with_dot_impl(env, target):
         "common.rules.{test_name}.withdot.Test".format(test_name = env.ctx.label.name),
     )
 
+def _test_java_test_has_assertions_enabled(name):
+    util.helper_target(
+        java_test,
+        name = name + "/testea",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_test_has_assertions_enabled_impl,
+        target = name + "/testea",
+    )
+
+def _test_java_test_has_assertions_enabled_impl(env, target):
+    expect_that_executable.of_target(env, target).jvm_flags().contains("-ea")
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -214,5 +229,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_implicit_main_class,
             _test_java_test_main_class,
             _test_java_test_main_class_with_dot,
+            _test_java_test_has_assertions_enabled,
         ],
     )
