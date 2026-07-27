@@ -1,10 +1,13 @@
 """Parameterized tests for java_binary with --java_launcher"""
 
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_test.bzl", "java_test")
+load("//java/common/rules:java_helper.bzl", "helper")
 load("//test/java/testutil:artifact_closure.bzl", "artifact_closure")
 load("//test/java/testutil:binary_executable_subject.bzl", "expect_that_executable")
 load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_toolchain")
@@ -217,6 +220,58 @@ def _test_java_test_has_assertions_enabled(name):
 def _test_java_test_has_assertions_enabled_impl(env, target):
     expect_that_executable.of_target(env, target).jvm_flags().contains("-ea")
 
+# Tests that the native library path computed from a ".so" cc_binary dependency
+# includes the transitive closure of that dependency.
+def _test_java_binary_native_library_path_includes_transitive_deps(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/app",
+        srcs = ["DoesNotMatter.java"],
+        deps = [name + "/jni.so"],
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/runtime_app",
+        srcs = ["AlsoDoesNotMatter.java"],
+        runtime_deps = [name + "/jni.so"],
+    )
+    util.helper_target(
+        cc_binary,
+        name = name + "/jni.so",
+        srcs = ["lib1.so"],
+        deps = [name + "/helper_lib"],
+    )
+    util.helper_target(
+        cc_library,
+        name = name + "/helper_lib",
+        srcs = ["lib2.so"],
+    )
+
+    analysis_test(
+        name = name,
+        attrs = {
+            "_windows_constraints": attr.label_list(default = ["@platforms//os:windows"]),
+            "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
+        },
+        impl = _test_java_binary_native_library_path_includes_transitive_deps_impl,
+        target = [
+            name + "/app",
+            name + "/runtime_app",
+        ],
+    )
+
+def _test_java_binary_native_library_path_includes_transitive_deps_impl(env, targets):
+    for target in targets:
+        if helper.is_target_platform_windows(env.ctx):
+            expect_that_executable.of_target(env, target).native_library_paths().contains_exactly([
+                "${{JAVA_RUNFILES}}/{workspace}/{package}",
+            ])
+        else:
+            expect_that_executable.of_target(env, target).native_library_paths().contains_exactly([
+                "${{JAVA_RUNFILES}}/{workspace}/_solib_{cpu}/_//{package}:{test_name}/helper_lib___{package}",
+                "${{JAVA_RUNFILES}}/{workspace}/_solib_{cpu}/_//{package}:{test_name}/jni.so___{package}",
+            ])
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -230,5 +285,6 @@ def java_binary_launcher_tests(name):
             _test_java_test_main_class,
             _test_java_test_main_class_with_dot,
             _test_java_test_has_assertions_enabled,
+            _test_java_binary_native_library_path_includes_transitive_deps,
         ],
     )

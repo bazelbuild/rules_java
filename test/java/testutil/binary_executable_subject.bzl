@@ -1,5 +1,6 @@
 """Custom rules_testing subject for java_binary/java_test executable output"""
 
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_testing//lib:truth.bzl", "subjects")
 load("//java/common:java_semantics.bzl", "semantics")
 
@@ -10,6 +11,7 @@ def _of_target(env, target):
         java_start_class = lambda: _java_start_class_subject(action_subject),
         test_suite = lambda: _test_suite_subject(action_subject),
         jvm_flags = lambda: _jvm_flags_subject(action_subject),
+        native_library_paths = lambda: _native_library_paths_subject(action_subject),
     )
     return public
 
@@ -41,6 +43,22 @@ def _jvm_flags_subject(action):
             map_each = lambda e: e.split("=", 1)[1],
             desc = "jvm_flags",
         ).offset(0, factory = subjects.str).split("\t")
+
+def _native_library_paths_subject(action):
+    return _jvm_flags_subject(action).transform(
+        filter = lambda e: e.startswith("-Djava.library.path="),
+        map_each = lambda e: e.split("=", 1)[1],
+        desc = "native library paths",
+    ).offset(
+        0,
+        factory = lambda actual, meta: subjects.str(actual, meta.derive(
+            format_str_kwargs = {"cpu": meta.ctx.attr._cc_toolchain[cc_common.CcToolchainInfo].cpu},
+        )),
+    ).split(":").transform(
+        map_each = lambda e: e.replace("_U", "_").replace("_S", "/").replace("_C", ":"),
+        desc = "pretty",
+        format = True,
+    )
 
 expect_that_executable = struct(
     of_target = _of_target,
