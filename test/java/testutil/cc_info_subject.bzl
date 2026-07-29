@@ -72,6 +72,7 @@ def _new_cc_info_libraries_to_link_subject(libraries_to_link, meta):
     )
     public = struct(
         static_libraries = lambda: _new_library_to_link_static_libraries_subject(self.actual, self.meta),
+        dynamic_libraries = lambda: _new_library_to_link_dynamic_libraries_subject(self.actual, self.meta),
         singleton = lambda: _new_library_to_link_subject(_get_singleton(self.actual), self.meta.derive("[0]")),
     )
     return public
@@ -92,6 +93,12 @@ def _new_library_to_link_static_libraries_subject(libraries_to_link, meta):
         contains_exactly_predicates = lambda expected: self.contains_exactly_predicates(expected),
     )
     return public
+
+def _new_library_to_link_dynamic_libraries_subject(libraries_to_link, meta):
+    return subjects.depset_file(
+        [testutil.cc_library_to_link_dynamic_library(lib) for lib in libraries_to_link],
+        meta = meta.derive("dynamic_library()"),
+    )
 
 def _get_singleton(seq):
     if len(seq) != 1:
