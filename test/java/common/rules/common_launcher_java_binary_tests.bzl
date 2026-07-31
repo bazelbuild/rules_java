@@ -272,6 +272,29 @@ def _test_java_binary_native_library_path_includes_transitive_deps_impl(env, tar
                 "${{JAVA_RUNFILES}}/{workspace}/_solib_{cpu}/_//{package}:{test_name}/jni.so___{package}",
             ])
 
+# Regression test for bug 2774317: Problems with inner classes as main class.
+def _test_java_binary_inner_class(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/inner",
+        srcs = ["Main.java"],
+        main_class = "Main$Inner",
+    )
+
+    analysis_test(
+        name = name,
+        attrs = {"_windows_constraints": attr.label_list(default = ["@platforms//os:windows"])},
+        impl = _test_java_binary_inner_class_impl,
+        target = name + "/inner",
+    )
+
+def _test_java_binary_inner_class_impl(env, target):
+    if helper.is_target_platform_windows(env.ctx):
+        expected = "Main$Inner"  # unquoted on windows
+    else:
+        expected = "'Main$Inner'"  # shell-quoted
+    expect_that_executable.of_target(env, target).java_start_class().equals(expected)
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -286,5 +309,6 @@ def java_binary_launcher_tests(name):
             _test_java_test_main_class_with_dot,
             _test_java_test_has_assertions_enabled,
             _test_java_binary_native_library_path_includes_transitive_deps,
+            _test_java_binary_inner_class,
         ],
     )
