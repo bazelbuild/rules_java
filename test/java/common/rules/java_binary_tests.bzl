@@ -456,6 +456,39 @@ def _test_java_binary_rule_in_sub_directory(name):
         target = "subdir/MyBinary",
     )
 
+def _test_java_binary_duplicate_classpath_resources(name):
+    util.helper_target(
+        native.filegroup,
+        name = name + "/a",
+        srcs = ["a/same.txt"],
+    )
+    util.helper_target(
+        native.filegroup,
+        name = name + "/b",
+        srcs = ["b/same.txt"],
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/app",
+        srcs = ["App.java"],
+        classpath_resources = [
+            name + "/a",
+            name + "/b",
+        ],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_duplicate_classpath_resources_impl,
+        target = name + "/app",
+        expect_failure = True,
+    )
+
+def _test_java_binary_duplicate_classpath_resources_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("entries must have different file names (duplicate: same.txt)"),
+    )
+
 def java_binary_tests(name):
     test_suite(
         name = name,
@@ -472,5 +505,6 @@ def java_binary_tests(name):
             _test_java_binary_no_launcher_dep_if_not_executable,
             _test_java_binary_java_package,
             _test_java_binary_rule_in_sub_directory,
+            _test_java_binary_duplicate_classpath_resources,
         ],
     )
