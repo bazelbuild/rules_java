@@ -27,15 +27,16 @@ for config in "$@"; do
       exit 1
     fi
     if [[ -z "${url##*.tar.gz}" ]]; then
-      root_dir=$(tar ztf ${TMP_FILE} --exclude='*/*')
+      bin_dir=$(tar ztf ${TMP_FILE} | egrep '/bin(|/)$' | sort | head -n1)
     elif [[ -z "${url##*.zip}" ]]; then
-      root_dir=$(unzip -Z1 ${TMP_FILE} | head -n1)
+      bin_dir=$(unzip -Z1 ${TMP_FILE} | egrep '/bin(|/)/$' | sort | head -n1)
     else
       echo "ERROR: unexpected archive type for ${name}"
       exit 1
     fi
-    if [ "${root_dir}" != "${strip_prefix}/" ]; then
-      echo "ERROR: bad strip_prefix for ${name}, wanted: ${strip_prefix}/, got: ${root_dir}"
+    root_dir="${bin_dir%/bin*}"
+    if [ "${root_dir}" != "${strip_prefix}" ]; then
+      echo "ERROR: bad strip_prefix for ${name}, wanted: ${strip_prefix}, got: ${root_dir}"
       exit 1
     fi
     if [[ -n "${mirror_url}" ]]; then
