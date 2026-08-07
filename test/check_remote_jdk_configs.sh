@@ -13,34 +13,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+function fail() {
+  echo "$@"
+  exit 1
+}
+
+function debug_log() {
+  # bazel test --test_env=DEBUG=1 ...
+  [[ -z "${DEBUG}" ]] || echo "$@"
+}
+
 echo "Checking hashes and strip_prefix for $# configs"
 
 _MISSING_MIRRORS=()
 for config in "$@"; do
     TMP_FILE=$(mktemp -q /tmp/remotejdk.XXXXXX)
     IFS=, read -r name url mirror_url hash strip_prefix <<< "${config}"
-    echo "fetching $name from $url to ${TMP_FILE}"
+    debug_log "fetching $name from $url to ${TMP_FILE}"
     curl --silent -o ${TMP_FILE} -L "$url"
     actual_hash=$(sha256sum ${TMP_FILE} | cut -d' ' -f1)
     if [ "${hash}" != "${actual_hash}" ]; then
-      echo "ERROR: wrong hash for ${name}! wanted: ${hash}, got: ${actual_hash}"
-      exit 1
+      fail "ERROR: wrong hash for ${name}! wanted: ${hash}, got: ${actual_hash}"
     fi
     if [[ -z "${url##*.tar.gz}" ]]; then
       bin_dir=$(tar ztf ${TMP_FILE} | egrep '/bin(|/)$' | sort | head -n1)
     elif [[ -z "${url##*.zip}" ]]; then
       bin_dir=$(unzip -Z1 ${TMP_FILE} | egrep '/bin(|/)/$' | sort | head -n1)
     else
-      echo "ERROR: unexpected archive type for ${name}"
-      exit 1
+      fail "ERROR: unexpected archive type for ${name}"
     fi
     root_dir="${bin_dir%/bin*}"
     if [ "${root_dir}" != "${strip_prefix}" ]; then
-      echo "ERROR: bad strip_prefix for ${name}, wanted: ${strip_prefix}, got: ${root_dir}"
-      exit 1
+      fail "ERROR: bad strip_prefix for ${name}, wanted: ${strip_prefix}, got: ${root_dir}"
     fi
     if [[ -n "${mirror_url}" ]]; then
-      echo "checking mirror: ${mirror_url}"
+      debug_log "checking mirror: ${mirror_url}"
       curl --silent --fail -I -L ${mirror_url} > /dev/null || { _MISSING_MIRRORS+=("${url}"); }
     fi
 done
