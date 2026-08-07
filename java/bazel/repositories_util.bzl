@@ -18,7 +18,7 @@ visibility(["//test"])
 _RELEASE_CONFIGS = {
     "8": {
         "zulu": {
-            "release": "8.90.0.19-ca-jdk8.0.472",
+            "release": "8.96.0.19-ca-jdk8.0.502",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -34,7 +34,7 @@ _RELEASE_CONFIGS = {
     },
     "11": {
         "zulu": {
-            "release": "11.84.17-ca-jdk11.0.29",
+            "release": "11.90.19-ca-jdk11.0.32",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -56,7 +56,7 @@ _RELEASE_CONFIGS = {
     },
     "17": {
         "zulu": {
-            "release": "17.62.17-ca-jdk17.0.17",
+            "release": "17.68.17-ca-jdk17.0.20",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -72,7 +72,7 @@ _RELEASE_CONFIGS = {
     },
     "21": {
         "zulu": {
-            "release": "21.46.19-ca-jdk21.0.9",
+            "release": "21.52.15-ca-jdk21.0.12",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -88,7 +88,7 @@ _RELEASE_CONFIGS = {
     },
     "25": {
         "zulu": {
-            "release": "25.32.17-ca-jdk25.0.2",
+            "release": "25.36.15-ca-jdk25.0.4",
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -135,7 +135,16 @@ def _zulu_remote_jdk_repo(os, cpu, release):
         "https://" + primary_url,
         "https://mirror.bazel.build/" + primary_url,
     ]
-    return urls, archive_name
+    patch_cmds = []
+    if os == "macos":
+        # Recent Zulu macOS archives are application bundles: the JDK lives
+        # under Contents/Home and the top-level bin/lib/... symlinks that
+        # earlier releases shipped are gone. strip_prefix stays at the
+        # archive root (uniform with the other platforms); recreate the
+        # top-level symlinks so the shared JDK BUILD template still finds
+        # bin/, lib/, etc.
+        patch_cmds = ["ln -s Contents/Home/* ."]
+    return urls, archive_name, patch_cmds
 
 def _adoptium_linux_remote_jdk_repo(version, cpu, release):
     os = "linux"
@@ -173,8 +182,9 @@ def _flatten_configs():
             for os, cpus in distrib_cfg["platforms"].items():
                 for cpu in cpus:
                     name = _name_for_remote_jdk(version, os, cpu)
+                    patch_cmds = []
                     if distrib == "zulu":
-                        urls, strip_prefix = _zulu_remote_jdk_repo(os, cpu, release)
+                        urls, strip_prefix, patch_cmds = _zulu_remote_jdk_repo(os, cpu, release)
                     elif distrib == "adoptium":
                         if os != "linux":
                             fail("adoptium jdk configured but not linux")
@@ -193,6 +203,7 @@ def _flatten_configs():
                         urls = urls,
                         strip_prefix = _STRIP_PREFIX_OVERRIDES.get(name, strip_prefix),
                         target_compatible_with = ["@platforms//os:" + os, "@platforms//cpu:" + cpu],
+                        patch_cmds = patch_cmds,
                     ))
     return result
 
