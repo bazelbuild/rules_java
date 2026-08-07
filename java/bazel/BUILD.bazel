@@ -39,6 +39,7 @@ while read -r config; do
     echo "  urls = $$urls,"
     echo "  version = \\"$$version\\","
     echo "),"
+    rm -f "$$TMP_FILE"
 done <<< '{configs}' >> $@
     """.format(configs = "\n".join([
         "|".join([
