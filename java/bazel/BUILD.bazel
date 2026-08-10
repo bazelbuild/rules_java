@@ -27,7 +27,7 @@ genrule(
 echo > $@
 while read -r config; do
     TMP_FILE=$$(mktemp -q /tmp/remotejdk.XXXXXX)
-    IFS=\\| read -r name version urls strip_prefix target_compatible_with primary_url <<< "$$config"
+    IFS=\\| read -r name version urls strip_prefix target_compatible_with primary_url patch_cmds <<< "$$config"
     echo "fetching: $$primary_url to $$TMP_FILE" > /dev/stderr
     curl --retry 5 --write-out '%{{onerror}}%{{url}}\n' --show-error --silent --fail -o $$TMP_FILE -L "$$primary_url" > /dev/stderr
     sha256=`sha256sum $$TMP_FILE | cut -d' ' -f1`
@@ -38,6 +38,9 @@ while read -r config; do
     echo "  strip_prefix = \\"$$strip_prefix\\","
     echo "  urls = $$urls,"
     echo "  version = \\"$$version\\","
+    if [[ "$$patch_cmds" != "[]" ]]; then
+      echo "  patch_cmds = $$patch_cmds,"
+    fi
     echo "),"
     rm -f "$$TMP_FILE"
 done <<< '{configs}' >> $@
@@ -49,6 +52,7 @@ done <<< '{configs}' >> $@
             config.strip_prefix,
             json.encode(config.target_compatible_with),
             config.urls[0],
+            json.encode(config.patch_cmds),
         ])
         for config in FLAT_CONFIGS
     ])),

@@ -36,15 +36,14 @@ for config in "$@"; do
       fail "ERROR: wrong hash for ${name}! wanted: ${hash}, got: ${actual_hash}"
     fi
     if [[ -z "${url##*.tar.gz}" ]]; then
-      bin_dir=$(tar ztf ${TMP_FILE} | egrep '/bin(|/)$' | sort | head -n1)
+      root_dir=$(tar ztf ${TMP_FILE} --exclude='*/*')
     elif [[ -z "${url##*.zip}" ]]; then
-      bin_dir=$(unzip -Z1 ${TMP_FILE} | egrep '/bin(|/)/$' | sort | head -n1)
+      root_dir=$(unzip -Z1 ${TMP_FILE} | head -n1)
     else
       fail "ERROR: unexpected archive type for ${name}"
     fi
-    root_dir="${bin_dir%/bin*}"
-    if [ "${root_dir}" != "${strip_prefix}" ]; then
-      fail "ERROR: bad strip_prefix for ${name}, wanted: ${strip_prefix}, got: ${root_dir}"
+    if [ "${root_dir}" != "${strip_prefix}/" ]; then
+      fail "ERROR: bad strip_prefix for ${name}, wanted: ${strip_prefix}/, got: ${root_dir}"
     fi
     if [[ -n "${mirror_url}" ]]; then
       debug_log "checking mirror: ${mirror_url}"
