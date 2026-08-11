@@ -22,39 +22,39 @@ load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
 
 # visible for tests
 JAVA_TOOLS_CONFIG = {
-    "version": "v19.0",
-    "source_revision": "61972bfd7fb6f587fc4576b5114e20758b501806",
+    "version": "v20.0",
+    "source_revision": "5dc60cedd5456112b1c21c577f94c041230be3ff",
     "release": "true",
     "artifacts": {
         "java_tools_linux": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v19.0/java_tools_linux-v19.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v19.0/java_tools_linux-v19.0.zip",
-            "sha": "7d5b0c01f99ea5596b7901a7e5f9173f3ae3c4f0b480378e87567eaf97d75d25",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v20.0/java_tools_linux-v20.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v20.0/java_tools_linux-v20.0.zip",
+            "sha": "3a64dd096053cf6b59b01f4485d834ad03cece23584cc50ba9c09687b14a24cc",
         },
         "java_tools_linux_aarch64": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v19.0/java_tools_linux_aarch64-v19.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v19.0/java_tools_linux_aarch64-v19.0.zip",
-            "sha": "34b14fdfe8d6e32ed7f80e7c4d34ce79f4006e0d4b621552f507e51b9d6a3d7d",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v20.0/java_tools_linux_aarch64-v20.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v20.0/java_tools_linux_aarch64-v20.0.zip",
+            "sha": "2b747db98949378d0108b22719f5edafb5178da9042c3652262c585485a4f655",
         },
         "java_tools_windows": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v19.0/java_tools_windows-v19.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v19.0/java_tools_windows-v19.0.zip",
-            "sha": "86c5a58ccefdb9e704fddd325f5fbc7867b2cdd128fb8b9abfdf607a75d2ae71",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v20.0/java_tools_windows-v20.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v20.0/java_tools_windows-v20.0.zip",
+            "sha": "90cef5c21481f5fce08cbf655cd29b9534474c104d350f503578ac88eb006fe5",
         },
         "java_tools_darwin_x86_64": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v19.0/java_tools_darwin_x86_64-v19.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v19.0/java_tools_darwin_x86_64-v19.0.zip",
-            "sha": "78ff8ec7038ab5f9cd261cdf9ff75ea0eb2af7579f9aeef9d658459ee37fabac",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v20.0/java_tools_darwin_x86_64-v20.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v20.0/java_tools_darwin_x86_64-v20.0.zip",
+            "sha": "9722b76d932f7dcf777cad779d5108a45af306a70e4ae736cf18096b580411eb",
         },
         "java_tools_darwin_arm64": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v19.0/java_tools_darwin_arm64-v19.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v19.0/java_tools_darwin_arm64-v19.0.zip",
-            "sha": "86f15280dd0ce121a22f061e2e301ecf746597caa4938cf56852b3d311b830d8",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v20.0/java_tools_darwin_arm64-v20.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v20.0/java_tools_darwin_arm64-v20.0.zip",
+            "sha": "fc66d59d6da440f2aacf399b2fb86ce0ef00675aa6c7e407f93d669bc85b4b09",
         },
         "java_tools": {
-            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v19.0/java_tools-v19.0.zip",
-            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v19.0/java_tools-v19.0.zip",
-            "sha": "d21d4aad1a18062512bcf4e8f7a09a4f5a042c760daa779e0ddda6e41b170507",
+            "mirror_url": "https://mirror.bazel.build/bazel_java_tools/releases/java/v20.0/java_tools-v20.0.zip",
+            "github_url": "https://github.com/bazelbuild/java_tools/releases/download/java_v20.0/java_tools-v20.0.zip",
+            "sha": "ffcc2e99395f2931d86f85de453e592393de75d8276a00bf5c1ccf983a61bf0f",
         },
     },
 }
