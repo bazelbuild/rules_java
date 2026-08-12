@@ -76,12 +76,17 @@ public final class RunfilesTest {
   @Test
   public void testCreatesManifestBasedRunfiles() throws Exception {
     Path mf = tempFile("foo.runfiles_manifest", ImmutableList.of("a/b c/d"));
+    Path dir =
+        Files.createTempDirectory(
+            FileSystems.getDefault().getPath(System.getenv("TEST_TMPDIR")), null);
+
+    // The manifest takes precedence over the runfiles directory: whoever set up the environment
+    // only names the manifest if the runfiles directory hasn't been fully materialized.
     Runfiles r =
         Runfiles.create(
             ImmutableMap.of(
-                "RUNFILES_MANIFEST_ONLY", "1",
                 "RUNFILES_MANIFEST_FILE", mf.toString(),
-                "RUNFILES_DIR", "ignored when RUNFILES_MANIFEST_ONLY=1",
+                "RUNFILES_DIR", dir.toString(),
                 "JAVA_RUNFILES", "ignored when RUNFILES_DIR has a value",
                 "TEST_SRCDIR", "should always be ignored"));
     assertThat(r.rlocation("a/b")).isEqualTo("c/d");
@@ -96,6 +101,19 @@ public final class RunfilesTest {
   }
 
   @Test
+  public void testCreatesManifestBasedRunfilesWithoutManifestOnly() throws Exception {
+    // RUNFILES_MANIFEST_ONLY is not consulted: it is derived from --enable_runfiles at analysis
+    // time, which doesn't account for how the runfiles were staged for this particular process.
+    Path mf = tempFile("foo.runfiles_manifest", ImmutableList.of("a/b c/d"));
+    Runfiles r =
+        Runfiles.create(
+            ImmutableMap.of(
+                "RUNFILES_MANIFEST_ONLY", "",
+                "RUNFILES_MANIFEST_FILE", mf.toString()));
+    assertThat(r.rlocation("a/b")).isEqualTo("c/d");
+  }
+
+  @Test
   public void testCreatesDirectoryBasedRunfiles() throws Exception {
     Path dir =
         Files.createTempDirectory(
@@ -104,7 +122,6 @@ public final class RunfilesTest {
     Runfiles r =
         Runfiles.create(
             ImmutableMap.of(
-                "RUNFILES_MANIFEST_FILE", "ignored when RUNFILES_MANIFEST_ONLY is not set to 1",
                 "RUNFILES_DIR", dir.toString(),
                 "JAVA_RUNFILES", "ignored when RUNFILES_DIR has a value",
                 "TEST_SRCDIR", "should always be ignored"));
@@ -114,12 +131,28 @@ public final class RunfilesTest {
     r =
         Runfiles.create(
             ImmutableMap.of(
-                "RUNFILES_MANIFEST_FILE", "ignored when RUNFILES_MANIFEST_ONLY is not set to 1",
                 "RUNFILES_DIR", "",
                 "JAVA_RUNFILES", dir.toString(),
                 "TEST_SRCDIR", "should always be ignored"));
     assertThat(r.rlocation("a/b")).endsWith("/a/b");
     assertThat(r.rlocation("foo")).endsWith("/foo");
+  }
+
+  @Test
+  public void testCreatesDirectoryBasedRunfilesWithMissingManifest() throws Exception {
+    // The sandbox and remote execution materialize the runfiles directory without staging the
+    // manifest, even though a launcher or parent process may have named one.
+    Path dir =
+        Files.createTempDirectory(
+            FileSystems.getDefault().getPath(System.getenv("TEST_TMPDIR")), null);
+
+    Runfiles r =
+        Runfiles.create(
+            ImmutableMap.of(
+                "RUNFILES_MANIFEST_ONLY", "1",
+                "RUNFILES_MANIFEST_FILE", dir.resolve("MANIFEST").toString(),
+                "RUNFILES_DIR", dir.toString()));
+    assertThat(r.rlocation("a/b")).isEqualTo(dir + "/a/b");
   }
 
   @Test
@@ -131,13 +164,11 @@ public final class RunfilesTest {
     Runfiles.create(
         ImmutableMap.of(
             "RUNFILES_DIR", dir.toString(),
-            "RUNFILES_MANIFEST_FILE", "ignored when RUNFILES_MANIFEST_ONLY is not set to 1",
             "TEST_SRCDIR", "should always be ignored"));
 
     Runfiles.create(
         ImmutableMap.of(
             "JAVA_RUNFILES", dir.toString(),
-            "RUNFILES_MANIFEST_FILE", "ignored when RUNFILES_MANIFEST_ONLY is not set to 1",
             "TEST_SRCDIR", "should always be ignored"));
 
     IOException e =
@@ -150,24 +181,23 @@ public final class RunfilesTest {
                         "",
                         "JAVA_RUNFILES",
                         "",
-                        "RUNFILES_MANIFEST_FILE",
-                        "ignored when RUNFILES_MANIFEST_ONLY is not set to 1",
                         "TEST_SRCDIR",
                         "should always be ignored")));
-    assertThat(e).hasMessageThat().contains("$RUNFILES_DIR and $JAVA_RUNFILES");
+    assertThat(e).hasMessageThat().contains("$RUNFILES_DIR / $JAVA_RUNFILES");
   }
 
   @Test
-  public void testFailsToCreateManifestBasedBecauseManifestDoesNotExist() {
+  public void testFailsToCreateBecauseNeitherManifestNorDirectoryExists() {
     IOException e =
         assertThrows(
             IOException.class,
             () ->
                 Runfiles.create(
                     ImmutableMap.of(
-                        "RUNFILES_MANIFEST_ONLY", "1",
-                        "RUNFILES_MANIFEST_FILE", "non-existing path")));
-    assertThat(e).hasMessageThat().contains("non-existing path");
+                        "RUNFILES_MANIFEST_FILE", "non-existing manifest",
+                        "RUNFILES_DIR", "non-existing directory")));
+    assertThat(e).hasMessageThat().contains("non-existing manifest");
+    assertThat(e).hasMessageThat().contains("non-existing directory");
   }
 
   @Test
@@ -176,15 +206,14 @@ public final class RunfilesTest {
     Map<String, String> envvars =
         Runfiles.create(
                 ImmutableMap.of(
-                    "RUNFILES_MANIFEST_ONLY", "1",
                     "RUNFILES_MANIFEST_FILE", mf.toString(),
-                    "RUNFILES_DIR", "ignored when RUNFILES_MANIFEST_ONLY=1",
-                    "JAVA_RUNFILES", "ignored when RUNFILES_DIR has a value",
                     "TEST_SRCDIR", "should always be ignored"))
             .getEnvVars();
     assertThat(envvars.keySet())
         .containsExactly(
             "RUNFILES_MANIFEST_ONLY", "RUNFILES_MANIFEST_FILE", "RUNFILES_DIR", "JAVA_RUNFILES");
+    // Subprocesses that don't check whether the runfiles directory has been materialized rely on
+    // RUNFILES_MANIFEST_ONLY to make them use the manifest.
     assertThat(envvars.get("RUNFILES_MANIFEST_ONLY")).isEqualTo("1");
     assertThat(envvars.get("RUNFILES_MANIFEST_FILE")).isEqualTo(mf.toString());
     assertThat(envvars.get("RUNFILES_DIR")).isEqualTo(tempDir.getRoot().toString());
@@ -196,10 +225,7 @@ public final class RunfilesTest {
     envvars =
         Runfiles.create(
                 ImmutableMap.of(
-                    "RUNFILES_MANIFEST_ONLY", "1",
                     "RUNFILES_MANIFEST_FILE", mf.toString(),
-                    "RUNFILES_DIR", "ignored when RUNFILES_MANIFEST_ONLY=1",
-                    "JAVA_RUNFILES", "ignored when RUNFILES_DIR has a value",
                     "TEST_SRCDIR", "should always be ignored"))
             .getEnvVars();
     assertThat(envvars.get("RUNFILES_MANIFEST_ONLY")).isEqualTo("1");
@@ -209,12 +235,30 @@ public final class RunfilesTest {
   }
 
   @Test
+  public void testManifestBasedEnvVarsPassOnTheRunfilesDirectoryFromTheEnvironment()
+      throws Exception {
+    // The runfiles directory doesn't have to be adjacent to the manifest, in which case it can only
+    // be taken from the environment.
+    Path mf = tempFile("manifest_with_unrelated_name", ImmutableList.of());
+    Path dir =
+        Files.createTempDirectory(
+            FileSystems.getDefault().getPath(System.getenv("TEST_TMPDIR")), null);
+
+    Map<String, String> envvars =
+        Runfiles.create(
+                ImmutableMap.of(
+                    "RUNFILES_MANIFEST_FILE", mf.toString(),
+                    "RUNFILES_DIR", dir.toString()))
+            .getEnvVars();
+    assertThat(envvars.get("RUNFILES_DIR")).isEqualTo(dir.toString());
+    assertThat(envvars.get("JAVA_RUNFILES")).isEqualTo(dir.toString());
+  }
+
+  @Test
   public void testDirectoryBasedEnvVars() throws Exception {
     Map<String, String> envvars =
         Runfiles.create(
                 ImmutableMap.of(
-                    "RUNFILES_MANIFEST_FILE",
-                    "ignored when RUNFILES_MANIFEST_ONLY is not set to 1",
                     "RUNFILES_DIR",
                     tempDir.getRoot().toString(),
                     "JAVA_RUNFILES",
