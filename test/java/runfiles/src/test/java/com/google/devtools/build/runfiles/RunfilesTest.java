@@ -266,9 +266,15 @@ public final class RunfilesTest {
                     "TEST_SRCDIR",
                     "should always be ignored"))
             .getEnvVars();
-    assertThat(envvars.keySet()).containsExactly("RUNFILES_DIR", "JAVA_RUNFILES");
+    assertThat(envvars.keySet())
+        .containsExactly(
+            "RUNFILES_DIR", "JAVA_RUNFILES", "RUNFILES_MANIFEST_FILE", "RUNFILES_MANIFEST_ONLY");
     assertThat(envvars.get("RUNFILES_DIR")).isEqualTo(tempDir.getRoot().toString());
     assertThat(envvars.get("JAVA_RUNFILES")).isEqualTo(tempDir.getRoot().toString());
+    // Values inherited from an ancestor process must not make a subprocess use a manifest instead
+    // of the fully materialized runfiles directory.
+    assertThat(envvars.get("RUNFILES_MANIFEST_FILE")).isEmpty();
+    assertThat(envvars.get("RUNFILES_MANIFEST_ONLY")).isEmpty();
   }
 
   @Test

@@ -528,10 +528,15 @@ public final class Runfiles {
 
     @Override
     protected Map<String, String> getEnvVars() {
-      HashMap<String, String> result = new HashMap<>(2);
+      HashMap<String, String> result = new HashMap<>(4);
       result.put("RUNFILES_DIR", runfilesRoot);
       // TODO(laszlocsomor): remove JAVA_RUNFILES once the Java launcher can pick up RUNFILES_DIR.
       result.put("JAVA_RUNFILES", runfilesRoot);
+      // Clear values inherited from an ancestor process, which describe how that process' runfiles
+      // were staged and not how this process' runfiles were. Since the variables are set to the
+      // empty string rather than to a path, a subprocess that doesn't recognize them is unaffected.
+      result.put("RUNFILES_MANIFEST_FILE", "");
+      result.put("RUNFILES_MANIFEST_ONLY", "");
       return result;
     }
   }
