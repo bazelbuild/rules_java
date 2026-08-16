@@ -91,6 +91,9 @@ def _java_toolchain_impl(ctx):
     else:
         header_compiler_direct_data = []
         header_compiler_direct_jvm_opts = []
+
+    header_compiler_direct_jvm_opts = header_compiler_direct_jvm_opts + ctx.attr.header_compiler_direct_opts
+
     if ctx.attr.oneversion_allowlist and ctx.attr.oneversion_whitelist:
         fail("oneversion_allowlist and oneversion_whitelist are mutually exclusive")
     oneversion_allowlist = ctx.file.oneversion_allowlist if ctx.file.oneversion_allowlist else ctx.file.oneversion_whitelist
@@ -586,6 +589,18 @@ Labels of data available for label-expansion in turbine_jvm_opts.
         "turbine_jvm_opts": attr.string_list(
             doc = """
 The list of arguments for the JVM when invoking turbine.
+            """,
+        ),
+        "header_compiler_direct_opts": attr.string_list(
+            doc = """
+Additional options passed to the direct header compiler, verbatim and without
+location or make-variable expansion.
+
+Warning: these are only meaningful when the direct header compiler runs on a
+JVM, such as TurbineDirect's deploy jar. A native direct header compiler such
+as turbine_direct_graal parses them as Turbine command-line options, so do not
+set JVM options (for example --sun-misc-unsafe-memory-access=allow) when a
+native direct header compiler is in use.
             """,
         ),
         "xlint": attr.string_list(
