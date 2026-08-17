@@ -489,6 +489,26 @@ def _test_java_binary_duplicate_classpath_resources_impl(env, target):
         matching.str_matches("entries must have different file names (duplicate: same.txt)"),
     )
 
+def _test_java_binary_jdeps(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/app",
+        srcs = ["App.java"],
+        resources = ["app.properties"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_jdeps_impl,
+        target = name + "/app",
+    )
+
+def _test_java_binary_jdeps_impl(env, target):
+    # should produce an app.jdeps file, not an app-class.jdeps file.
+    env.expect.that_target(target).action_generating("{package}/{name}-class.jar").contains_flag_values([
+        ("--output_deps_proto", "{bindir}/{package}/{name}.jdeps"),
+    ])
+
 def java_binary_tests(name):
     test_suite(
         name = name,
@@ -506,5 +526,6 @@ def java_binary_tests(name):
             _test_java_binary_java_package,
             _test_java_binary_rule_in_sub_directory,
             _test_java_binary_duplicate_classpath_resources,
+            _test_java_binary_jdeps,
         ],
     )
