@@ -1,9 +1,11 @@
 """Tests for the Bazel java_binary rule"""
 
+load("@bazel_features//private:util.bzl", _bazel_version_ge = "ge")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
+load("//test/java/testutil:helper.bzl", "always_passes")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:rules/template_var_info_rule.bzl", "template_var_info_rule")
 
@@ -48,6 +50,66 @@ def _test_java_binary_cross_compilation_to_unix_impl(env, target):
     assert_action.mnemonic().equals("TemplateExpand")
     assert_action.substitutions().keys().contains("%jvm_flags%")
     assert_action.inputs().contains_exactly(["java/bazel/rules/java_stub_template.txt"])
+
+def _test_java_binary_excludes_build_data(name):
+    if not _bazel_version_ge("8.0.0"):
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Main.java"],
+        exclude_build_data = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_excludes_build_data_impl,
+        target = name + "/bin",
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_java_binary_excludes_build_data_impl(env, target):
+    assert_deploy_jar_action = env.expect.that_target(target).action_generating(
+        "{package}/{name}_deploy.jar",
+    )
+
+    assert_deploy_jar_action.argv().contains("--normalize")
+    assert_deploy_jar_action.argv().contains("--exclude_build_data")
+    assert_deploy_jar_action.argv().not_contains("--build_info_file")
+    assert_deploy_jar_action.inputs().not_contains_predicate(
+        matching.file_basename_equals("non_volatile_file.properties"),
+    )
+    assert_deploy_jar_action.inputs().not_contains_predicate(
+        matching.file_basename_equals("redacted_file.properties"),
+    )
+
+def _test_java_binary_stamping_enabled_build_data_excluded_fails(name):
+    if not _bazel_version_ge("8.0.0"):
+        always_passes(name)
+        return
+
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Main.java"],
+        exclude_build_data = True,
+        stamp = 1,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_stamping_enabled_build_data_excluded_fails_impl,
+        target = name + "/bin",
+        expect_failure = True,
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_java_binary_stamping_enabled_build_data_excluded_fails_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("Enabling stamping has no effect with exclude_build_data enabled"),
+    )
 
 def _test_java_binary_javacopts_make_variable_expansion(name):
     util.helper_target(
@@ -137,6 +199,8 @@ def java_binary_tests(name):
         name = name,
         tests = [
             _test_java_binary_cross_compilation_to_unix,
+            _test_java_binary_excludes_build_data,
+            _test_java_binary_stamping_enabled_build_data_excluded_fails,
             _test_java_binary_javacopts_make_variable_expansion,
             _test_java_binary_javacopts_location_expansion,
             _test_java_binary_resource_strip_prefix,
