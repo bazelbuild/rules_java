@@ -1,6 +1,7 @@
 """Tests for the java_binary rule"""
 
 load("@bazel_features//:features.bzl", "bazel_features")
+load("@bazel_features//private:util.bzl", _bazel_version_ge = "ge")
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
@@ -67,6 +68,10 @@ def _test_stamp_conversion_does_not_override_int_impl(env, target):
     )
 
 def _test_java_binary_excludes_build_data(name):
+    if not _bazel_version_ge("8.0.0"):
+        always_passes(name)
+        return
+
     util.helper_target(
         java_binary,
         name = name + "/bin",
@@ -97,6 +102,10 @@ def _test_java_binary_excludes_build_data_impl(env, target):
     )
 
 def _test_java_binary_stamping_enabled_build_data_excluded_fails(name):
+    if not _bazel_version_ge("8.0.0"):
+        always_passes(name)
+        return
+
     util.helper_target(
         java_binary,
         name = name + "/bin",
