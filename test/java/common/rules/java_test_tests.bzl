@@ -209,6 +209,25 @@ def _test_stamp_values_impl(env, targets):
     env.expect.that_target(targets.defaultstamp).attr("stamp", factory = subjects.int).equals(0)
     env.expect.that_target(targets.autostamp).attr("stamp", factory = subjects.int).equals(-1)
 
+def _test_execution_requirements(name):
+    util.helper_target(
+        rule = java_test,
+        name = name + "/test",
+        srcs = [name + "/Test.java"],
+        execution_requirements = {"requires-network": ""},
+    )
+
+    analysis_test(
+        name = name,
+        target = name + "/test",
+        impl = _test_execution_requirements_impl,
+    )
+
+def _test_execution_requirements_impl(env, target):
+    env.expect.that_target(target).provider(testing.ExecutionInfo).requirements().contains_at_least(
+        {"requires-network": ""},
+    )
+
 def _test_mac_requires_darwin_for_execution(name):
     util.helper_target(
         rule = native.platform,
@@ -223,6 +242,7 @@ def _test_mac_requires_darwin_for_execution(name):
         rule = java_test,
         name = name + "/test",
         srcs = [name + "/Test.java"],
+        execution_requirements = {"requires-network": ""},
         use_launcher = False,
         use_testrunner = 0,
     )
@@ -252,7 +272,10 @@ def _test_mac_requires_darwin_for_execution(name):
 
 def _test_mac_requires_darwin_for_execution_impl(env, target):
     env.expect.that_target(target).provider(testing.ExecutionInfo).requirements().contains_at_least(
-        {"requires-darwin": ""},
+        {
+            "requires-darwin": "",
+            "requires-network": "",
+        },
     )
 
 def _test_java_test_sets_securiry_manager_property_jdk17(name):
@@ -405,6 +428,7 @@ def java_test_tests(name):
             _test_java_test_propagates_direct_native_libraries,
             _test_coverage_uses_coverage_runner_for_main,
             _test_stamp_values,
+            _test_execution_requirements,
             _test_mac_requires_darwin_for_execution,
             _test_java_test_sets_securiry_manager_property_jdk17,
             _test_one_version_check_java_test,

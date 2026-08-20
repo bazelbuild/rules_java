@@ -360,6 +360,12 @@ The Java class to be loaded by the test runner.<br/>
 </p>
         """,
     ),
+    "execution_requirements": attr.string_dict(
+        doc = """
+Execution requirements applied only when running the test, rather than to
+every action that builds the test target.
+        """,
+    ),
     "env_inherit": attr.string_list(),
     "_apple_constraints": attr.label_list(
         default = [

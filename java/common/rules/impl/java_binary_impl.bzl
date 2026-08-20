@@ -473,8 +473,11 @@ def _auto_create_deploy_jar(ctx, info, launcher_info, main_class, coverage_main_
 
 def _test_providers(ctx):
     test_providers = []
+    execution_requirements = dict(ctx.attr.execution_requirements)
     if helper.has_target_constraints(ctx, ctx.attr._apple_constraints):
-        test_providers.append(testing.ExecutionInfo({"requires-darwin": ""}))
+        execution_requirements["requires-darwin"] = ""
+    if execution_requirements:
+        test_providers.append(testing.ExecutionInfo(execution_requirements))
 
     test_env = {}
     test_env.update(cc_helper.get_expanded_env(ctx, {}))
