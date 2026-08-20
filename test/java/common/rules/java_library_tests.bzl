@@ -337,7 +337,7 @@ def _test_strict_java_deps_impl(env, target):
     # javac action's argv at all; the "OFF" value (which is equivalent to an unset flag) in that
     # case is injected by javac_action_subject for convenience and canonicalization.
     expect_that_javac_action = javac_action_subject.of(env, target, "{package}/lib{name}.jar")
-    expect_that_javac_action.strict_java_deps().contains_exactly([env.ctx.attr.expected_strict_java_deps])
+    expect_that_javac_action.strict_java_deps().equals(env.ctx.attr.expected_strict_java_deps)
 
 def _test_strict_java_deps_off(name):
     _test_strict_java_deps(name, "OFF")

@@ -1,15 +1,19 @@
 """Bespoke rules_testing subject for the Java compilation action"""
 
-load("@rules_testing//lib:truth.bzl", "subjects", "truth")
+load("@rules_testing//lib:truth.bzl", "subjects")
 load("@rules_testing//lib:util.bzl", "TestingAspectInfo")
 
-def _new_javac_action_subject(env, target, output):
-    action_subject = env.expect.that_target(target).action_generating(output)
+def _new_javac_action_subject(env, target, output = None, desc = ""):
+    target_subject = env.expect.that_target(target)
+    if output:
+        action_subject = target_subject.action_generating(output)
+    else:
+        action_subject = target_subject.action_named("Javac")
     self = struct(
         actual = action_subject.actual,
         parsed_flags = _parse_flags(action_subject.actual.argv),
-        meta = truth.expect(env).meta.derive(
-            "Javac",
+        meta = target_subject.meta.derive(
+            desc + ".Javac",
             format_str_kwargs = {
                 "name": target.label.name,
                 "package": target.label.package,
@@ -19,12 +23,12 @@ def _new_javac_action_subject(env, target, output):
     )
 
     public = struct(
-        direct_dependencies = lambda: _create_subject_for_flag("--direct_dependencies", self.parsed_flags, self.meta),
+        direct_dependencies = lambda: _create_subject_for_flag("--direct_dependencies", self.parsed_flags, self.meta, default = []),
         deps_artifacts = lambda: _create_subject_for_flag("--deps_artifacts", self.parsed_flags, self.meta),
         javacopts = lambda: _create_subject_for_flag("--javacopts", self.parsed_flags, self.meta),
         jar = lambda: _create_subject_for_flag("-jar", self.parsed_flags, self.meta),
         # An unset --strict_java_deps is equivalent to "OFF".
-        strict_java_deps = lambda: _create_subject_for_flag("--strict_java_deps", self.parsed_flags, self.meta, default = ["OFF"]),
+        strict_java_deps = lambda: _create_subject_for_flag("--strict_java_deps", self.parsed_flags, self.meta, default = ["OFF"]).offset(0, factory = subjects.str),
         sources = lambda: _create_subject_for_flag("--sources", self.parsed_flags, self.meta),
         resources = lambda: _create_subject_for_flag("--resources", self.parsed_flags, self.meta),
         classpath = lambda: _create_subject_for_flag("--classpath", self.parsed_flags, self.meta),
