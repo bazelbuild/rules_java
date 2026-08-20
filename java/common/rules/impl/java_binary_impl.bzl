@@ -462,6 +462,7 @@ def _auto_create_deploy_jar(ctx, info, launcher_info, main_class, coverage_main_
         build_info_files = [],
         build_target = str(ctx.label),
         output = output,
+        exclude_build_data = ctx.attr.exclude_build_data,
         one_version_level = ctx.fragments.java.one_version_enforcement_level,
         one_version_allowlist = helper.check_and_get_one_version_attribute(ctx, "_one_version_allowlist"),
         multi_release = ctx.fragments.java.multi_release_deploy_jars,

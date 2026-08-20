@@ -56,11 +56,66 @@ def _test_stamp_conversion_does_not_override_int_impl(env, target):
         "{package}/{name}_deploy.jar",
     )
 
+    assert_deploy_jar_action.argv().contains("--normalize")
+    assert_deploy_jar_action.argv().not_contains("--exclude_build_data")
+    assert_deploy_jar_action.argv().contains("--build_info_file")
     assert_deploy_jar_action.inputs().not_contains_predicate(
         matching.file_basename_equals("non_volatile_file.properties"),
     )
     assert_deploy_jar_action.inputs().contains_predicate(
         matching.file_basename_equals("redacted_file.properties"),
+    )
+
+def _test_java_binary_excludes_build_data(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Main.java"],
+        exclude_build_data = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_excludes_build_data_impl,
+        target = name + "/bin",
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_java_binary_excludes_build_data_impl(env, target):
+    assert_deploy_jar_action = env.expect.that_target(target).action_generating(
+        "{package}/{name}_deploy.jar",
+    )
+
+    assert_deploy_jar_action.argv().contains("--normalize")
+    assert_deploy_jar_action.argv().contains("--exclude_build_data")
+    assert_deploy_jar_action.argv().not_contains("--build_info_file")
+    assert_deploy_jar_action.inputs().not_contains_predicate(
+        matching.file_basename_equals("non_volatile_file.properties"),
+    )
+    assert_deploy_jar_action.inputs().not_contains_predicate(
+        matching.file_basename_equals("redacted_file.properties"),
+    )
+
+def _test_java_binary_stamping_enabled_build_data_excluded_fails(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Main.java"],
+        exclude_build_data = True,
+        stamp = 1,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_stamping_enabled_build_data_excluded_fails_impl,
+        target = name + "/bin",
+        expect_failure = True,
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_java_binary_stamping_enabled_build_data_excluded_fails_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("Enabling stamping has no effect with exclude_build_data enabled"),
     )
 
 def _test_java_binary_attributes(name):
@@ -515,6 +570,8 @@ def java_binary_tests(name):
         tests = [
             _test_java_binary_provides_binary_java_info,
             _test_stamp_conversion_does_not_override_int,
+            _test_java_binary_excludes_build_data,
+            _test_java_binary_stamping_enabled_build_data_excluded_fails,
             _test_java_binary_attributes,
             _test_java_binary_propagates_direct_native_libraries,
             _test_java_compile_only,

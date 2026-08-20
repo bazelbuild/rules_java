@@ -247,6 +247,13 @@ A list of lines to add to the <code>META-INF/manifest.mf</code> file generated f
 to <a href="make-variables.html">"Make variable"</a> substitution.
             """,
         ),
+        "exclude_build_data": attr.bool(
+            default = False,
+            doc = """
+Whether to omit the <code>build-data.properties</code> file from the
+<code>*_deploy.jar</code> output.
+            """,
+        ),
         "stamp": attr.int(
             default = -1,
             values = [-1, 0, 1],

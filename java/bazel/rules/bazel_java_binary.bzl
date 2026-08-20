@@ -122,6 +122,7 @@ def bazel_base_binary_impl(ctx, is_test_rule_class):
         main_class,
         coverage_main_class,
         info.strip_as_default,
+        exclude_build_data = ctx.attr.exclude_build_data,
         add_exports = info.add_exports,
         add_opens = info.add_opens,
     )
