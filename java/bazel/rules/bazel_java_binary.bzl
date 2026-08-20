@@ -347,6 +347,13 @@ def make_binary_rule(implementation, *, doc, attrs, executable = False, test = F
 BASE_BINARY_ATTRS = merge_attrs(
     BASIC_JAVA_BINARY_ATTRIBUTES,
     {
+        "exclude_build_data": attr.bool(
+            default = False,
+            doc = """
+Whether to omit the <code>build-data.properties</code> file from the
+<code>*_deploy.jar</code> output.
+            """,
+        ),
         "resource_strip_prefix": attr.string(
             doc = """
 The path prefix to strip from Java resources.
