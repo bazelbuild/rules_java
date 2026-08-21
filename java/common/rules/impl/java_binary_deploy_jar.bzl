@@ -32,7 +32,8 @@ def create_deploy_archives(
         one_version_level = "OFF",
         one_version_allowlist = None,
         extra_args = [],
-        extra_manifest_lines = []):
+        extra_manifest_lines = [],
+        exclude_build_data = False):
     """ Registers actions for _deploy.jar and _deploy.jar.unstripped
 
     Args:
@@ -49,6 +50,7 @@ def create_deploy_archives(
         one_version_allowlist: (File) Optional allowlist for one version check
         extra_args: (list[Args]) Optional arguments for the deploy jar action
         extra_manifest_lines: (list[String]) Optional lines added to the jar manifest
+        exclude_build_data: (bool) Whether to omit build-data.properties
     """
     classpath_resources = java_attrs.classpath_resources
 
@@ -61,7 +63,10 @@ def create_deploy_archives(
         order = "preorder",
     )
     multi_release = ctx.fragments.java.multi_release_deploy_jars
-    build_info_files = helper.get_build_info(ctx, ctx.attr.stamp)
+    if exclude_build_data and ctx.attr.stamp == 1:
+        fail("Enabling stamping has no effect with exclude_build_data enabled")
+
+    build_info_files = [] if exclude_build_data else helper.get_build_info(ctx, ctx.attr.stamp)
     build_target = str(ctx.label)
     manifest_lines = ctx.attr.deploy_manifest_lines + extra_manifest_lines
     create_deploy_archive(
@@ -75,6 +80,7 @@ def create_deploy_archives(
         build_info_files,
         build_target,
         output = ctx.outputs.deployjar,
+        exclude_build_data = exclude_build_data,
         one_version_level = one_version_level,
         one_version_allowlist = one_version_allowlist,
         multi_release = multi_release,
@@ -96,6 +102,7 @@ def create_deploy_archives(
             build_info_files,
             build_target,
             output = ctx.outputs.unstrippeddeployjar,
+            exclude_build_data = exclude_build_data,
             multi_release = multi_release,
             hermetic = hermetic,
             add_exports = add_exports,
@@ -122,7 +129,8 @@ def create_deploy_archive(
         hermetic = False,
         add_exports = [],
         add_opens = [],
-        extra_args = []):
+        extra_args = [],
+        exclude_build_data = False):
     """ Creates a deploy jar
 
     Requires a Java runtime toolchain if and only if hermetic is True.
@@ -146,6 +154,7 @@ def create_deploy_archive(
         add_exports: (depset)
         add_opens: (depset)
         extra_args: (list[Args]) Optional arguments for the deploy jar action
+        exclude_build_data: (bool) Whether to omit build-data.properties
     """
     input_files = []
     input_files.extend(build_info_files)
@@ -172,7 +181,10 @@ def create_deploy_archive(
     if main_class:
         args.add("--main_class", main_class)
     args.add_all("--deploy_manifest_lines", manifest_lines)
-    args.add_all(build_info_files, before_each = "--build_info_file")
+    if exclude_build_data:
+        args.add("--exclude_build_data")
+    else:
+        args.add_all(build_info_files, before_each = "--build_info_file")
     if launcher:
         input_files.append(launcher)
         args.add("--java_launcher", launcher)

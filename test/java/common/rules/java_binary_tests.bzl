@@ -56,6 +56,9 @@ def _test_stamp_conversion_does_not_override_int_impl(env, target):
         "{package}/{name}_deploy.jar",
     )
 
+    assert_deploy_jar_action.argv().contains("--normalize")
+    assert_deploy_jar_action.argv().not_contains("--exclude_build_data")
+    assert_deploy_jar_action.argv().contains("--build_info_file")
     assert_deploy_jar_action.inputs().not_contains_predicate(
         matching.file_basename_equals("non_volatile_file.properties"),
     )
