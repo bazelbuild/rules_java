@@ -21,7 +21,6 @@ bzl_library(
     deps = [
         ":java_helper_bzl",
         "//java/common:proguard_spec_info_bzl",
-        "@com_google_protobuf//bazel/common:proto_info_bzl",
         "@rules_cc//cc/common:cc_helper_bzl",
     ],
 )

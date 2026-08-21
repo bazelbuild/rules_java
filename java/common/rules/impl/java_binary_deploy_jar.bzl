@@ -69,7 +69,6 @@ def create_deploy_archives(
         launcher_info.launcher,
         main_class,
         coverage_main_class,
-        java_attrs.resources,
         classpath_resources,
         runtime_classpath,
         manifest_lines,
@@ -91,7 +90,6 @@ def create_deploy_archives(
             launcher_info.unstripped_launcher,
             main_class,
             coverage_main_class,
-            java_attrs.resources,
             classpath_resources,
             runtime_classpath,
             manifest_lines,
@@ -112,7 +110,6 @@ def create_deploy_archive(
         launcher,
         main_class,
         coverage_main_class,
-        resources,
         classpath_resources,
         runtime_classpath,
         manifest_lines,
@@ -135,7 +132,6 @@ def create_deploy_archive(
         launcher: (File) the launcher artifact
         main_class: (String) FQN of the entry point for execution
         coverage_main_class: (String) FQN of the entry point for coverage collection
-        resources: (Depset) resource inputs
         classpath_resources: (Depset) classpath resource inputs
         runtime_classpath: (Depset) source files to add to the jar
         build_target: (String) Name of the build target for stamping
@@ -155,7 +151,6 @@ def create_deploy_archive(
     input_files.extend(build_info_files)
 
     transitive_input_files = [
-        resources,
         classpath_resources,
         runtime_classpath,
     ]

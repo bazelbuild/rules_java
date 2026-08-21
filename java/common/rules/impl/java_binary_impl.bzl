@@ -14,7 +14,6 @@
 
 """ Implementation of java_binary for bazel """
 
-load("@com_google_protobuf//bazel/common:proto_info.bzl", "ProtoInfo")
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_cc//cc/common:cc_helper.bzl", "cc_helper")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
@@ -300,13 +299,6 @@ def _collect_attrs(ctx, runtime_classpath, classpath_resources):
     runtime_classpath_for_archive = get_runtime_classpath_for_archive(runtime_classpath, deploy_env_jars)
     runtime_jars = [ctx.outputs.classjar]
 
-    resources = [p for p in ctx.files.srcs if p.extension == "properties"]
-    transitive_resources = []
-    for r in ctx.attr.resources:
-        transitive_resources.append(
-            r[ProtoInfo].transitive_sources if ProtoInfo in r else r.files,
-        )
-
     resource_names = dict()
     for r in classpath_resources:
         if r.basename in resource_names:
@@ -318,7 +310,6 @@ def _collect_attrs(ctx, runtime_classpath, classpath_resources):
         runtime_classpath_for_archive = runtime_classpath_for_archive,
         classpath_resources = depset(classpath_resources),
         runtime_classpath = depset(order = "preorder", direct = runtime_jars, transitive = [runtime_classpath]),
-        resources = depset(resources, transitive = transitive_resources),
     )
 
 def _generate_coverage_manifest(ctx, output, runtime_classpath):
@@ -455,7 +446,6 @@ def _auto_create_deploy_jar(ctx, info, launcher_info, main_class, coverage_main_
         launcher = launcher_info.launcher,
         main_class = main_class,
         coverage_main_class = coverage_main_class,
-        resources = java_attrs.resources,
         classpath_resources = java_attrs.classpath_resources,
         runtime_classpath = runtime_classpath,
         manifest_lines = [],
