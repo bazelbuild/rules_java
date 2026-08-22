@@ -20,6 +20,7 @@ load("//java/common/rules:java_helper.bzl", "helper")
 load("//java/common/rules:java_toolchain.bzl", "JavaToolchainInfo")
 load(
     ":java_info.bzl",
+    "JavaInfo",
     "JavaPluginInfo",
     "disable_plugin_info_annotation_processing",
     "java_info_for_compilation",
@@ -165,7 +166,8 @@ def compile(
         include_compilation_info = True,
         classpath_resources = [],
         resource_jars = [],
-        injecting_rule_kind = None):
+        injecting_rule_kind = None,
+        extra_args = []):
     """Compiles Java source files/jars from the implementation of a Starlark rule
 
     The result is a provider that represents the results of the compilation and can be added to the
@@ -215,6 +217,7 @@ def compile(
         add_exports: ([str]) Allow this library to access the given <module>/<package>. Optional.
         add_opens: ([str]) Allow this library to reflectively access the given <module>/<package>.
              Optional.
+        extra_args: (list[Args]) Additional args to pass to JavaBuilder. Optional.
 
     Returns:
         (JavaInfo)
@@ -314,7 +317,30 @@ def compile(
     if uses_annotation_processing:
         generated_class_jar = _derive_output_file(ctx, output, name_suffix = "-gen")
         generated_source_jar = _derive_output_file(ctx, output, name_suffix = "-gensrc")
-    get_internal_java_common().create_compilation_action(
+
+    extra_args_list = list(extra_args)
+    unused_deps_args = ctx.actions.args()
+    resolved_unused_deps_mode = "off"
+    internal_common = get_internal_java_common()
+    repo_name = ctx.label.repo_name if hasattr(ctx.label, "repo_name") else ctx.label.workspace_name
+    if not repo_name:
+        for package_config in java_toolchain._package_configuration:
+            matched = package_config.matches(package_config.package_specs, ctx.label)
+            if matched:
+                if hasattr(package_config, "unused_deps"):
+                    resolved_unused_deps_mode = package_config.unused_deps
+
+        if resolved_unused_deps_mode == "error" and hasattr(ctx.attr, "deps"):
+            for dep in ctx.attr.deps:
+                if JavaInfo in dep:
+                    if hasattr(dep[JavaInfo], "java_outputs"):
+                        for output_info in dep[JavaInfo].java_outputs:
+                            compile_jar = output_info.compile_jar if output_info.compile_jar else output_info.class_jar
+                            if compile_jar:
+                                unused_deps_args.add("--declared_dep", compile_jar, format = "%s::" + str(dep.label))
+            extra_args_list.append(unused_deps_args)
+
+    internal_common.create_compilation_action(
         ctx,
         java_toolchain,
         output,
@@ -343,6 +369,7 @@ def compile(
         enable_direct_classpath,
         annotation_processor_additional_inputs,
         annotation_processor_additional_outputs,
+        extra_args = extra_args_list,
     )
 
     create_output_source_jar = len(source_files) > 0 or source_jars != [output_source_jar]
