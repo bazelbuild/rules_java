@@ -23,7 +23,8 @@ def import_deps_check(
         jars_to_check,
         declared_deps,
         transitive_deps,
-        rule_class):
+        rule_class,
+        checking_mode = "error"):
     """
     Creates actions that checks import deps for java rules.
 
@@ -33,6 +34,7 @@ def import_deps_check(
       declared_deps: (list[File]) A list of direct dependencies.
       transitive_deps: (list[File]) A list of transitive dependencies.
       rule_class: (String) Rule class.
+      checking_mode: (String) One of "error", "warning" or "silence".
 
     Returns:
       (File) Output file of the created action.
@@ -53,9 +55,11 @@ def import_deps_check(
         before_each = "--classpath_entry",
     )
     args.add_all(java_toolchain.bootclasspath, before_each = "--bootclasspath_entry")
-    args.add("--checking_mode=error")
+    args.add(checking_mode, format = "--checking_mode=%s")
     args.add("--jdeps_output", jdeps_output)
-    args.add("--rule_label", ctx.label)
+
+    # ctx.label can start with an @ and must not be understood as a flagfile.
+    args.add(ctx.label, format = "--rule_label=%s")
 
     semantics.update_args_for_import_deps(ctx, args)
     inputs = depset(

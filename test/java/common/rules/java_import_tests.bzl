@@ -178,6 +178,48 @@ def _test_deps_impl(env, targets):
         "{package}/depjar.jar",
     ])
 
+# Regression test for https://github.com/bazelbuild/rules_java/issues/362: every java_import
+# records a jdeps proto as its compile_jdeps so that reduced classpaths of downstream compilations
+# are not missing its transitive dependencies.
+def _test_compile_jdeps_propagated_for_deps(name):
+    util.helper_target(
+        java_import,
+        name = name + "/import-jar",
+        jars = ["import.jar"],
+        deps = [name + "/depjar"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/incomplete-jar",
+        jars = ["incomplete.jar"],
+        deps = [name + "/depjar"],
+        tags = ["incomplete-deps"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/depjar",
+        jars = ["depjar.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_jdeps_propagated_for_deps_impl,
+        targets = {
+            "incomplete_deps": name + "/incomplete-jar",
+            "with_deps": name + "/import-jar",
+            "without_deps": name + "/depjar",
+        },
+        # The rules_java Starlark implementation is used from Bazel 8 on.
+        attr_values = {"tags": ["min_bazel_8"]},
+    )
+
+def _test_compile_jdeps_propagated_for_deps_impl(env, targets):
+    for target in [targets.with_deps, targets.incomplete_deps, targets.without_deps]:
+        assert_compilation_args = java_info_subject.from_target(env, target).compilation_args()
+        assert_compilation_args.compile_time_java_dependencies().contains_exactly([
+            "{package}/_java_import/{name}/jdeps.proto",
+        ])
+
 # Regression test for b/262751943.
 def _test_commandline_contains_target_label(name):
     util.helper_target(
@@ -959,6 +1001,7 @@ def java_import_tests(name):
             _test_simple,
             _test_with_java_library,
             _test_deps,
+            _test_compile_jdeps_propagated_for_deps,
             _test_commandline_contains_target_label,
             _test_java_library_allows_import_in_deps,
             _test_module_flags,
