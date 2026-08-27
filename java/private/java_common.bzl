@@ -65,7 +65,8 @@ def _compile(
         sourcepath = [],
         resources = [],
         neverlink = False,
-        enable_annotation_processing = True):
+        enable_annotation_processing = True,
+        declared_deps = None):
     return _compile_internal(
         ctx,
         output = output,
@@ -88,6 +89,7 @@ def _compile(
         resources = resources,
         neverlink = neverlink,
         enable_annotation_processing = enable_annotation_processing,
+        declared_deps = declared_deps,
     )
 
 def _compile_header(

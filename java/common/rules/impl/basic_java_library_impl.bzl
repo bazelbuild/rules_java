@@ -151,6 +151,7 @@ def basic_java_library(
         add_opens = add_opens,
         bootclasspath = bootclasspath[BootClassPathInfo] if bootclasspath else None,
         javabuilder_jvm_flags = javabuilder_jvm_flags,
+        declared_deps = deps,
     )
     target = {"JavaInfo": java_info}
 
