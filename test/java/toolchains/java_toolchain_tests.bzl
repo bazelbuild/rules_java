@@ -7,6 +7,7 @@ load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_common.bzl", "java_common")
+load("//java/common/rules:java_package_configuration.bzl", "JavaPackageConfigurationInfo", "java_package_configuration")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:java_toolchain_info_subject.bzl", "java_toolchain_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
@@ -744,6 +745,39 @@ def _test_default_javac_opts_impl(env, target):
         "6",
     ]).in_order()
 
+def _test_java_package_configuration_unused_deps(name):
+    util.helper_target(
+        java_package_configuration,
+        name = name + "/pkg_config",
+        unused_deps = "error",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_package_configuration_unused_deps_impl,
+        target = name + "/pkg_config",
+    )
+
+def _test_java_package_configuration_unused_deps_impl(env, target):
+    info = target[JavaPackageConfigurationInfo]
+    env.expect.that_str(info.unused_deps).equals("error")
+
+def _test_java_package_configuration_default_unused_deps(name):
+    util.helper_target(
+        java_package_configuration,
+        name = name + "/pkg_config_default",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_package_configuration_default_unused_deps_impl,
+        target = name + "/pkg_config_default",
+    )
+
+def _test_java_package_configuration_default_unused_deps_impl(env, target):
+    info = target[JavaPackageConfigurationInfo]
+    env.expect.that_str(info.unused_deps).equals("off")
+
 def java_toolchain_tests(name):
     test_suite(
         name = name,
@@ -772,5 +806,7 @@ def java_toolchain_tests(name):
             _test_java_toolchain_flag_set,
             _test_default_javac_opts_depset,
             _test_default_javac_opts,
+            _test_java_package_configuration_unused_deps,
+            _test_java_package_configuration_default_unused_deps,
         ],
     )
