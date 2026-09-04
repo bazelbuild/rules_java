@@ -1,12 +1,60 @@
 """Tests for the java_single_jar rule"""
 
-load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
+load("@bazel_features//:features.bzl", "bazel_features")
+load("@rules_testing//lib:analysis_test.bzl", _analysis_test = "analysis_test")
 load("@rules_testing//lib:truth.bzl", "matching")
 load("@rules_testing//lib:util.bzl", "util")
+load("@rules_testing//lib/private:util.bzl", "get_test_name_from_function")  # buildifier: disable=bzl-visibility
 load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_single_jar.bzl", "java_single_jar")
 load("//java/common:java_semantics.bzl", "semantics")
+
+def _path_stripping_analysis_test(name, impl, config_settings = {}, **kwargs):
+    if name.endswith("_off"):
+        output_path_mode = "off"
+    elif name.endswith("_strip"):
+        output_path_mode = "strip"
+    else:
+        fail("expected test name to end with one of [_strip, _off]")
+
+    # TODO: remove once Bazel 7 is no longer supported
+    if bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        config_settings = config_settings | {
+            "//command_line_option:experimental_output_paths": output_path_mode,
+        }
+
+    _analysis_test(
+        name = name,
+        impl = lambda env, target: impl(env, target, output_path_mode),
+        config_settings = config_settings,
+        **kwargs
+    )
+
+def _path_stripping_test_suite(name, *, tests = [], test_kwargs = {}):
+    """Expands each test into 'off' and 'strip' output path mode variants"""
+    test_targets = []
+    for suffix in ["_off", "_strip"]:
+        for setup_func in tests:
+            test_name = get_test_name_from_function(setup_func) + suffix
+            setup_func(name = test_name, **test_kwargs)
+            test_targets.append(test_name)
+    native.test_suite(
+        name = name,
+        tests = test_targets,
+    )
+
+def _get_bindir_for_output_path_mode(output_path_mode):
+    # TODO: remove once Bazel 7 is no longer supported
+    if not bazel_features.rules.analysis_tests_can_transition_on_experimental_incompatible_flags:
+        return "{bindir}"
+
+    if output_path_mode == "off":
+        return "{bindir}"
+    elif output_path_mode == "strip":
+        # TODO(b/554023226): use "{cfg_stripped_bindir}" once java_single_jar opts into path stripping
+        return "{bindir}"
+    fail("unexpected output path mode: " + output_path_mode)
 
 def _test_java_single_jar_basic(name):
     util.helper_target(
@@ -15,20 +63,20 @@ def _test_java_single_jar_basic(name):
         deps = ["1.jar", "2.jar"],
     )
 
-    analysis_test(
+    _path_stripping_analysis_test(
         name = name,
         impl = _test_java_single_jar_basic_impl,
         target = name + "/jar",
     )
 
-def _test_java_single_jar_basic_impl(env, target):
+def _test_java_single_jar_basic_impl(env, target, output_path_mode):
     assert_that_action = env.expect.that_target(target).action_named("JavaSingleJar")
     assert_that_action.argv().contains_at_least([
         "--sources",
         "{package}/1.jar",
         "{package}/2.jar",
         "--output",
-        "{bindir}/{package}/{name}.jar",
+        _get_bindir_for_output_path_mode(output_path_mode) + "/{package}/{name}.jar",
         "--normalize",
         "--dont_change_compression",
         "--exclude_build_data",
@@ -43,7 +91,7 @@ def _test_java_single_jar_force_enable_stamping(name):
         exclude_build_data = False,
     )
 
-    analysis_test(
+    _path_stripping_analysis_test(
         name = name,
         impl = _test_java_single_jar_force_enable_stamping_impl,
         targets = {
@@ -52,12 +100,21 @@ def _test_java_single_jar_force_enable_stamping(name):
         },
     )
 
-def _test_java_single_jar_force_enable_stamping_impl(env, targets):
-    assert_that_action = env.expect.that_target(targets.jar).action_named("JavaSingleJar")
+def _assert_build_info_files(env, jar_target, build_info_files, output_path_mode):
+    bin_dir = _get_bindir_for_output_path_mode(output_path_mode)
+    assert_that_action = env.expect.that_target(jar_target).action_named("JavaSingleJar")
     assert_that_action.contains_flag_values([
-        ("--build_info_file", f.path)
-        for f in targets.build_info[OutputGroupInfo].non_redacted_build_info_files.to_list()
+        ("--build_info_file", bin_dir + f.path[len(f.root.path):])
+        for f in build_info_files.to_list()
     ])
+
+def _test_java_single_jar_force_enable_stamping_impl(env, targets, output_path_mode):
+    _assert_build_info_files(
+        env,
+        targets.jar,
+        targets.build_info[OutputGroupInfo].non_redacted_build_info_files,
+        output_path_mode,
+    )
 
 def _test_java_single_jar_force_disable_stamping(name):
     util.helper_target(
@@ -67,7 +124,7 @@ def _test_java_single_jar_force_disable_stamping(name):
         exclude_build_data = False,
     )
 
-    analysis_test(
+    _path_stripping_analysis_test(
         name = name,
         impl = _test_java_single_jar_force_disable_stamping_impl,
         targets = {
@@ -76,12 +133,13 @@ def _test_java_single_jar_force_disable_stamping(name):
         },
     )
 
-def _test_java_single_jar_force_disable_stamping_impl(env, targets):
-    assert_that_action = env.expect.that_target(targets.jar).action_named("JavaSingleJar")
-    assert_that_action.contains_flag_values([
-        ("--build_info_file", f.path)
-        for f in targets.build_info[OutputGroupInfo].redacted_build_info_files.to_list()
-    ])
+def _test_java_single_jar_force_disable_stamping_impl(env, targets, output_path_mode):
+    _assert_build_info_files(
+        env,
+        targets.jar,
+        targets.build_info[OutputGroupInfo].redacted_build_info_files,
+        output_path_mode,
+    )
 
 def _test_java_single_jar_stamping_enabled_build_data_excluded_fails(name):
     util.helper_target(
@@ -91,7 +149,7 @@ def _test_java_single_jar_stamping_enabled_build_data_excluded_fails(name):
         exclude_build_data = True,
     )
 
-    analysis_test(
+    _analysis_test(
         name = name,
         impl = _test_java_single_jar_stamping_enabled_build_data_excluded_fails_impl,
         target = name + "/jar",
@@ -111,7 +169,7 @@ def _test_java_single_jar_stamp_attr_auto_stamp_flag_enabled(name):
         exclude_build_data = False,
     )
 
-    analysis_test(
+    _path_stripping_analysis_test(
         name = name,
         impl = _test_java_single_jar_stamp_attr_auto_stamp_flag_enabled_impl,
         targets = {
@@ -123,12 +181,13 @@ def _test_java_single_jar_stamp_attr_auto_stamp_flag_enabled(name):
         },
     )
 
-def _test_java_single_jar_stamp_attr_auto_stamp_flag_enabled_impl(env, targets):
-    assert_that_action = env.expect.that_target(targets.jar).action_named("JavaSingleJar")
-    assert_that_action.contains_flag_values([
-        ("--build_info_file", f.path)
-        for f in targets.build_info[OutputGroupInfo].non_redacted_build_info_files.to_list()
-    ])
+def _test_java_single_jar_stamp_attr_auto_stamp_flag_enabled_impl(env, targets, output_path_mode):
+    _assert_build_info_files(
+        env,
+        targets.jar,
+        targets.build_info[OutputGroupInfo].non_redacted_build_info_files,
+        output_path_mode,
+    )
 
 def _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled(name):
     util.helper_target(
@@ -138,7 +197,7 @@ def _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled(name):
         exclude_build_data = False,
     )
 
-    analysis_test(
+    _path_stripping_analysis_test(
         name = name,
         impl = _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled_impl,
         targets = {
@@ -150,12 +209,13 @@ def _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled(name):
         },
     )
 
-def _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled_impl(env, targets):
-    assert_that_action = env.expect.that_target(targets.jar).action_named("JavaSingleJar")
-    assert_that_action.contains_flag_values([
-        ("--build_info_file", f.path)
-        for f in targets.build_info[OutputGroupInfo].redacted_build_info_files.to_list()
-    ])
+def _test_java_single_jar_stamp_attr_auto_stamp_flag_disabled_impl(env, targets, output_path_mode):
+    _assert_build_info_files(
+        env,
+        targets.jar,
+        targets.build_info[OutputGroupInfo].redacted_build_info_files,
+        output_path_mode,
+    )
 
 def _test_java_single_jar_deploy_manifest_lines(name):
     util.helper_target(
@@ -168,7 +228,7 @@ def _test_java_single_jar_deploy_manifest_lines(name):
         ],
     )
 
-    analysis_test(
+    _analysis_test(
         name = name,
         impl = _test_java_single_jar_deploy_manifest_lines_impl,
         target = name + "/jar",
@@ -216,21 +276,22 @@ def _test_java_single_jar_transitive_deploy_env(name):
         deploy_env = [name + "_inner"],
     )
 
-    analysis_test(
+    _path_stripping_analysis_test(
         name = name,
         impl = _test_java_single_jar_transitive_deploy_env_impl,
         target = name + "_outer",
     )
 
-def _test_java_single_jar_transitive_deploy_env_impl(env, target):
+def _test_java_single_jar_transitive_deploy_env_impl(env, target, output_path_mode):
+    bin_dir = _get_bindir_for_output_path_mode(output_path_mode)
     assert_that_action = env.expect.that_target(target).action_named("JavaSingleJar")
     assert_that_action.argv().contains_at_least([
         "--sources",
-        "{bindir}/{package}/lib{test_name}_lib_c.jar",
+        bin_dir + "/{package}/lib{test_name}_lib_c.jar",
         "--output",
     ])
-    assert_that_action.argv().not_contains("{bindir}/{package}/lib{test_name}_lib_a.jar")
-    assert_that_action.argv().not_contains("{bindir}/{package}/lib{test_name}_lib_b.jar")
+    assert_that_action.argv().not_contains(bin_dir + "/{package}/lib{test_name}_lib_a.jar")
+    assert_that_action.argv().not_contains(bin_dir + "/{package}/lib{test_name}_lib_b.jar")
 
 def _test_java_binary_deploy_env_with_java_single_jar(name):
     util.helper_target(
@@ -256,7 +317,7 @@ def _test_java_binary_deploy_env_with_java_single_jar(name):
         deploy_env = [name + "_single_jar"],
     )
 
-    analysis_test(
+    _analysis_test(
         name = name,
         attr_values = {"tags": ["min_bazel_8"]},  # the deploy jar was created by a separate rule in Bazel 7
         impl = _test_java_binary_deploy_env_with_java_single_jar_impl,
@@ -271,7 +332,7 @@ def _test_java_binary_deploy_env_with_java_single_jar_impl(env, target):
     assert_that_action.inputs().not_contains("{package}/lib{test_name}_lib_a.jar")
 
 def java_single_jar_tests(name):
-    test_suite(
+    _path_stripping_test_suite(
         name = name,
         tests = [
             _test_java_single_jar_basic,
