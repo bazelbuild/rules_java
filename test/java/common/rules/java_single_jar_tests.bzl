@@ -52,8 +52,7 @@ def _get_bindir_for_output_path_mode(output_path_mode):
     if output_path_mode == "off":
         return "{bindir}"
     elif output_path_mode == "strip":
-        # TODO(b/554023226): use "{cfg_stripped_bindir}" once java_single_jar opts into path stripping
-        return "{bindir}"
+        return "{cfg_stripped_bindir}"
     fail("unexpected output path mode: " + output_path_mode)
 
 def _test_java_single_jar_basic(name):

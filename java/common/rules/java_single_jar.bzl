@@ -94,6 +94,9 @@ def _bazel_java_single_jar_impl(ctx):
         progress_message = "Merging into %s" % ctx.outputs.output.short_path,
         mnemonic = "JavaSingleJar",
         executable = ctx.executable._singlejar,
+        execution_requirements = {
+            "supports-path-mapping": "1",
+        },
         use_default_shell_env = True,
     )
 
