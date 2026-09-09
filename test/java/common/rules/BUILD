@@ -55,5 +55,5 @@ util.helper_target(
         "open/one",
         "open/two",
     ],
-    visibility = ["//test/java:__subpackages__"],
+    visibility = ["//visibility:private"],
 )
