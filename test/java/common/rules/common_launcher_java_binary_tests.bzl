@@ -4,6 +4,7 @@ load("@bazel_features//:features.bzl", "bazel_features")
 load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
+load("@rules_testing//lib:truth.bzl", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
 load("//java:java_library.bzl", "java_library")
@@ -392,6 +393,86 @@ def _test_java_binary_strict_java_deps_flag_impl(env, targets):
             "{bindir}/{package}/lib{test_name}/delta-hjar.jar",
         ]).in_order()
 
+def _test_java_binary_runtime_deps_transitivity(name):
+    util.helper_target(
+        java_library,
+        name = name + "/l0",
+        srcs = ["l0.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/l1",
+        srcs = ["l1.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/l2",
+        srcs = ["l2.java"],
+        runtime_deps = [name + "/l1"],
+        deps = [name + "/l0"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/l3",
+        srcs = ["l3.java"],
+        deps = [name + "/l2"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/l4",
+        srcs = ["l4.java"],
+        deps = [name + "/l1"],
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/b1",
+        srcs = ["b1.java"],
+        deps = [name + "/l2"],
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/b2",
+        srcs = ["b2.java"],
+        runtime_deps = [name + "/l3"],
+    )
+
+    analysis_test(
+        name = name,
+        attr_values = {"tags": ["min_bazel_8"]},  # the deploy jar was created by a separate rule in Bazel 7
+        impl = _test_java_binary_runtime_deps_transitivity_impl,
+        targets = {
+            "b1": name + "/b1",
+            "b2": name + "/b2",
+        },
+    )
+
+def _expect_that_deploy_jar_action_inputs(env, target, extension):
+    action = env.expect.that_target(target).action_generating("{package}/{name}_deploy.jar")
+    return subjects.collection(
+        action.actual.inputs.to_list(),
+        meta = action.meta,
+    ).transform(
+        desc = extension + " inputs",
+        filter = lambda f: f.extension == extension,
+        format = True,
+        map_each = lambda f: f.short_path,
+    )
+
+def _test_java_binary_runtime_deps_transitivity_impl(env, targets):
+    _expect_that_deploy_jar_action_inputs(env, targets.b1, "jar").contains_exactly([
+        "{package}/lib{test_name}/l0.jar",
+        "{package}/lib{test_name}/l1.jar",
+        "{package}/lib{test_name}/l2.jar",
+        "{package}/{test_name}/b1.jar",
+    ])
+    _expect_that_deploy_jar_action_inputs(env, targets.b2, "jar").contains_exactly([
+        "{package}/lib{test_name}/l0.jar",
+        "{package}/lib{test_name}/l1.jar",
+        "{package}/lib{test_name}/l2.jar",
+        "{package}/lib{test_name}/l3.jar",
+        "{package}/{test_name}/b2.jar",
+    ])
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -409,5 +490,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_inner_class,
             _test_java_test_inner_class,
             _test_java_binary_strict_java_deps_flag,
+            _test_java_binary_runtime_deps_transitivity,
         ],
     )
