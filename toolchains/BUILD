@@ -129,6 +129,16 @@ java_runtime_files(
     srcs = ["include/openbsd/jni_md.h"],
 )
 
+java_runtime_files(
+    name = "jni_md_header-dragonfly",
+    srcs = ["include/dragonfly/jni_md.h"],
+)
+
+java_runtime_files(
+    name = "jni_md_header-netbsd",
+    srcs = ["include/netbsd/jni_md.h"],
+)
+
 # The Java native interface. Depend on this package if you #include <jni.h>.
 #
 # See test_jni in third_party/bazel/src/test/shell/bazel/bazel_java_test.sh for
@@ -139,6 +149,8 @@ cc_library(
         "@bazel_tools//src/conditions:darwin": [":jni_md_header-darwin"],
         "@bazel_tools//src/conditions:freebsd": [":jni_md_header-freebsd"],
         "@bazel_tools//src/conditions:linux": [":jni_md_header-linux"],
+        "@bazel_tools//src/conditions:netbsd": [":jni_md_header-netbsd"],
+        "@bazel_tools//src/conditions:dragonfly": [":jni_md_header-dragonfly"],
         "@bazel_tools//src/conditions:openbsd": [":jni_md_header-openbsd"],
         "@bazel_tools//src/conditions:windows": [":jni_md_header-windows"],
         "//conditions:default": [],
@@ -147,6 +159,8 @@ cc_library(
         "@bazel_tools//src/conditions:darwin": ["include/darwin"],
         "@bazel_tools//src/conditions:freebsd": ["include/freebsd"],
         "@bazel_tools//src/conditions:linux": ["include/linux"],
+        "@bazel_tools//src/conditions:netbsd": ["include/netbsd"],
+        "@bazel_tools//src/conditions:dragonfly": ["include/dragonfly"],
         "@bazel_tools//src/conditions:openbsd": ["include/openbsd"],
         "@bazel_tools//src/conditions:windows": ["include/win32"],
         "//conditions:default": [],
