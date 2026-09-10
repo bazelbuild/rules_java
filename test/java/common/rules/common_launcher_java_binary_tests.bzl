@@ -473,6 +473,53 @@ def _test_java_binary_runtime_deps_transitivity_impl(env, targets):
         "{package}/{test_name}/b2.jar",
     ])
 
+def _test_java_binary_runtime_deps_with_transitive_data(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Bin.java"],
+        runtime_deps = [name + "/lib"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["Lib.java"],
+        deps = [name + "/bundle"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/bundle",
+        data = [name + "/fava"],
+        exports = [name + "/bundle2"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/bundle2",
+        data = [name + "/extra"],
+    )
+    util.helper_target(
+        native.filegroup,
+        name = name + "/fava",
+        srcs = ["some.js"],
+    )
+    util.helper_target(
+        native.filegroup,
+        name = name + "/extra",
+        srcs = ["some.gss"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_runtime_deps_with_transitive_data_impl,
+        target = name + "/bin",
+    )
+
+def _test_java_binary_runtime_deps_with_transitive_data_impl(env, target):
+    env.expect.that_target(target).runfiles().contains_at_least([
+        "{workspace}/{package}/some.js",
+        "{workspace}/{package}/some.gss",
+    ])
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -491,5 +538,6 @@ def java_binary_launcher_tests(name):
             _test_java_test_inner_class,
             _test_java_binary_strict_java_deps_flag,
             _test_java_binary_runtime_deps_transitivity,
+            _test_java_binary_runtime_deps_with_transitive_data,
         ],
     )
