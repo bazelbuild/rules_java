@@ -16,7 +16,10 @@
 Definition of java_library rule.
 """
 
+load("@rules_runfiles_group//runfiles_group:lib.bzl", "runfiles_groups")
+load("@rules_runfiles_group//runfiles_group:providers.bzl", "RunfilesGroupInfo")
 load("//java/common/rules/impl:basic_java_library_impl.bzl", "basic_java_library", "construct_defaultinfo")
+load("//java/common/rules/impl:runfiles_group_support.bzl", "MERGE_AFFINITY", "collect_entries", "own_kind", "runfiles_groups_enabled")
 
 # copybara: default visibility
 
@@ -98,4 +101,23 @@ def bazel_java_library_rule(
     )
     target["OutputGroupInfo"] = OutputGroupInfo(**base_info.output_groups)
 
+    if not neverlink:
+        _add_runfiles_group_provider(target, ctx, base_info.runfiles, deps, exports, runtime_deps)
+
     return target
+
+def _add_runfiles_group_provider(target, ctx, own_runfiles, deps, exports, runtime_deps):
+    if not runfiles_groups_enabled(ctx):
+        return
+
+    target["RunfilesGroupInfo"] = RunfilesGroupInfo(entries = collect_entries(
+        ctx,
+        deps = [deps, exports, runtime_deps],
+        data = [getattr(ctx.attr, "data", [])],
+        own = [runfiles_groups.entry(
+            name = ctx.label,
+            content = depset(own_runfiles),
+            kind = own_kind(ctx.label),
+            merge_affinity = MERGE_AFFINITY,
+        )],
+    ))
