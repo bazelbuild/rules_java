@@ -9,22 +9,13 @@ bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "rules_cc", version = "0.2.17")
 bazel_dep(name = "bazel_features", version = "1.30.0")
 bazel_dep(name = "bazel_skylib", version = "1.6.1")
-bazel_dep(name = "protobuf", version = "32.1", repo_name = "com_google_protobuf")
+bazel_dep(name = "protobuf", version = "33.4", repo_name = "com_google_protobuf")
 bazel_dep(name = "zlib", version = "1.3.1.bcr.5")
 
 # Required by @remote_java_tools, which is loaded via module extension.
 bazel_dep(name = "rules_license", version = "0.0.3")
 bazel_dep(name = "abseil-cpp", version = "20250814.1", repo_name = "com_google_absl")
 bazel_dep(name = "re2", version = "2025-11-05.bcr.1")
-
-single_version_override(
-    module_name = "protobuf",
-    patch_strip = 1,
-    patches = [
-        "//third_party:protobuf_load-cc-rules.patch",
-    ],
-    version = "32.1",
-)
 
 register_toolchains("//toolchains:all")
 
@@ -116,6 +107,25 @@ REMOTE_JDK_REPOS = [(("remote_jdk" if version == "8" else "remotejdk") + version
 # Compatibility layer
 compat = use_extension("//java:rules_java_deps.bzl", "compatibility_proxy")
 use_repo(compat, "compatibility_proxy")
+
+java_tools_deps = use_extension("//java_tools/buildjar:deps.bzl", "java_tools_deps_ext")
+use_repo(
+    java_tools_deps,
+    "rules_java_auto_value",
+    "rules_java_auto_value_annotations",
+    "rules_java_caffeine",
+    "rules_java_error_prone",
+    "rules_java_error_prone_annotation",
+    "rules_java_error_prone_annotations",
+    "rules_java_error_prone_check_api",
+    "rules_java_gson",
+    "rules_java_guava",
+    "rules_java_jacoco_core",
+    "rules_java_javax_inject",
+    "rules_java_jsr305",
+    "rules_java_junit4",
+    "rules_java_truth",
+)
 
 # Dev dependencies
 bazel_dep(name = "rules_pkg", version = "0.9.1", dev_dependency = True)
