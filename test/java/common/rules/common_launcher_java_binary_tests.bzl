@@ -276,6 +276,47 @@ def _test_java_binary_native_library_path_includes_transitive_deps_impl(env, tar
                 "${{JAVA_RUNFILES}}/{workspace}/_solib_{cpu}/_//{package}:{test_name}/jni.so___{package}",
             ])
 
+# Regression test: the native library path separator on Windows is ";" instead of ":".
+def _test_java_binary_native_library_path_separator(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/app",
+        srcs = ["DoesNotMatter.java"],
+        deps = [
+            name + "/lib1",
+            name + "/lib2",
+        ],
+    )
+
+    # Define two native libs (in different directories so java.library.path has multiple entries).
+    util.helper_target(
+        cc_binary,
+        name = name + "/lib1",
+        srcs = ["lib1.so"],
+    )
+    util.helper_target(
+        cc_binary,
+        name = name + "/lib2",
+        srcs = ["subdir/lib2.so"],
+    )
+
+    analysis_test(
+        name = name,
+        # The Starlark rules are only used with Bazel 8 onwards.
+        attr_values = {"tags": ["min_bazel_8"]},
+        attrs = {
+            "_windows_constraints": attr.label_list(default = ["@platforms//os:windows"]),
+            "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
+        },
+        impl = _test_java_binary_native_library_path_separator_impl,
+        target = name + "/app",
+    )
+
+def _test_java_binary_native_library_path_separator_impl(env, target):
+    # We should find two libraries on java.library.path (if the correct path separator was used).
+    native_library_paths = expect_that_executable.of_target(env, target).native_library_paths()
+    native_library_paths.has_size(2)
+
 # Regression test for bug 2774317: Problems with inner classes as main class.
 def _test_java_binary_inner_class(name):
     util.helper_target(
@@ -596,6 +637,7 @@ def java_binary_launcher_tests(name):
             _test_java_test_main_class_with_dot,
             _test_java_test_has_assertions_enabled,
             _test_java_binary_native_library_path_includes_transitive_deps,
+            _test_java_binary_native_library_path_separator,
             _test_java_binary_inner_class,
             _test_java_test_inner_class,
             _test_java_binary_strict_java_deps_flag,
