@@ -129,6 +129,19 @@ java_runtime_files(
     srcs = ["include/openbsd/jni_md.h"],
 )
 
+java_runtime_files(
+    name = "jni_md_header-netbsd",
+    srcs = ["include/netbsd/jni_md.h"],
+)
+
+# Defined here rather than taken from @bazel_tools//src/conditions so that it
+# resolves with every Bazel version: @platforms//os:netbsd has been in the
+# platforms module since 0.0.11.
+config_setting(
+    name = "netbsd",
+    constraint_values = ["@platforms//os:netbsd"],
+)
+
 # The Java native interface. Depend on this package if you #include <jni.h>.
 #
 # See test_jni in third_party/bazel/src/test/shell/bazel/bazel_java_test.sh for
@@ -140,6 +153,7 @@ cc_library(
         "@bazel_tools//src/conditions:freebsd": [":jni_md_header-freebsd"],
         "@bazel_tools//src/conditions:linux": [":jni_md_header-linux"],
         "@bazel_tools//src/conditions:openbsd": [":jni_md_header-openbsd"],
+        ":netbsd": [":jni_md_header-netbsd"],
         "@bazel_tools//src/conditions:windows": [":jni_md_header-windows"],
         "//conditions:default": [],
     }),
@@ -148,6 +162,7 @@ cc_library(
         "@bazel_tools//src/conditions:freebsd": ["include/freebsd"],
         "@bazel_tools//src/conditions:linux": ["include/linux"],
         "@bazel_tools//src/conditions:openbsd": ["include/openbsd"],
+        ":netbsd": ["include/netbsd"],
         "@bazel_tools//src/conditions:windows": ["include/win32"],
         "//conditions:default": [],
     }),
