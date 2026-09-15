@@ -15,6 +15,14 @@ load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
 load("//test/java/testutil:rules/custom_library.bzl", "custom_library")
 load("//test/java/testutil:rules/forward_java_info.bzl", "java_info_forwarding_rule")
 
+# The default toolchains don't validate proguard specs, so the tests below use a
+# toolchain with a (fake) proguard_allowlister.
+_PROGUARD_ALLOWLISTER_TOOLCHAIN = {
+    "//command_line_option:extra_toolchains": [
+        str(Label("//test/java/common/rules:proguard_allowlister_toolchain_definition")),
+    ],
+}
+
 def _test_java_import_attributes(name):
     target_name = name + "/import"
     util.helper_target(
@@ -850,6 +858,7 @@ def _test_transitive_proguard_specs_are_validated(name):
     analysis_test(
         name = name,
         impl = _test_transitive_proguard_specs_are_validated_impl,
+        config_settings = _PROGUARD_ALLOWLISTER_TOOLCHAIN,
         targets = {
             "lib": target_name,
             "dep": target_name + "/transitive",
@@ -878,6 +887,7 @@ def _test_proguard_specs_are_validated(name):
     analysis_test(
         name = name,
         impl = _test_proguard_specs_are_validated_impl,
+        config_settings = _PROGUARD_ALLOWLISTER_TOOLCHAIN,
         target = target_name,
     )
 
@@ -919,6 +929,7 @@ def _test_transitive_proguard_specs_are_exported(name):
     analysis_test(
         name = name,
         impl = _test_transitive_proguard_specs_are_exported_impl,
+        config_settings = _PROGUARD_ALLOWLISTER_TOOLCHAIN,
         target = target_name,
         # Before Bazel 8, native rules use the native ProguardSpecProvider
         attr_values = {"tags": ["min_bazel_8"]},

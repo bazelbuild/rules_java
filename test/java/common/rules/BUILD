@@ -1,5 +1,7 @@
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_library.bzl", "java_library")
+load("//toolchains:default_java_toolchain.bzl", "default_java_toolchain")
 load(":add_exports_tests.bzl", "add_exports_tests")
 load(":common_launcher_java_binary_tests.bzl", "java_binary_launcher_tests")
 load(":common_launcher_java_library_tests.bzl", "java_library_launcher_tests")
@@ -55,5 +57,27 @@ util.helper_target(
         "open/one",
         "open/two",
     ],
+    visibility = ["//visibility:private"],
+)
+
+# A toolchain that validates proguard specs, for the proguard tests. The default
+# toolchains don't set proguard_allowlister.
+sh_binary(
+    name = "fake_proguard_allowlister",
+    srcs = ["fake_proguard_allowlister.sh"],
+    visibility = ["//visibility:private"],
+)
+
+default_java_toolchain(
+    name = "proguard_allowlister_toolchain",
+    proguard_allowlister = ":fake_proguard_allowlister",
+    toolchain_definition = False,
+    visibility = ["//visibility:private"],
+)
+
+toolchain(
+    name = "proguard_allowlister_toolchain_definition",
+    toolchain = ":proguard_allowlister_toolchain",
+    toolchain_type = "@bazel_tools//tools/jdk:toolchain_type",
     visibility = ["//visibility:private"],
 )

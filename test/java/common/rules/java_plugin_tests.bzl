@@ -9,6 +9,14 @@ load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//java/common:proguard_spec_info.bzl", "ProguardSpecInfo")
 load("//test/java/testutil:java_info_subject.bzl", "java_plugin_info_subject")
 
+# The default toolchains don't validate proguard specs, so the tests below use a
+# toolchain with a (fake) proguard_allowlister.
+_PROGUARD_ALLOWLISTER_TOOLCHAIN = {
+    "//command_line_option:extra_toolchains": [
+        str(Label("//test/java/common/rules:proguard_allowlister_toolchain_definition")),
+    ],
+}
+
 def _test_exposes_plugins_to_starlark(name):
     target_name = name + "/plugin"
     util.helper_target(
@@ -193,6 +201,7 @@ def _test_java_plugin_exports_transitive_proguard_specs(name):
     analysis_test(
         name = name,
         impl = _test_java_plugin_exports_transitive_proguard_specs_impl,
+        config_settings = _PROGUARD_ALLOWLISTER_TOOLCHAIN,
         target = name + "/top",
         # Before Bazel 8, native rules use the native ProguardSpecProvider
         attr_values = {"tags": ["min_bazel_8"]},
@@ -222,6 +231,7 @@ def _test_java_plugin_validates_proguard_specs(name):
     analysis_test(
         name = name,
         impl = _test_java_plugin_validates_proguard_specs_impl,
+        config_settings = _PROGUARD_ALLOWLISTER_TOOLCHAIN,
         target = name + "/plugin",
     )
 
@@ -254,6 +264,7 @@ def _test_java_plugin_validates_transitive_proguard_specs(name):
     analysis_test(
         name = name,
         impl = _test_java_plugin_validates_transitive_proguard_specs_impl,
+        config_settings = _PROGUARD_ALLOWLISTER_TOOLCHAIN,
         targets = {
             "transitive": name + "/transitive",
             "plugin": name + "/plugin",

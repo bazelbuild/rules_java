@@ -42,7 +42,7 @@ JavaToolchainInfo, _new_javatoolchaininfo = provider(
         "java_runtime": "(JavaRuntimeInfo) The java runtime information.",
         "jvm_opt": "(depset[str]) The default options for the JVM running the java compiler and associated tools.",
         "label": "(label) The toolchain label.",
-        "proguard_allowlister": "(FilesToRunProvider) The binary to validate proguard configuration.",
+        "proguard_allowlister": "(FilesToRunProvider|None) The binary to validate proguard configuration, if any.",
         "single_jar": "(FilesToRunProvider) The SingleJar executable.",
         "source_version": "(str) The java source version.",
         "target_version": "(str) The java target version.",
@@ -533,9 +533,10 @@ Configuration that should be applied to the specified package groups.
             cfg = "exec",
             executable = True,
             allow_files = True,
-            default = semantics.PROGUARD_ALLOWLISTER_LABEL,
             doc = """
-Label of the Proguard allowlister.
+Label of the Proguard allowlister, a binary that is invoked with
+`--path <spec> --output <validated spec>` to validate the `proguard_specs` of
+libraries. If unset, specs are not validated.
             """,
         ),
         "reduced_classpath_incompatible_processors": attr.string_list(

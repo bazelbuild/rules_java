@@ -25,11 +25,13 @@ def _filter_provider(provider, *attrs):
     return [dep[provider] for attr in attrs for dep in attr if provider in dep]
 
 def _validate_spec(ctx, spec_file):
+    toolchain = semantics.find_java_toolchain(ctx)
+    if not toolchain.proguard_allowlister:
+        return spec_file
+
     validated_proguard_spec = ctx.actions.declare_file(
         "validated_proguard/%s/%s_valid" % (ctx.label.name, spec_file.path),
     )
-
-    toolchain = semantics.find_java_toolchain(ctx)
 
     args = ctx.actions.args()
     args.add("--path", spec_file)
@@ -51,6 +53,9 @@ def _validate_spec(ctx, spec_file):
 def validate_proguard_specs(ctx, proguard_specs = [], transitive_attrs = []):
     """
     Creates actions that validate Proguard specification and returns ProguardSpecProvider.
+
+    If the Java toolchain doesn't provide a `proguard_allowlister`, the specs are
+    returned as they are.
 
     Use transtive_attrs parameter to collect Proguard validations from `deps`,
     `runtime_deps`, `exports`, `plugins`, and `exported_plugins` attributes.
