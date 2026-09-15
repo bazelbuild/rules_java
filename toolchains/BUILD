@@ -302,6 +302,7 @@ alias(
         "@bazel_tools//src/conditions:linux_aarch64": ":turbine_direct_graal_linux_aarch64",
         "@bazel_tools//src/conditions:windows": ":turbine_direct_graal_windows",
     }),
+    tags = ["manual"],  # So we can build //... on CI platforms that don't match
 )
 
 string_setting(
