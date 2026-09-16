@@ -296,19 +296,13 @@ def _test_no_header_compiler_header_compilation_disabled_analyzes_successfully(n
 
     analysis_test(
         name = name,
-        impl = _test_no_header_compiler_header_compilation_disabled_analyzes_successfully_impl,
+        impl = lambda unused_env, unused_target: None,  # Implicitly succeeds.
         target = name + "/a",
         config_settings = {
             "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
             "//command_line_option:java_header_compilation": "false",
         },
     )
-
-def _test_no_header_compiler_header_compilation_disabled_analyzes_successfully_impl(
-        env,  # @unused
-        target):  # @unused
-    # Implicitly succeeds.
-    pass
 
 def _test_header_compiler_builtin_processors(name):
     util.helper_target(

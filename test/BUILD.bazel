@@ -54,7 +54,7 @@ sh_test(
     name = "check_release_notes_test",
     srcs = ["check_release_notes_test.sh"],
     args = [
-        "$(location //distro:relnotes.txt)",
+        "$(rootpath //distro:relnotes.txt)",
         module_version(),
     ],
     data = ["//distro:relnotes.txt"],

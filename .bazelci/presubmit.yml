@@ -26,7 +26,7 @@ flags_workspace_integration: &flags_workspace_integration
 buildifier: latest
 
 matrix:
-  all_platforms: ["rockylinux8_arm64", "ubuntu2004", "macos", "macos_arm64", "windows"]
+  all_platforms: ["rockylinux8_arm64", "ubuntu2404", "macos", "macos_arm64", "windows"]
   bazel: ["7.x", "8.x", "9.x", "last_green"]
   modern_bazel: ["9.x", "last_green", "rolling"] # Fully supported Bazel versions
 
@@ -85,7 +85,7 @@ tasks:
   # internal tests for configs and release process
   internal_tests:
     name: "Internal tests"
-    platform: "ubuntu2004"
+    platform: "ubuntu2404"
     shell_commands:
       - "git init"
       - "git config user.name 'fake-user-for-testing'"
