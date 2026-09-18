@@ -520,6 +520,31 @@ def _test_java_binary_runtime_deps_with_transitive_data_impl(env, target):
         "{workspace}/{package}/some.gss",
     ])
 
+def _test_java_binary_runtime_deps_with_genrule(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Bin.java"],
+        runtime_deps = [name + "/langtools"],
+    )
+    util.helper_target(
+        native.genrule,
+        name = name + "/langtools",
+        outs = [name + "/langtools.jar"],
+        cmd = "",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_runtime_deps_with_genrule_impl,
+        target = name + "/bin",
+    )
+
+def _test_java_binary_runtime_deps_with_genrule_impl(env, target):
+    env.expect.that_target(target).runfiles().contains(
+        "{workspace}/{package}/{test_name}/langtools.jar",
+    )
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -539,5 +564,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_strict_java_deps_flag,
             _test_java_binary_runtime_deps_transitivity,
             _test_java_binary_runtime_deps_with_transitive_data,
+            _test_java_binary_runtime_deps_with_genrule,
         ],
     )
