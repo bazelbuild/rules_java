@@ -20,11 +20,12 @@ bazel_dep(name = "rules_java", version = "{VERSION}")
 
 **WORKSPACE setup**
 
-With Bazel 8.0.0 and before 8.3.0, add the following to your `.bazelrc` file:
+With Bazel 8.x, add the following to your `.bazelrc` file:
 
 ~~~
+# https://github.com/bazelbuild/bazel/issues/23043
 # https://github.com/bazelbuild/bazel/pull/26119
-common --repositories_without_autoloads=bazel_features_version,bazel_features_globals
+common --repositories_without_autoloads=rules_runfiles_group,bazel_features_version,bazel_features_globals
 ~~~
 
 In all cases, add the following to your `WORKSPACE` file:
