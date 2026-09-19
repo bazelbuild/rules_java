@@ -16,6 +16,7 @@
 Common code for reuse across java_* rules
 """
 
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/private:java_common.bzl", "java_common")
 load("//java/private:java_info.bzl", "JavaPluginInfo")
@@ -35,5 +36,7 @@ BASIC_JAVA_LIBRARY_IMPLICIT_ATTRS = merge_attrs(
             providers = [java_common.JavaToolchainInfo],
         ),
         "_use_auto_exec_groups": attr.bool(default = True),
+        "_coverage_includes": attr.label(default = "//java/config:coverage_includes", providers = [BuildSettingInfo]),
+        "_coverage_excludes": attr.label(default = "//java/config:coverage_excludes", providers = [BuildSettingInfo]),
     },
 )
