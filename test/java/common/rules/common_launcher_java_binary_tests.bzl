@@ -545,6 +545,43 @@ def _test_java_binary_runtime_deps_with_genrule_impl(env, target):
         "{workspace}/{package}/{test_name}/langtools.jar",
     )
 
+def _test_java_binary_runtime_deps_with_native_libraries(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Bin.java"],
+        runtime_deps = [name + "/lib"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["Foo.java"],
+        deps = [name + "/jni.so"],
+    )
+    util.helper_target(
+        cc_binary,
+        name = name + "/jni.so",
+        srcs = ["lib1.so"],
+        deps = [name + "/helper_library"],
+    )
+    util.helper_target(
+        cc_library,
+        name = name + "/helper_library",
+        srcs = ["lib2.so"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_runtime_deps_with_native_libraries_impl,
+        target = name + "/bin",
+    )
+
+def _test_java_binary_runtime_deps_with_native_libraries_impl(env, target):
+    env.expect.that_target(target).runfiles().paths().transform(
+        desc = "basenames",
+        map_each = lambda f: reversed(f.rsplit("/"))[0],
+    ).contains_at_least(["lib1.so", "lib2.so"])
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -565,5 +602,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_runtime_deps_transitivity,
             _test_java_binary_runtime_deps_with_transitive_data,
             _test_java_binary_runtime_deps_with_genrule,
+            _test_java_binary_runtime_deps_with_native_libraries,
         ],
     )
