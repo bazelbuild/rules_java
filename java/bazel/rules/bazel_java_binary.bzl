@@ -79,17 +79,15 @@ def bazel_base_binary_impl(ctx, is_test_rule_class):
         _java_runtime_version = semantics.find_java_runtime_toolchain(ctx).version
         if _java_runtime_version >= 17 and _java_runtime_version < 24:
             jvm_flags.append("-Djava.security.manager=allow")
-        test_class = ctx.attr.test_class if hasattr(ctx.attr, "test_class") else ""
-        if test_class == "":
-            test_class = helper.primary_class(ctx)
-        if test_class == None:
-            fail("cannot determine test class. You might want to rename the " +
-                 "rule or add a 'test_class' attribute.")
+        test_classes = helper.test_classes(ctx)
+        if not test_classes:
+            fail("cannot determine test class. You might want to add a " +
+                 "'test_class' or 'test_classes' attribute.")
         jvm_flags.extend([
             "-ea",
             "-D{prop_name}={prop_value}".format(
                 prop_name = semantics.TEST_SUITE_PROPERTY_NAME,
-                prop_value = helper.shell_escape(test_class),
+                prop_value = helper.shell_escape(",".join(test_classes)),
             ),
         ])
 

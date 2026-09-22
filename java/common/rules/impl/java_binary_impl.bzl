@@ -87,7 +87,14 @@ def basic_java_binary(
     if not ctx.attr.use_launcher and (ctx.attr.launcher and ctx.attr.launcher.label != semantics.LAUNCHER_FLAG_LABEL):
         fail("launcher specified but use_launcher is false")
 
-    if not ctx.attr.srcs and ctx.attr.deps:
+    if not is_test_rule_class:
+        if hasattr(ctx.attr, "test_classes") and ctx.attr.test_classes:
+            fail("in %s: 'test_classes' is not allowed on java_binary" % ctx.label)
+        if hasattr(ctx.attr, "non_test_srcs") and ctx.attr.non_test_srcs:
+            fail("in %s: 'non_test_srcs' is not allowed on java_binary" % ctx.label)
+
+    srcs = ctx.files.srcs + [src for src in getattr(ctx.files, "non_test_srcs", []) if src not in ctx.files.srcs]
+    if not srcs and ctx.attr.deps:
         fail("deps not allowed without srcs; move to runtime_deps?")
 
     module_flags = [dep[JavaInfo].module_flags_info for dep in runtime_deps if JavaInfo in dep]
@@ -103,7 +110,7 @@ def basic_java_binary(
     timezone_data = [toolchain._timezone_data] if toolchain._timezone_data else []
     target, common_info = basic_java_library(
         ctx,
-        srcs = ctx.files.srcs,
+        srcs = srcs,
         deps = deps,
         runtime_deps = runtime_deps,
         plugins = ctx.attr.plugins,

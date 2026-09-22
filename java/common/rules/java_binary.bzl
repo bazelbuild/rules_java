@@ -360,6 +360,24 @@ The Java class to be loaded by the test runner.<br/>
 </p>
         """,
     ),
+    "test_classes": attr.string_list(
+        doc = """
+The Java classes to be loaded by the test runner.
+<p>
+  By default, test classes are automatically inferred from source file names in
+  <code>srcs</code>.
+</p>
+<p>
+  Specify <code>test_classes</code> explicitly when:
+  <ul>
+    <li>The classes to run cannot be inferred from the source file names or do not
+        match the package path convention.</li>
+    <li>Only a specific subset of test classes compiled into the binary should be executed.</li>
+    <li>Test suites or base test classes are defined elsewhere.</li>
+  </ul>
+</p>
+        """,
+    ),
     "env_inherit": attr.string_list(),
     "_apple_constraints": attr.label_list(
         default = [

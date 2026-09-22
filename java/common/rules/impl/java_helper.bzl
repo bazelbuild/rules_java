@@ -88,13 +88,23 @@ def _check_and_get_main_class(ctx):
             main_class = _primary_class(ctx)
     return main_class
 
+def _canonical_class_from_target_name(ctx):
+    return _full_classname(helper.get_relative(ctx.label.package, ctx.label.name))
+
 def _primary_class(ctx):
     if ctx.attr.srcs:
         main = ctx.label.name + ".java"
-        for src in ctx.files.srcs:
+        for src in _test_srcs(ctx):
             if src.basename == main:
                 return _full_classname(_strip_extension(src))
-    return _full_classname(helper.get_relative(ctx.label.package, ctx.label.name))
+    return _canonical_class_from_target_name(ctx)
+
+def _test_srcs(ctx):
+    """Returns ctx.files.srcs excluding any files listed in non_test_srcs."""
+    if not hasattr(ctx.files, "non_test_srcs") or not ctx.files.non_test_srcs:
+        return ctx.files.srcs
+    non_test_srcs = {src: None for src in ctx.files.non_test_srcs}
+    return [src for src in ctx.files.srcs if src not in non_test_srcs]
 
 def _strip_extension(file):
     return file.dirname + "/" + (
@@ -105,6 +115,28 @@ def _strip_extension(file):
 def _full_classname(path):
     java_segments = _loading_phase_helper.java_segments(path)
     return ".".join(java_segments) if java_segments != None else None
+
+def _test_classes(ctx):
+    has_test_class = hasattr(ctx.attr, "test_class") and bool(ctx.attr.test_class)
+    has_test_classes = hasattr(ctx.attr, "test_classes") and bool(ctx.attr.test_classes)
+    if has_test_class and has_test_classes:
+        fail("in %s: cannot specify both 'test_class' and 'test_classes'" % ctx.label)
+    if has_test_class:
+        return [ctx.attr.test_class]
+    if has_test_classes:
+        return ctx.attr.test_classes
+    if ctx.attr.srcs:
+        classes = []
+        for src in _test_srcs(ctx):
+            if src.extension == "java":
+                cls = _full_classname(_strip_extension(src))
+                if cls == None:
+                    return []
+                classes.append(cls)
+        if classes:
+            return classes
+    canonical = _canonical_class_from_target_name(ctx)
+    return [canonical] if canonical != None else []
 
 def _concat(*lists):
     result = []
@@ -256,6 +288,8 @@ helper = struct(
     launcher_artifact_for_target = _launcher_artifact_for_target,
     check_and_get_main_class = _check_and_get_main_class,
     primary_class = _primary_class,
+    test_classes = _test_classes,
+    test_srcs = _test_srcs,
     strip_extension = _strip_extension,
     concat = _concat,
     get_shared_native_deps_path = _get_shared_native_deps_path,
