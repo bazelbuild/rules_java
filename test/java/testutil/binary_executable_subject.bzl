@@ -3,6 +3,7 @@
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 load("@rules_testing//lib:truth.bzl", "subjects")
 load("//java/common:java_semantics.bzl", "semantics")
+load("//java/common/rules:java_helper.bzl", "helper")
 
 def _of_target(env, target):
     executable = target[DefaultInfo].files_to_run.executable.short_path
@@ -11,7 +12,7 @@ def _of_target(env, target):
         java_start_class = lambda: _java_start_class_subject(action_subject),
         test_suite = lambda: _test_suite_subject(action_subject),
         jvm_flags = lambda: _jvm_flags_subject(action_subject),
-        native_library_paths = lambda: _native_library_paths_subject(action_subject),
+        native_library_paths = lambda: _native_library_paths_subject(env, action_subject),
     )
     return public
 
@@ -44,7 +45,8 @@ def _jvm_flags_subject(action):
             desc = "jvm_flags",
         ).offset(0, factory = subjects.str).split("\t")
 
-def _native_library_paths_subject(action):
+def _native_library_paths_subject(env, action):
+    separator = ";" if helper.is_target_platform_windows(env.ctx) else ":"
     return _jvm_flags_subject(action).transform(
         filter = lambda e: e.startswith("-Djava.library.path="),
         map_each = lambda e: e.split("=", 1)[1],
@@ -54,7 +56,7 @@ def _native_library_paths_subject(action):
         factory = lambda actual, meta: subjects.str(actual, meta.derive(
             format_str_kwargs = {"cpu": meta.ctx.attr._cc_toolchain[cc_common.CcToolchainInfo].cpu},
         )),
-    ).split(":").transform(
+    ).split(separator).transform(
         map_each = lambda e: e.replace("_U", "_").replace("_S", "/").replace("_C", ":"),
         desc = "pretty",
         format = True,

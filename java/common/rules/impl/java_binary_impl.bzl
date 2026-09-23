@@ -169,8 +169,9 @@ def basic_java_binary(
     native_libs_dirs = collect_native_deps_dirs(depset(transitive = native_libs_depsets))
     if native_libs_dirs:
         prefix = "${JAVA_RUNFILES}/" + ctx.workspace_name + "/"
+        separator = ";" if helper.is_target_platform_windows(ctx) else ":"
         jvm_flags.append("-Djava.library.path=%s" % (
-            ":".join([prefix + d for d in native_libs_dirs])
+            separator.join([prefix + d for d in native_libs_dirs])
         ))
 
     jvm_flags.extend(ctx.fragments.java.default_jvm_opts)
