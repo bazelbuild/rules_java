@@ -337,10 +337,12 @@ The Java class to be loaded by the test runner.<br/>
 <p>
   This attribute specifies the name of a Java class to be run by
   this test. It is rare to need to set this. If this argument is omitted,
-  it will be inferred using the target's <code>name</code> and its
-  source-root-relative path. If the test is located outside a known
-  source root, Bazel will report an error if <code>test_class</code>
-  is unset.
+  the test classes will be inferred from <code>srcs</code> if present, or
+  otherwise inferred using the target's <code>name</code> and its
+  source-root-relative path (which is discouraged; when <code>srcs</code> is
+  empty, prefer setting <code>test_class</code> explicitly). If the test is
+  located outside a known source root, Bazel will report an error if
+  <code>test_class</code> is unset.
 </p>
 <p>
   For JUnit3, the test class needs to either be a subclass of
@@ -365,16 +367,18 @@ The Java class to be loaded by the test runner.<br/>
 The Java classes to be loaded by the test runner.
 <p>
   By default, test classes are automatically inferred from source file names in
-  <code>srcs</code>.
+  <code>srcs</code>. Setting <code>test_classes</code> is generally discouraged:
+  prefer listing test sources directly in <code>srcs</code> and omitting
+  <code>test_classes</code>. In particular, specifying <code>test_classes</code>
+  when <code>srcs</code> is non-empty is discouraged, and placing test sources in
+  a separate <code>java_library</code> with <code>test_classes</code> risks
+  silently skipping newly added test files unless they are also manually listed
+  in <code>test_classes</code>.
 </p>
 <p>
-  Specify <code>test_classes</code> explicitly when:
-  <ul>
-    <li>The classes to run cannot be inferred from the source file names or do not
-        match the package path convention.</li>
-    <li>Only a specific subset of test classes compiled into the binary should be executed.</li>
-    <li>Test suites or base test classes are defined elsewhere.</li>
-  </ul>
+  Specify <code>test_classes</code> only when <code>srcs</code> is empty and the
+  test target runs multiple pre-compiled test classes from <code>deps</code> or
+  <code>runtime_deps</code>.
 </p>
         """,
     ),
