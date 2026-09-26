@@ -124,5 +124,14 @@ This corresponds to the javac and JVM --add-opens= flags.
         """,
     ),
     "licenses": attr.license() if hasattr(attr, "license") else attr.string_list(),
+    "runfiles_weight": attr.int(
+        default = 0,
+        doc = """
+Weight hint for the target's runfiles group entry. If set to a value greater
+than 0, this weight is attached to the target's runfiles group to help packaging
+rules make informed merge decisions. Intended to be set by dependency management
+rulesets (e.g. rules_jvm_external) using actual jar byte sizes.
+        """,
+    ),
     "_java_toolchain_type": attr.label(default = semantics.JAVA_TOOLCHAIN_TYPE),
 }

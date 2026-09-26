@@ -22,6 +22,8 @@ bzl_library(
         ":java_helper_bzl",
         "//java/common:proguard_spec_info_bzl",
         "@rules_cc//cc/common:cc_helper_bzl",
+        "@rules_runfiles_group//runfiles_group:lib",
+        "@rules_runfiles_group//runfiles_group:providers",
     ],
 )
 
