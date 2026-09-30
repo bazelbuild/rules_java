@@ -38,6 +38,7 @@ bzl_library(
     visibility = ["//visibility:public"],
     deps = [
         "@bazel_features//:features",
+        "@rules_cc//cc:action_names_bzl",
         "@rules_cc//cc/common:cc_helper_bzl",
     ],
 )
