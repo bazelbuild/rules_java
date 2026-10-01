@@ -105,7 +105,6 @@ _RELEASE_CONFIGS = {
     "27": {
         "zulu": {
             "release": "27.28.101-ca-jdk27.0.0",
-            "mirrored": False,
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -114,7 +113,6 @@ _RELEASE_CONFIGS = {
         },
         "adoptium": {
             "release": "27+35",
-            "mirrored": False,
             "platforms": {
                 "linux": ["ppc64le", "riscv64", "s390x"],
             },
@@ -216,9 +214,6 @@ def _flatten_configs():
                     else:
                         fail("unexpected distribution:", distrib)
 
-                    # Only include a mirror after the archives have been mirrored.
-                    if not distrib_cfg.get("mirrored", True):
-                        urls = urls[:1]
                     result.append(struct(
                         name = name,
                         version = version,
