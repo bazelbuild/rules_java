@@ -396,6 +396,16 @@ RELEASES = (8, 9, 10, 11, 17, 21, 25)
     for release in RELEASES
 ]
 
+# The default configuration runs javac on JDK 25, which rejects source/target 27.
+# Use JDK 27 here without changing the compiler JDK for older language versions.
+default_java_toolchain(
+    name = "toolchain_jdk_27",
+    configuration = DEFAULT_TOOLCHAIN_CONFIGURATION,
+    java_runtime = ":remotejdk_27",
+    source_version = "27",
+    target_version = "27",
+)
+
 default_java_toolchain(
     name = "prebuilt_toolchain",
     configuration = PREBUILT_TOOLCHAIN_CONFIGURATION,
@@ -424,6 +434,12 @@ java_runtime_version_alias(
 java_runtime_version_alias(
     name = "remotejdk_25",
     runtime_version = "remotejdk_25",
+    visibility = ["//visibility:public"],
+)
+
+java_runtime_version_alias(
+    name = "remotejdk_27",
+    runtime_version = "remotejdk_27",
     visibility = ["//visibility:public"],
 )
 

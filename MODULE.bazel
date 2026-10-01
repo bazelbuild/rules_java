@@ -101,6 +101,16 @@ JDKS = {
         "win",
         "win_arm64",
     ],
+    "27": [
+        "linux",
+        "linux_aarch64",
+        "linux_ppc64le",
+        "linux_riscv64",
+        "linux_s390x",
+        "macos",
+        "macos_aarch64",
+        "win",
+    ],
 }
 
 REMOTE_JDK_REPOS = [(("remote_jdk" if version == "8" else "remotejdk") + version + "_" + platform) for version in JDKS for platform in JDKS[version]]

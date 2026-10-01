@@ -102,6 +102,24 @@ _RELEASE_CONFIGS = {
             },
         },
     },
+    "27": {
+        "zulu": {
+            "release": "27.28.101-ca-jdk27.0.0",
+            "mirrored": False,
+            "platforms": {
+                "linux": ["aarch64", "x86_64"],
+                "macos": ["aarch64", "x86_64"],
+                "windows": ["x86_64"],
+            },
+        },
+        "adoptium": {
+            "release": "27+35",
+            "mirrored": False,
+            "platforms": {
+                "linux": ["ppc64le", "riscv64", "s390x"],
+            },
+        },
+    },
 }
 
 _STRIP_PREFIX_OVERRIDES = {
@@ -197,6 +215,10 @@ def _flatten_configs():
                         urls, strip_prefix = _adoptopenjdk_remote_jdk_repo(version, os, cpu, release)
                     else:
                         fail("unexpected distribution:", distrib)
+
+                    # Only include a mirror after the archives have been mirrored.
+                    if not distrib_cfg.get("mirrored", True):
+                        urls = urls[:1]
                     result.append(struct(
                         name = name,
                         version = version,
