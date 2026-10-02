@@ -232,12 +232,16 @@ def _test_java_binary_native_library_path_includes_transitive_deps(name):
         name = name + "/app",
         srcs = ["DoesNotMatter.java"],
         deps = [name + "/jni.so"],
+        # Launchers can contribute extra native deps, affecting test expectations.
+        use_launcher = False,
     )
     util.helper_target(
         java_binary,
         name = name + "/runtime_app",
         srcs = ["AlsoDoesNotMatter.java"],
         runtime_deps = [name + "/jni.so"],
+        # Launchers can contribute extra native deps, affecting test expectations.
+        use_launcher = False,
     )
     util.helper_target(
         cc_binary,
@@ -286,6 +290,8 @@ def _test_java_binary_native_library_path_separator(name):
             name + "/lib1",
             name + "/lib2",
         ],
+        # Launchers can contribute extra native deps, affecting test expectations.
+        use_launcher = False,
     )
 
     # Define two native libs (in different directories so java.library.path has multiple entries).

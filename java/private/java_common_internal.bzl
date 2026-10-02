@@ -516,7 +516,12 @@ def collect_native_deps_dirs(libraries):
     Returns:
         ([String]) A set of root-relative paths as a list
     """
-    return get_internal_java_common().collect_native_deps_dirs(libraries)
+    dirs = {}
+    for library in libraries.to_list():
+        dylib = library.dynamic_library
+        if dylib:
+            dirs[paths.dirname(dylib.short_path)] = None
+    return dirs.keys()
 
 def get_runtime_classpath_for_archive(jars, excluded_jars):
     """Filters a classpath to remove certain entries
