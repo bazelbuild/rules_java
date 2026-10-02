@@ -22,7 +22,6 @@ load("//java/common/rules/impl:basic_java_library_impl.bzl", "basic_java_library
 load("//java/private:java_common.bzl", "java_common")
 load(
     "//java/private:java_common_internal.bzl",
-    "collect_native_deps_dirs",
     "get_runtime_classpath_for_archive",
 )
 load("//java/private:java_info.bzl", "JavaCompilationInfo", "JavaInfo", "to_java_binary_info")
@@ -166,7 +165,7 @@ def basic_java_binary(
                 native_libs_depsets.append(dep[CcInfo]._legacy_transitive_native_libraries)
             else:
                 native_libs_depsets.append(dep[CcInfo].transitive_native_libraries())
-    native_libs_dirs = collect_native_deps_dirs(depset(transitive = native_libs_depsets))
+    native_libs_dirs = _collect_native_deps_dirs(depset(transitive = native_libs_depsets))
     if native_libs_dirs:
         prefix = "${JAVA_RUNFILES}/" + ctx.workspace_name + "/"
         separator = ";" if helper.is_target_platform_windows(ctx) else ":"
@@ -468,6 +467,22 @@ def _auto_create_deploy_jar(ctx, info, launcher_info, main_class, coverage_main_
         add_opens = info.add_opens,
     )
     return output
+
+def _collect_native_deps_dirs(libraries):
+    result = {}
+    for library_to_link in libraries.to_list():
+        candidate = None
+        if library_to_link.interface_library:
+            candidate = library_to_link.interface_library
+        elif library_to_link.dynamic_library:
+            candidate = library_to_link.dynamic_library
+        if candidate:
+            ext = "." + candidate.extension
+            if ext in cc_helper.extensions.INTERFACE_SHARED_LIBRARY:
+                continue
+            parent_dir = candidate.short_path[:-(1 + len(candidate.basename))]
+            result[parent_dir] = None
+    return result.keys()
 
 def _test_providers(ctx):
     test_providers = []

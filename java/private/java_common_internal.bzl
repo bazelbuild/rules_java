@@ -507,17 +507,6 @@ def target_kind(target):
     """
     return get_internal_java_common().target_kind(target)
 
-def collect_native_deps_dirs(libraries):
-    """Collect the set of root-relative paths containing native libraries
-
-    Args:
-        libraries: (depset[LibraryToLink]) set of native libraries
-
-    Returns:
-        ([String]) A set of root-relative paths as a list
-    """
-    return get_internal_java_common().collect_native_deps_dirs(libraries)
-
 def get_runtime_classpath_for_archive(jars, excluded_jars):
     """Filters a classpath to remove certain entries
 
