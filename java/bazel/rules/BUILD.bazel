@@ -36,6 +36,8 @@ bzl_library(
         "@bazel_skylib//lib:paths",
         "@rules_cc//cc:find_cc_toolchain_bzl",
         "@rules_cc//cc/common",
+        "@rules_runfiles_group//runfiles_group:lib",
+        "@rules_runfiles_group//runfiles_group:providers",
     ],
 )
 

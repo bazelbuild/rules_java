@@ -23,6 +23,8 @@ bzl_library(
         "//java/common:proguard_spec_info_bzl",
         "@rules_cc//cc:action_names_bzl",  # TODO: remove after https://github.com/bazelbuild/rules_cc/issues/913 is fixed
         "@rules_cc//cc/common:cc_helper_bzl",
+        "@rules_runfiles_group//runfiles_group:lib",
+        "@rules_runfiles_group//runfiles_group:providers",
     ],
 )
 
