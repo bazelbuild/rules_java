@@ -27,7 +27,7 @@ buildifier: latest
 
 matrix:
   all_platforms: ["rockylinux8_arm64", "ubuntu2404", "macos", "macos_arm64", "windows"]
-  bazel: ["7.x", "8.x", "9.x", "last_green"]
+  bazel: ["8.x", "9.x", "last_green"]
   modern_bazel: ["9.x", "last_green", "rolling"] # Fully supported Bazel versions
 
 tasks:
@@ -47,15 +47,6 @@ tasks:
     test_targets: *test_targets
     test_flags:
     - "--test_tag_filters=-min_bazel_9"
-# Bazel 7.x
-  build_and_test_bazel7:
-    name: "Bazel 7.x"
-    bazel: "7.x"
-    platform: ${{ all_platforms }}
-    build_targets: *build_targets
-    test_targets: *test_targets
-    test_flags:
-      - "--test_tag_filters=-min_bazel_8,-min_bazel_9"
 
 # Integration tests
   integration_build_and_test:
