@@ -318,7 +318,6 @@ def _test_java_binary_deploy_env_with_java_single_jar(name):
 
     _analysis_test(
         name = name,
-        attr_values = {"tags": ["min_bazel_8"]},  # the deploy jar was created by a separate rule in Bazel 7
         impl = _test_java_binary_deploy_env_with_java_single_jar_impl,
         target = name + "_bin",
     )

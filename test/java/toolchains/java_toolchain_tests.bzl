@@ -111,8 +111,6 @@ def _test_singlejar_get_command_line(name):
         config_settings = {
             "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
         },
-        # This crashes in earlier Bazel versions where native rules handled deploy jars differently.
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_singlejar_get_command_line_impl(env, target):
@@ -697,7 +695,6 @@ def _test_default_javac_opts_depset(name):
         name = name,
         impl = _test_default_javac_opts_depset_impl,
         target = name + "/alias",
-        attr_values = {"tags": ["min_bazel_8"]},
         config_settings = {
             "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
         },
@@ -727,7 +724,6 @@ def _test_default_javac_opts(name):
         config_settings = {
             "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
         },
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_default_javac_opts_impl(env, target):

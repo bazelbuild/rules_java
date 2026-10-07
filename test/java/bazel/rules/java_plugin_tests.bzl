@@ -25,8 +25,6 @@ def _test_java_plugin_javacopts_make_variable_expansion(name):
         name = name,
         impl = _test_java_plugin_javacopts_make_variable_expansion_impl,
         target = name + "/plug",
-        # Broken by Starlarkification in the embedded rules in Bazel 7
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_java_plugin_javacopts_make_variable_expansion_impl(env, target):

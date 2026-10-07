@@ -194,8 +194,6 @@ def _test_java_plugin_exports_transitive_proguard_specs(name):
         name = name,
         impl = _test_java_plugin_exports_transitive_proguard_specs_impl,
         target = name + "/top",
-        # Before Bazel 8, native rules use the native ProguardSpecProvider
-        attr_values = {"tags": ["min_bazel_8"]},
         provider_subject_factories = [struct(
             type = ProguardSpecInfo,
             name = "ProguardInfo",

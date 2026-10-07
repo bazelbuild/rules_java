@@ -782,8 +782,6 @@ def _test_compile_strict_deps_enum(name):
         impl = _test_compile_strict_deps_enum_impl,
         target = name + "/custom",
         expect_failure = True,
-        # This is a crash in earlier Bazel versions (i.e. native rules)
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_compile_strict_deps_enum_impl(env, target):

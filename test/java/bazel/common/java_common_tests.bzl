@@ -20,8 +20,6 @@ def _test_java_common_pack_sources_with_external_resource(name):
         name = name,
         impl = _test_java_common_pack_sources_with_external_resource_impl,
         target = name + "/custom",
-        # Bazel 7 names external repos differently
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_java_common_pack_sources_with_external_resource_impl(env, target):

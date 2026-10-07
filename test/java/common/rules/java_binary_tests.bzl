@@ -47,8 +47,6 @@ def _test_stamp_conversion_does_not_override_int(name):
         config_settings = {
             "//command_line_option:stamp": False,
         },
-        # deploy jars are in a separate rule in Bazel 7, Bazel 6 generated build-info differently
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_stamp_conversion_does_not_override_int_impl(env, target):

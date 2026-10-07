@@ -1130,8 +1130,6 @@ def _transitive_native_libraries_test(name):
         name = name,
         impl = _transitive_native_libraries_test_impl,
         target = target_name,
-        # LibraryToLink.library_indentifier only available from Bazel 8
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _transitive_native_libraries_test_impl(env, target):
@@ -1191,8 +1189,6 @@ def _native_libraries_propagation_test(name):
         name = name,
         impl = _native_libraries_propagation_test_impl,
         target = target_name,
-        # LibraryToLink.library_identifier only available from Bazel 8
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _native_libraries_propagation_test_impl(env, target):

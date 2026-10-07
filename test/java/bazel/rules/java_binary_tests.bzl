@@ -67,7 +67,6 @@ def _test_java_binary_excludes_build_data(name):
         name = name,
         impl = _test_java_binary_excludes_build_data_impl,
         target = name + "/bin",
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_java_binary_excludes_build_data_impl(env, target):
@@ -103,7 +102,6 @@ def _test_java_binary_stamping_enabled_build_data_excluded_fails(name):
         impl = _test_java_binary_stamping_enabled_build_data_excluded_fails_impl,
         target = name + "/bin",
         expect_failure = True,
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_java_binary_stamping_enabled_build_data_excluded_fails_impl(env, target):
@@ -131,8 +129,6 @@ def _test_java_binary_javacopts_make_variable_expansion(name):
         name = name,
         impl = _test_java_binary_javacopts_make_variable_expansion_impl,
         target = name + "/bin",
-        # Broken by Starlarkification in the embedded rules in Bazel 7
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_java_binary_javacopts_make_variable_expansion_impl(env, target):

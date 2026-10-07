@@ -25,8 +25,6 @@ def _test_custom_singlejar(name):
         config_settings = {
             "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
         },
-        # Starlark rules are only used with Bazel 8 onwards.
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_custom_singlejar_impl(env, target):

@@ -21,8 +21,6 @@ def _test_import_deps_checker_checking_mode(name):
         name = name,
         impl = _test_import_deps_checker_checking_mode_impl,
         target = name + "/import-jar",
-        # The rules_java Starlark implementation is used from Bazel 8 on.
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_import_deps_checker_checking_mode_impl(env, target):

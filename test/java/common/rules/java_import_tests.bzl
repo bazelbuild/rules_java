@@ -209,8 +209,6 @@ def _test_compile_jdeps_propagated_for_deps(name):
             "with_deps": name + "/import-jar",
             "without_deps": name + "/depjar",
         },
-        # The rules_java Starlark implementation is used from Bazel 8 on.
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_compile_jdeps_propagated_for_deps_impl(env, targets):
@@ -350,8 +348,6 @@ def _test_srcjar_added_to_validation_output_group(name):
         name = name,
         impl = _test_srcjar_added_to_validation_output_group_impl,
         target = name + "/libraryjar_with_srcjar",
-        # Starlark rules are only used with Bazel 8 onwards.
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_srcjar_added_to_validation_output_group_impl(env, target):
@@ -920,8 +916,6 @@ def _test_transitive_proguard_specs_are_exported(name):
         name = name,
         impl = _test_transitive_proguard_specs_are_exported_impl,
         target = target_name,
-        # Before Bazel 8, native rules use the native ProguardSpecProvider
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_transitive_proguard_specs_are_exported_impl(env, target):

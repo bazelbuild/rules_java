@@ -58,7 +58,6 @@ def _test_java_binary_resources_only(name):
 
     analysis_test(
         name = name,
-        attr_values = {"tags": ["min_bazel_8"]},  # the deploy jar was created by a separate rule in Bazel 7
         config_settings = {
             "//command_line_option:extra_toolchains": [Label(name + "/toolchain")],
         },
@@ -94,7 +93,6 @@ def _test_java_binary_deploy_jar_coverage_setup(name):
 
     analysis_test(
         name = name,
-        attr_values = {"tags": ["min_bazel_8"]},  # the deploy jar was created by a separate rule in Bazel 7
         config_settings = {
             "//command_line_option:collect_code_coverage": True,
         },
@@ -302,8 +300,6 @@ def _test_java_binary_native_library_path_separator(name):
 
     analysis_test(
         name = name,
-        # The Starlark rules are only used with Bazel 8 onwards.
-        attr_values = {"tags": ["min_bazel_8"]},
         attrs = {
             "_windows_constraints": attr.label_list(default = ["@platforms//os:windows"]),
             "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
@@ -479,7 +475,6 @@ def _test_java_binary_runtime_deps_transitivity(name):
 
     analysis_test(
         name = name,
-        attr_values = {"tags": ["min_bazel_8"]},  # the deploy jar was created by a separate rule in Bazel 7
         impl = _test_java_binary_runtime_deps_transitivity_impl,
         targets = {
             "b1": name + "/b1",

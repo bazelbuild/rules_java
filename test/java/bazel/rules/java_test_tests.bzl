@@ -22,7 +22,6 @@ def _test_deduced_test_class(name):
         name = name,
         impl = _test_deduced_test_class_impl,
         target = name + "/foo",
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_deduced_test_class_impl(env, target):
@@ -71,7 +70,6 @@ def _test_test_classes(name):
         name = name,
         impl = _test_test_classes_impl,
         target = name + "/foo",
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_test_classes_impl(env, target):
@@ -108,7 +106,6 @@ def _test_both_test_class_and_test_classes_fails(name):
         impl = _test_both_test_class_and_test_classes_fails_impl,
         target = name + "/foo",
         expect_failure = True,
-        attr_values = {"tags": ["min_bazel_8"]},
     )
 
 def _test_both_test_class_and_test_classes_fails_impl(env, target):
