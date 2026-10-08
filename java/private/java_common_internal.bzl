@@ -165,7 +165,9 @@ def compile(
         include_compilation_info = True,
         classpath_resources = [],
         resource_jars = [],
-        injecting_rule_kind = None):
+        injecting_rule_kind = None,
+        coverage_includes = [],
+        coverage_excludes = []):
     """Compiles Java source files/jars from the implementation of a Starlark rule
 
     The result is a provider that represents the results of the compilation and can be added to the
@@ -215,6 +217,8 @@ def compile(
         add_exports: ([str]) Allow this library to access the given <module>/<package>. Optional.
         add_opens: ([str]) Allow this library to reflectively access the given <module>/<package>.
              Optional.
+        coverage_includes: (list[str]) A list of patterns to include in code coverage. Optional.
+        coverage_excludes: (list[str]) A list of patterns to exclude from code coverage. Optional.
 
     Returns:
         (JavaInfo)
@@ -343,6 +347,8 @@ def compile(
         enable_direct_classpath,
         annotation_processor_additional_inputs,
         annotation_processor_additional_outputs,
+        coverage_includes,
+        coverage_excludes,
     )
 
     create_output_source_jar = len(source_files) > 0 or source_jars != [output_source_jar]
