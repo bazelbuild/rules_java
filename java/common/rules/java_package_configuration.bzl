@@ -28,6 +28,7 @@ JavaPackageConfigurationInfo = provider(
         "matches",
         "package_specs",
         "system",
+        "unused_deps",
     ],
 )
 
@@ -50,6 +51,7 @@ def _rule_impl(ctx):
             matches = _matches,
             package_specs = package_specs,
             system = system,
+            unused_deps = ctx.attr.unused_deps,
         ),
     ]
 
@@ -116,6 +118,13 @@ The list of files needed by this configuration at runtime.
             providers = [BootClassPathInfo],
             doc = """
 Corresponds to javac's --system flag.
+""",
+        ),
+        "unused_deps": attr.string(
+            default = "off",
+            values = ["off", "error"],
+            doc = """
+Unused dependencies checking mode.
 """,
         ),
         # buildifier: disable=attr-licenses

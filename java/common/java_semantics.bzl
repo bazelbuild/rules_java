@@ -128,5 +128,6 @@ semantics = struct(
     update_args_for_import_deps = _update_args_for_import_deps,
     expand_javacopts_make_variables = True,
     java_toolchain_supports_one_version = _bazel_version_ge("8.0.0"),  # can be dropped once we no longer support Bazel 7
+    create_compilation_action_supports_extra_args = _bazel_version_ge("10.0.0-pre"),
     TEST_SUITE_PROPERTY_NAME = "bazel.test_suite",
 )
