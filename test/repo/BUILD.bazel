@@ -61,7 +61,7 @@ sh_test(
 
 default_java_toolchain(
     name = "my_funky_toolchain",
-    bootclasspath = ["@bazel_tools//tools/jdk:platformclasspath"],
+    bootclasspath = ["@rules_java//toolchains:platformclasspath"],
     configuration = NONPREBUILT_TOOLCHAIN_CONFIGURATION,
     exec_compatible_with = [
         "@platforms//os:linux",

@@ -82,7 +82,7 @@ def _tokenize_javacopts(opts):
     return result
 
 semantics = struct(
-    JAVA_TOOLCHAIN_LABEL = "@bazel_tools//tools/jdk:current_java_toolchain",
+    JAVA_TOOLCHAIN_LABEL = "@rules_java//toolchains:current_java_toolchain",  # copybara-use-repo-external-label
     JAVA_TOOLCHAIN_TYPE = "@bazel_tools//tools/jdk:toolchain_type",
     JAVA_TOOLCHAIN = config_common.toolchain_type("@bazel_tools//tools/jdk:toolchain_type", mandatory = True),
     find_java_toolchain = _find_java_toolchain,
