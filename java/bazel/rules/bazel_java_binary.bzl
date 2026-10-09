@@ -26,6 +26,11 @@ load("//java/common/rules:rule_util.bzl", "merge_attrs")
 load("//java/common/rules/impl:java_binary_deploy_jar.bzl", "create_deploy_archives")
 load("//java/common/rules/impl:java_binary_impl.bzl", "basic_java_binary", "binary_provider_helper")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
+load(
+    "//java/common/rules/impl:runfiles_group_support.bzl",
+    "BINARY_RUNFILES_GROUP_ATTRS",
+    "describer_attrs",
+)
 load("//java/private:java_info.bzl", "JavaInfo")
 
 def _bazel_java_binary_impl(ctx):
@@ -378,6 +383,16 @@ logic as the Java package of source files. For example, a source file at
             executable = True,
         ),
     } if not bazel_features.rules._has_launcher_maker_toolchain else {},
+    describer_attrs(
+        Label("//java/common/rules/impl:java_binary_runfiles_group_describer"),
+        BINARY_RUNFILES_GROUP_ATTRS,
+    ),
+    {
+        # The JDK as one runfiles group, shared by every binary in the configuration.
+        "_runfiles_group_java_runtime": attr.label(
+            default = Label("//java/common/rules/impl:runfiles_group_java_runtime"),
+        ),
+    },
 )
 
 def make_java_binary(executable):

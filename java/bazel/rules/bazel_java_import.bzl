@@ -18,7 +18,9 @@ Definition of java_import rule.
 
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules:java_import.bzl", "JAVA_IMPORT_ATTRS")
+load("//java/common/rules:rule_util.bzl", "merge_attrs")
 load("//java/common/rules/impl:bazel_java_import_impl.bzl", "bazel_java_import_rule")
+load("//java/common/rules/impl:runfiles_group_support.bzl", "LIBRARY_RUNFILES_GROUP_ATTRS", "describer_attrs")
 load("//java/private:java_info.bzl", "JavaInfo")
 
 def _proxy(ctx):
@@ -59,7 +61,13 @@ java_import = rule(
 </code>
 </pre>
     """,
-    attrs = JAVA_IMPORT_ATTRS,
+    attrs = merge_attrs(
+        JAVA_IMPORT_ATTRS,
+        describer_attrs(
+            Label("//java/common/rules/impl:java_import_runfiles_group_describer"),
+            LIBRARY_RUNFILES_GROUP_ATTRS,
+        ),
+    ),
     provides = [JavaInfo],
     fragments = ["java", "cpp"],
     toolchains = [semantics.JAVA_TOOLCHAIN],
