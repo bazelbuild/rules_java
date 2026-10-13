@@ -176,8 +176,9 @@ def _get_android_lint_tool(ctx):
         fail(ctx.attr.android_lint_runner.label, "does not refer to a valid executable target")
     return struct(
         tool = files_to_run,
+        tools = depset(ctx.files.android_lint_tools),
         data = depset(ctx.files.android_lint_data),
-        jvm_opts = depset([ctx.expand_location(opt, ctx.attr.android_lint_data) for opt in ctx.attr.android_lint_jvm_opts]),
+        jvm_opts = depset([ctx.expand_location(opt, ctx.attr.android_lint_tools) for opt in ctx.attr.android_lint_jvm_opts]),
         lint_opts = [ctx.expand_location(opt, ctx.attr.android_lint_data) for opt in ctx.attr.android_lint_opts],
         package_config = [dep[JavaPackageConfigurationInfo] for dep in ctx.attr.android_lint_package_configuration],
     )
@@ -294,6 +295,13 @@ java_toolchain(
     # buildifier: disable=attr-licenses
     attrs = {
         "android_lint_data": attr.label_list(
+            cfg = "exec",
+            allow_files = True,
+            doc = """
+Labels of files available for label-expansion in android_lint_opts.
+            """,
+        ),
+        "android_lint_tools": attr.label_list(
             cfg = "exec",
             allow_files = True,
             doc = """

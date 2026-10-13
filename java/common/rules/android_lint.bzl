@@ -82,7 +82,7 @@ def _android_lint_action(ctx, source_files, source_jars, compilation_info, is_li
     executable = linter.tool.executable
     transitive_inputs = []
     if executable.extension != "jar":
-        tools = [linter.tool]
+        tools = [linter.tool, linter.tools]
         transitive_inputs.append(linter.data)
         args_list = [args]
     else:
@@ -91,7 +91,7 @@ def _android_lint_action(ctx, source_files, source_jars, compilation_info, is_li
         jvm_args.add_all(linter.jvm_opts)
         jvm_args.add("-jar", executable)
         executable = java_runtime.java_executable_exec_path
-        tools = [java_runtime.files, linter.tool.executable]
+        tools = [java_runtime.files, linter.tool.executable, linter.tools]
         transitive_inputs.append(linter.data)
         args_list = [jvm_args, args]
 
