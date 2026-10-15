@@ -5,6 +5,7 @@ load(":common_launcher_java_binary_tests.bzl", "java_binary_launcher_tests")
 load(":common_launcher_java_library_tests.bzl", "java_library_launcher_tests")
 load(":deploy_archive_builder_tests.bzl", "deploy_archive_builder_test_suite")
 load(":java_binary_tests.bzl", "java_binary_tests")
+load(":java_helper_tests.bzl", "java_helper_test_suite")
 load(":java_import_tests.bzl", "java_import_tests")
 load(":java_launcher_tests.bzl", "java_launcher_tests")
 load(":java_library_tests.bzl", "java_library_tests")
@@ -16,6 +17,8 @@ load(":merge_attrs_tests.bzl", "merge_attrs_test_suite")
 package(default_applicable_licenses = ["@rules_java//:license"])
 
 deploy_archive_builder_test_suite(name = "deploy_archive_builder_tests")
+
+java_helper_test_suite(name = "java_helper_tests")
 
 merge_attrs_test_suite(name = "merge_attrs_tests")
 

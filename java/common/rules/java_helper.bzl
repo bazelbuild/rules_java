@@ -22,6 +22,16 @@ load("//java/common:java_semantics.bzl", "semantics")
 def _java_segments(path):
     if path.startswith("/"):
         fail("path must not be absolute: '%s'" % path)
+    if path.startswith("third_party/java/"):
+        # For third_party/java, try skipping past the first two segments and looking for a nested
+        # source root, to relativize e.g. third_party/java/foo/java/resource into 'resource',
+        # not 'foo/java/resource'.
+        segments = _java_segments_impl(path[len("third_party/java/"):])
+        if segments != None:
+            return segments
+    return _java_segments_impl(path)
+
+def _java_segments_impl(path):
     segments = path.split("/")
     root_idx = -1
     for idx, segment in enumerate(segments):
