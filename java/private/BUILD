@@ -76,7 +76,7 @@ bzl_library(
     name = "android_support",
     srcs = ["android_support.bzl"],
     visibility = ["//visibility:public"],
-    deps = ["@compatibility_proxy//:proxy_bzl"],
+    deps = [":internals"],
 )
 
 filegroup(

@@ -13,8 +13,10 @@
 # limitations under the License.
 """Legacy support for the android rules."""
 
-load("@compatibility_proxy//:proxy.bzl", "java_info_to_implicit_exportable")
+load(":java_info.bzl", _java_info_to_implicit_exportable = "to_implicit_exportable")
+
+# copybara: android_support visibility
 
 android_support = struct(
-    enable_implicit_sourceless_deps_exports_compatibility = java_info_to_implicit_exportable,
+    enable_implicit_sourceless_deps_exports_compatibility = _java_info_to_implicit_exportable,
 )
