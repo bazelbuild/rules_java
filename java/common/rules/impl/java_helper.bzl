@@ -289,7 +289,6 @@ helper = struct(
     check_and_get_main_class = _check_and_get_main_class,
     primary_class = _primary_class,
     test_classes = _test_classes,
-    test_srcs = _test_srcs,
     strip_extension = _strip_extension,
     concat = _concat,
     get_shared_native_deps_path = _get_shared_native_deps_path,
