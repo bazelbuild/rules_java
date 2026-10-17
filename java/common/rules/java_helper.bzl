@@ -19,27 +19,27 @@ load("//java/common:java_semantics.bzl", "semantics")
 
 # copybara: rules_java visibility
 
-def _java_segments(path):
+def _java_segment_index(path):
     if path.startswith("/"):
         fail("path must not be absolute: '%s'" % path)
+    segments = path.split("/")
     if path.startswith("third_party/java/"):
         # For third_party/java, try skipping past the first two segments and looking for a nested
         # source root, to relativize e.g. third_party/java/foo/java/resource into 'resource',
         # not 'foo/java/resource'.
-        segments = _java_segments_impl(path[len("third_party/java/"):])
-        if segments != None:
-            return segments
-    return _java_segments_impl(path)
+        idx = _java_segment_index_impl(segments[2:])
+        if idx >= 0:
+            return idx + 2
+    return _java_segment_index_impl(segments)
 
-def _java_segments_impl(path):
-    segments = path.split("/")
+def _java_segment_index_impl(segments):
     root_idx = -1
     for idx, segment in enumerate(segments):
         if segment in ["java", "javatests", "src", "testsrc"]:
             root_idx = idx
             break
     if root_idx < 0:
-        return None
+        return -1
     is_src = "src" == segments[root_idx]
     check_mvn_idx = root_idx if is_src else -1
     if (root_idx == 0 or is_src):
@@ -59,7 +59,23 @@ def _java_segments_impl(path):
             next = segments[check_mvn_idx + 2]
             if next in ["java", "resources"]:
                 root_idx = check_mvn_idx + 2
-    return segments[(root_idx + 1):]
+    return root_idx
+
+def _java_segments(path):
+    idx = _java_segment_index(path)
+    return path.split("/")[(idx + 1):] if idx >= 0 else None
+
+def _java_path(path):
+    java_segments = _java_segments(path)
+    return "/".join(java_segments) if java_segments != None else None
+
+def _java_root(path):
+    idx = _java_segment_index(path)
+    return "/".join(path.split("/")[:(idx + 1)]) if idx >= 0 else None
+
+def _full_classname(path):
+    java_segments = _java_segments(path)
+    return ".".join(java_segments) if java_segments != None else None
 
 def _has_target_constraints(ctx, constraints):
     # Constraints is a label_list.
@@ -219,4 +235,7 @@ helper = struct(
     get_relative = _get_relative,
     has_target_constraints = _has_target_constraints,
     java_segments = _java_segments,
+    java_path = _java_path,
+    java_root = _java_root,
+    full_classname = _full_classname,
 )

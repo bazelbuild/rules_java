@@ -92,6 +92,7 @@ filegroup(
     srcs = [
         "BUILD",
         ":core_rules",
+        ":java_helper_bzl",
         ":java_single_jar_bzl",
         ":toolchain_rules",
         "//java/common/rules/impl:for_bazel_tests",

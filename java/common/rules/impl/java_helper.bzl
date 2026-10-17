@@ -89,14 +89,14 @@ def _check_and_get_main_class(ctx):
     return main_class
 
 def _canonical_class_from_target_name(ctx):
-    return _full_classname(helper.get_relative(ctx.label.package, ctx.label.name))
+    return _loading_phase_helper.full_classname(helper.get_relative(ctx.label.package, ctx.label.name))
 
 def _primary_class(ctx):
     if ctx.attr.srcs:
         main = ctx.label.name + ".java"
         for src in _test_srcs(ctx):
             if src.basename == main:
-                return _full_classname(_strip_extension(src))
+                return _loading_phase_helper.full_classname(_strip_extension(src))
     return _canonical_class_from_target_name(ctx)
 
 def _test_srcs(ctx):
@@ -111,11 +111,6 @@ def _strip_extension(file):
         file.basename[:-(1 + len(file.extension))] if file.extension else file.basename
     )
 
-# TODO(b/465048589): once out of builtins, create a canonical implementation and remove duplicates in depot
-def _full_classname(path):
-    java_segments = _loading_phase_helper.java_segments(path)
-    return ".".join(java_segments) if java_segments != None else None
-
 def _test_classes(ctx):
     has_test_class = hasattr(ctx.attr, "test_class") and bool(ctx.attr.test_class)
     has_test_classes = hasattr(ctx.attr, "test_classes") and bool(ctx.attr.test_classes)
@@ -129,7 +124,7 @@ def _test_classes(ctx):
         classes = []
         for src in _test_srcs(ctx):
             if src.extension == "java":
-                cls = _full_classname(_strip_extension(src))
+                cls = _loading_phase_helper.full_classname(_strip_extension(src))
                 if cls == None:
                     return []
                 classes.append(cls)
@@ -310,4 +305,8 @@ helper = struct(
     get_build_info = _get_build_info,
     get_relative = _loading_phase_helper.get_relative,
     has_target_constraints = _loading_phase_helper.has_target_constraints,
+    java_segments = _loading_phase_helper.java_segments,
+    java_path = _loading_phase_helper.java_path,
+    java_root = _loading_phase_helper.java_root,
+    full_classname = _loading_phase_helper.full_classname,
 )
