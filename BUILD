@@ -19,6 +19,7 @@ filegroup(
         "MODULE.bazel",
         "WORKSPACE",
         "//java:srcs",
+        "//java_tools/buildjar:srcs",
         "//toolchains:srcs",
     ],
     visibility = ["//visibility:public"],
