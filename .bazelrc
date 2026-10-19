@@ -1,6 +1,6 @@
 common --incompatible_disallow_empty_glob
 
-# Use hermetic JDKs for testing and ensure compatibliity with Java 8.
+# Use hermetic JDKs for testing and ensure compatibility with Java 8.
 common --java_language_version=8
 common --java_runtime_version=remotejdk_8
 common --tool_java_language_version=8
