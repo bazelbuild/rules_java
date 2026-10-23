@@ -68,8 +68,11 @@ filegroup(
         ["lib/**", "release"],
         allow_empty = True,
         exclude = [
+            # keep-sorted start
+            "lib/**/man/**",
             "lib/missioncontrol/**",
             "lib/visualvm/**",
+            # keep-sorted end
         ],
     ),
 )
