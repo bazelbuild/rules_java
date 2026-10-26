@@ -68,6 +68,22 @@ def _test_incompatible_language_version_bootclasspath_enabled_unversioned_impl(e
     system_path = target[java_common.BootClassPathInfo]._system_path
     env.expect.that_str(system_path).contains("local_jdk")
 
+def _test_incompatible_language_version_bootclasspath_enabled_default_language_version(name):
+    analysis_test(
+        name = name,
+        impl = _test_incompatible_language_version_bootclasspath_enabled_default_language_version_impl,
+        target = Label("//toolchains:platformclasspath"),
+        config_settings = {
+            "//command_line_option:java_language_version": "",
+            "//command_line_option:java_runtime_version": "remotejdk_17",
+            str(Label("//toolchains:incompatible_language_version_bootclasspath")): True,
+        },
+    )
+
+def _test_incompatible_language_version_bootclasspath_enabled_default_language_version_impl(env, target):
+    system_path = target[java_common.BootClassPathInfo]._system_path
+    env.expect.that_str(system_path).contains("remotejdk11_")
+
 def _test_jdk8_uses_tree_artifact(name):
     analysis_test(
         name = name,
@@ -123,6 +139,7 @@ def bootclasspath_tests(name):
             _test_incompatible_language_version_bootclasspath_disabled,
             _test_incompatible_language_version_bootclasspath_enabled_versioned,
             _test_incompatible_language_version_bootclasspath_enabled_unversioned,
+            _test_incompatible_language_version_bootclasspath_enabled_default_language_version,
             _test_jdk8_uses_tree_artifact,
             _test_jdk11_uses_source_launcher,
         ],

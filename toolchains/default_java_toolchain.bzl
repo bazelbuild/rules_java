@@ -15,7 +15,11 @@
 """Rules for defining default_java_toolchain"""
 
 load("//java/toolchains:java_toolchain.bzl", "java_toolchain")
-load(":bootclasspath.bzl", _bootclasspath = "bootclasspath")
+load(
+    ":bootclasspath.bzl",
+    _DEFAULT_JAVA_LANGUAGE_VERSION = "DEFAULT_JAVA_LANGUAGE_VERSION",
+    _bootclasspath = "bootclasspath",
+)
 
 # JVM options, without patching java.compiler and jdk.compiler modules.
 BASE_JDK9_JVM_OPTS = [
@@ -69,10 +73,6 @@ DEFAULT_JAVACOPTS = [
     # we need to make sure not to filter any warnings so that Bazel can trigger them as errors.
     "-Xmaxwarns -1",
 ]
-
-# If this is changed, the docs for "{,tool_}java_language_version" also
-# need to be updated in the Bazel user manual
-_DEFAULT_JAVA_LANGUAGE_VERSION = "11"
 
 # Default java_toolchain parameters
 _BASE_TOOLCHAIN_CONFIGURATION = dict(

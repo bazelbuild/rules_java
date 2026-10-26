@@ -20,6 +20,10 @@ load(":utf8_environment.bzl", "Utf8EnvironmentInfo")
 
 visibility("private")
 
+# If this is changed, the docs for "{,tool_}java_language_version" also
+# need to be updated in the Bazel user manual
+DEFAULT_JAVA_LANGUAGE_VERSION = "11"
+
 # TODO: This provider and is only necessary since --java_{language,runtime}_version
 # are not available directly to Starlark.
 _JavaVersionsInfo = provider(
@@ -66,6 +70,9 @@ def _get_bootstrap_runtime_version(*, java_language_version, java_runtime_versio
     Otherwise, the language version replaces the numeric part of the runtime version, e.g.,
     "remotejdk_17" becomes "remotejdk_8".
     """
+    if java_language_version == "":
+        java_language_version = DEFAULT_JAVA_LANGUAGE_VERSION
+
     prefix, separator, version = java_runtime_version.rpartition("_")
     if version and version.isdigit():
         new_version = java_language_version
