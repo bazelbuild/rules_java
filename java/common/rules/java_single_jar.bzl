@@ -91,7 +91,7 @@ def _bazel_java_single_jar_impl(ctx):
         inputs = depset(build_info_files, transitive = [inputs]),
         outputs = [ctx.outputs.output],
         arguments = [args],
-        progress_message = "Merging into %s" % ctx.outputs.output.short_path,
+        progress_message = "Merging into %{output}",
         mnemonic = "JavaSingleJar",
         executable = ctx.executable._singlejar,
         execution_requirements = {

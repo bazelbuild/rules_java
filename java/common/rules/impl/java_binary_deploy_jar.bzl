@@ -235,7 +235,7 @@ def create_deploy_archive(
 
     ctx.actions.run(
         mnemonic = "JavaDeployJar",
-        progress_message = "Building deploy jar %s" % output.short_path,
+        progress_message = "Building deploy jar %{output}",
         executable = single_jar,
         inputs = inputs,
         tools = [single_jar],
