@@ -44,7 +44,7 @@ filegroup(
 # `--java_runtime_version`.
 bool_flag(
     name = "incompatible_language_version_bootclasspath",
-    build_setting_default = False,
+    build_setting_default = True,
     visibility = ["//visibility:private"],
 )
 
