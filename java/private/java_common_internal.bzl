@@ -20,6 +20,7 @@ load("//java/common/rules:java_helper.bzl", "helper")
 load("//java/common/rules:java_toolchain.bzl", "JavaToolchainInfo")
 load(
     ":java_info.bzl",
+    "JavaInfo",
     "JavaPluginInfo",
     "disable_plugin_info_annotation_processing",
     "java_info_for_compilation",
@@ -134,6 +135,37 @@ def _validate_strict_deps(strict_deps):
         fail("Got an invalid value for strict_deps:", strict_deps, "must be one of:", _STRICT_DEPS_VALUES)
     return strict_deps
 
+def _get_extra_args(ctx, java_toolchain, declared_deps):
+    if not semantics.create_compilation_action_supports_extra_args or not declared_deps:
+        return {}
+
+    matching_modes = {}
+    for package_config in java_toolchain._package_configuration:
+        if package_config.matches(package_config.package_specs, ctx.label):
+            if package_config.unused_deps_mode:
+                matching_modes[package_config.unused_deps_mode] = True
+
+    if not matching_modes:
+        resolved_unused_deps_mode = "off"
+    elif len(matching_modes) == 1:
+        resolved_unused_deps_mode = matching_modes.keys()[0]
+    else:
+        fail("Conflicting unused_deps_mode configurations for target %s: found %s" % (
+            ctx.label,
+            ", ".join(sorted(matching_modes.keys())),
+        ))
+
+    if resolved_unused_deps_mode == "off":
+        return {}
+
+    unused_deps_args = ctx.actions.args()
+    unused_deps_args.add("--experimental_check_unused_deps", resolved_unused_deps_mode.upper())
+    for dep in declared_deps:
+        label = dep.label if hasattr(dep, "label") else dep
+        unused_deps_args.add("--target_declared_deps", str(label))
+
+    return {"extra_args": [unused_deps_args]}
+
 def compile(
         ctx,
         output,
@@ -165,7 +197,8 @@ def compile(
         include_compilation_info = True,
         classpath_resources = [],
         resource_jars = [],
-        injecting_rule_kind = None):
+        injecting_rule_kind = None,
+        declared_deps = None):
     """Compiles Java source files/jars from the implementation of a Starlark rule
 
     The result is a provider that represents the results of the compilation and can be added to the
@@ -214,6 +247,8 @@ def compile(
         injecting_rule_kind: (str|None)
         add_exports: ([str]) Allow this library to access the given <module>/<package>. Optional.
         add_opens: ([str]) Allow this library to reflectively access the given <module>/<package>.
+             Optional.
+        declared_deps: ([Target|Label|str]) The list of declared dependencies for unused dependency checking.
              Optional.
 
     Returns:
@@ -314,6 +349,7 @@ def compile(
     if uses_annotation_processing:
         generated_class_jar = _derive_output_file(ctx, output, name_suffix = "-gen")
         generated_source_jar = _derive_output_file(ctx, output, name_suffix = "-gensrc")
+
     get_internal_java_common().create_compilation_action(
         ctx,
         java_toolchain,
@@ -343,6 +379,7 @@ def compile(
         enable_direct_classpath,
         annotation_processor_additional_inputs,
         annotation_processor_additional_outputs,
+        **_get_extra_args(ctx, java_toolchain, declared_deps)
     )
 
     create_output_source_jar = len(source_files) > 0 or source_jars != [output_source_jar]
