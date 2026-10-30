@@ -16,6 +16,7 @@
 Common code for reuse across java_* rules
 """
 
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//java/common/rules:android_lint.bzl", "android_lint_subrule")
 load("//java/private:boot_class_path_info.bzl", "BootClassPathInfo")
@@ -151,6 +152,8 @@ def basic_java_library(
         add_opens = add_opens,
         bootclasspath = bootclasspath[BootClassPathInfo] if bootclasspath else None,
         javabuilder_jvm_flags = javabuilder_jvm_flags,
+        coverage_includes = ctx.attr._coverage_includes[BuildSettingInfo].value,
+        coverage_excludes = ctx.attr._coverage_excludes[BuildSettingInfo].value,
     )
     target = {"JavaInfo": java_info}
 
