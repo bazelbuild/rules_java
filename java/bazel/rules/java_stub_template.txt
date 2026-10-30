@@ -193,15 +193,26 @@ if is_windows; then
 fi
 
 export JAVA_RUNFILES
-export RUNFILES_MANIFEST_FILE="${JAVA_RUNFILES}/MANIFEST"
-export RUNFILES_MANIFEST_ONLY=%runfiles_manifest_only%
+# Runfiles libraries look up the runfiles directory in RUNFILES_DIR; JAVA_RUNFILES is only still
+# exported for the benefit of this script and of tools that predate RUNFILES_DIR.
+export RUNFILES_DIR="$JAVA_RUNFILES"
+# %runfiles_manifest_only% is derived from --enable_runfiles, which doesn't account for the runfiles
+# directory being materialized by the sandbox or by remote execution. Only ask subprocesses to use
+# the manifest if it has actually been staged, and tell them to use the runfiles directory otherwise.
+if [[ "%runfiles_manifest_only%" == 1 && -e "${JAVA_RUNFILES}/MANIFEST" ]]; then
+  export RUNFILES_MANIFEST_FILE="${JAVA_RUNFILES}/MANIFEST"
+  export RUNFILES_MANIFEST_ONLY=1
+else
+  export RUNFILES_MANIFEST_FILE=
+  export RUNFILES_MANIFEST_ONLY=
+fi
 
 if [ -z "$RUNFILES_MANIFEST_ONLY" ]; then
   function rlocation() {
     if [[ "$1" = /* ]]; then
       echo $1
     else
-      echo "$(dirname $RUNFILES_MANIFEST_FILE)/$1"
+      echo "${JAVA_RUNFILES}/$1"
     fi
   }
 else
