@@ -63,6 +63,14 @@ filegroup(
 )
 
 filegroup(
+    name = "jdk-legal",
+    srcs = glob(
+        ["legal/**"],
+        allow_empty = True,
+    ),
+)
+
+filegroup(
     name = "jdk-lib",
     srcs = glob(
         ["lib/**", "release"],
