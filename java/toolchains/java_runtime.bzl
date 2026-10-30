@@ -13,7 +13,7 @@
 # limitations under the License.
 """java_runtime rule"""
 
-load("@compatibility_proxy//:proxy.bzl", _java_runtime = "java_runtime")
+load("//java/common/rules:java_runtime.bzl", _java_runtime = "java_runtime")
 
 def java_runtime(**attrs):
     """Bazel java_runtime rule.

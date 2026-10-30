@@ -13,7 +13,7 @@
 # limitations under the License.
 """java_toolchain rule"""
 
-load("@compatibility_proxy//:proxy.bzl", _java_toolchain = "java_toolchain")
+load("//java/common/rules:java_toolchain.bzl", _java_toolchain = "java_toolchain")
 
 def java_toolchain(**attrs):
     """Bazel java_toolchain rule.
