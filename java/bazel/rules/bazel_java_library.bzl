@@ -19,8 +19,10 @@ Definition of java_library rule.
 load("//java/common:java_semantics.bzl", "semantics")
 load("//java/common/rules:android_lint.bzl", "android_lint_subrule")
 load("//java/common/rules:java_library.bzl", "JAVA_LIBRARY_ATTRS")
+load("//java/common/rules:rule_util.bzl", "merge_attrs")
 load("//java/common/rules/impl:bazel_java_library_impl.bzl", "bazel_java_library_rule")
 load("//java/private:java_info.bzl", "JavaInfo")
+load(":runfiles_group_support.bzl", "describer_attrs")
 
 def _proxy(ctx):
     return bazel_java_library_rule(
@@ -53,7 +55,10 @@ java_library = rule(
     jar").</li>
 </ul>
     """,
-    attrs = JAVA_LIBRARY_ATTRS,
+    attrs = merge_attrs(
+        JAVA_LIBRARY_ATTRS,
+        describer_attrs(Label("//java/bazel/rules:java_library_runfiles_group_describer")),
+    ),
     provides = [JavaInfo],
     outputs = {
         "classjar": "lib%{name}.jar",
