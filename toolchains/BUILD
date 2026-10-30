@@ -20,6 +20,7 @@ load(
     "java_runtime_version_alias",
     "java_toolchain_alias",
 )
+load(":java_toolchain_type.bzl", "java_toolchain_type")
 load(":utf8_environment.bzl", "utf8_environment")
 
 package(
@@ -60,8 +61,7 @@ bool_flag(
 #
 # Obtain the associated JavaToolchainInfo via:
 #   ctx.toolchains["@bazel_tools//tools/jdk:toolchain_type"].java
-# TODO: migrate away from using @bazel_tools//tools/jdk:toolchain_type ?
-# toolchain_type(name = "toolchain_type")
+java_toolchain_type(name = "toolchain_type")
 
 # The Java runtime that executable Java compilation outputs (e.g., java_binary with
 # create_executable = True) will run on.
@@ -72,8 +72,7 @@ bool_flag(
 #
 # Obtain the associated JavaRuntimeInfo via:
 #   ctx.toolchains["@bazel_tools//tools/jdk:runtime_toolchain_type"].java_runtime
-# TODO: migrate away from using @bazel_tools//tools/jdk:runtime_toolchain_type ?
-# toolchain_type(name = "runtime_toolchain_type")
+java_toolchain_type(name = "runtime_toolchain_type")
 
 # The Java runtime to extract the bootclasspath from that is then used to compile Java sources.
 #
@@ -84,8 +83,7 @@ bool_flag(
 #
 # Toolchains of this type are only consumed internally by the bootclasspath rule and should not be
 # accessed from Starlark.
-# TODO: migrate away from using @bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type ?
-# toolchain_type(name = "bootstrap_runtime_toolchain_type")
+java_toolchain_type(name = "bootstrap_runtime_toolchain_type")
 
 # Points to toolchain[":runtime_toolchain_type"] (was :legacy_current_java_runtime)
 java_runtime_alias(name = "current_java_runtime")
