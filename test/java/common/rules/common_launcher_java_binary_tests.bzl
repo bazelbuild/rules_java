@@ -7,6 +7,7 @@ load("@rules_testing//lib:analysis_test.bzl", "analysis_test", "test_suite")
 load("@rules_testing//lib:truth.bzl", "subjects")
 load("@rules_testing//lib:util.bzl", "util")
 load("//java:java_binary.bzl", "java_binary")
+load("//java:java_import.bzl", "java_import")
 load("//java:java_library.bzl", "java_library")
 load("//java:java_test.bzl", "java_test")
 load("//java/common/rules:java_helper.bzl", "helper")
@@ -618,6 +619,31 @@ def _test_java_binary_runtime_deps_with_native_libraries_impl(env, target):
         map_each = lambda f: reversed(f.rsplit("/"))[0],
     ).contains_at_least(["lib1.so", "lib2.so"])
 
+def _test_java_binary_runtime_deps_with_java_import(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Bin.java"],
+        deps = [name + "/import"],
+    )
+    util.helper_target(
+        java_import,
+        name = name + "/import",
+        jars = ["import.jar"],
+        runtime_deps = ["runtime.jar"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_runtime_deps_with_java_import_impl,
+        target = name + "/bin",
+    )
+
+def _test_java_binary_runtime_deps_with_java_import_impl(env, target):
+    env.expect.that_target(target).runfiles().contains(
+        "{workspace}/{package}/runtime.jar",
+    )
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -640,5 +666,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_runtime_deps_with_transitive_data,
             _test_java_binary_runtime_deps_with_genrule,
             _test_java_binary_runtime_deps_with_native_libraries,
+            _test_java_binary_runtime_deps_with_java_import,
         ],
     )
