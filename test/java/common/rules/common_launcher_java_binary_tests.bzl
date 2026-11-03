@@ -644,6 +644,38 @@ def _test_java_binary_runtime_deps_with_java_import_impl(env, target):
         "{workspace}/{package}/runtime.jar",
     )
 
+def _test_java_binary_runtime_deps_are_not_on_classpath(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Bin.java"],
+        runtime_deps = [name + "/runtime_dep"],
+        deps = [name + "/compile_dep"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/compile_dep",
+        srcs = ["Compile.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/runtime_dep",
+        srcs = ["Runtime.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_runtime_deps_are_not_on_classpath_impl,
+        target = name + "/bin",
+    )
+
+def _test_java_binary_runtime_deps_are_not_on_classpath_impl(env, target):
+    # Verify that normal deps are present but runtime_dep is not present in
+    # the compile time classpath
+    javac_action_subject.of(env, target).classpath().contains_exactly([
+        "{bindir}/{package}/lib{test_name}/compile_dep-hjar.jar",
+    ])
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -667,5 +699,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_runtime_deps_with_genrule,
             _test_java_binary_runtime_deps_with_native_libraries,
             _test_java_binary_runtime_deps_with_java_import,
+            _test_java_binary_runtime_deps_are_not_on_classpath,
         ],
     )
