@@ -676,6 +676,85 @@ def _test_java_binary_runtime_deps_are_not_on_classpath_impl(env, target):
         "{bindir}/{package}/lib{test_name}/compile_dep-hjar.jar",
     ])
 
+def _test_java_binary_neverlink_transitivity(name):
+    util.helper_target(
+        java_library,
+        name = name + "/l1",
+        srcs = ["l1.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/l2",
+        srcs = ["l2.java"],
+        neverlink = True,
+        deps = [name + "/l1"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/l3",
+        srcs = ["l3.java"],
+        deps = [name + "/l2"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/l4",
+        srcs = ["l4.java"],
+        deps = [name + "/l1"],
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/b1",
+        srcs = ["b1.java"],
+        deps = [name + "/l2"],
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/b2",
+        srcs = ["b2.java"],
+        deps = [name + "/l3"],
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/b3",
+        srcs = ["b3.java"],
+        deps = [
+            name + "/l3",
+            name + "/l4",
+        ],
+    )
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+    )
+
+    analysis_test(
+        name = name,
+        config_settings = {"//command_line_option:extra_toolchains": [Label(name + "/toolchain")]},
+        impl = _test_java_binary_neverlink_transitivity_impl,
+        targets = {
+            "b1": name + "/b1",
+            "b2": name + "/b2",
+            "b3": name + "/b3",
+        },
+    )
+
+def _test_java_binary_neverlink_transitivity_impl(env, targets):
+    # l2 has neverlink set, so it should never be an input to a binary.
+    # l1 should only be an input to a binary if it is depended on through something else than l2.
+    _expect_that_deploy_jar_action_inputs(env, targets.b1, "jar").contains_exactly([
+        "{package}/{test_name}/b1.jar",
+    ])
+    _expect_that_deploy_jar_action_inputs(env, targets.b2, "jar").contains_exactly([
+        "{package}/lib{test_name}/l3.jar",
+        "{package}/{test_name}/b2.jar",
+    ])
+    _expect_that_deploy_jar_action_inputs(env, targets.b3, "jar").contains_exactly([
+        "{package}/lib{test_name}/l1.jar",
+        "{package}/lib{test_name}/l3.jar",
+        "{package}/lib{test_name}/l4.jar",
+        "{package}/{test_name}/b3.jar",
+    ])
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -700,5 +779,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_runtime_deps_with_native_libraries,
             _test_java_binary_runtime_deps_with_java_import,
             _test_java_binary_runtime_deps_are_not_on_classpath,
+            _test_java_binary_neverlink_transitivity,
         ],
     )
