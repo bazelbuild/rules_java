@@ -231,40 +231,8 @@ def _get_jspecify_info(ctx):
         packages = [target[PackageSpecificationInfo] for target in ctx.attr.jspecify_packages],
     )
 
-def _extract_singleton_list_value(dict, key):
-    if key in dict and type(dict[key]) == type([]):
-        list = dict[key]
-        if len(list) > 1:
-            fail("expected a single value for:", key, "got: ", list)
-        elif len(list) == 1:
-            dict[key] = dict[key][0]
-        else:
-            dict[key] = None
-
-# TODO: b/463873596 - remove this in Bazel 10
-_LEGACY_ANY_TYPE_ATTRS = [
-    "genclass",
-    "deps_checker",
-    "header_compiler",
-    "header_compiler_direct",
-    "ijar",
-    "javabuilder",
-    "singlejar",
-]
-
-def _java_toolchain_initializer(**kwargs):
-    # these attributes are defined as executable `label_list`s in native but are
-    # expected to be singleton values. Since this is not supported in Starlark,
-    # we just inline the value from the list (if present) before invoking the
-    # rule.
-    for attr in _LEGACY_ANY_TYPE_ATTRS:
-        _extract_singleton_list_value(kwargs, attr)
-
-    return kwargs
-
 java_toolchain = rule(
     implementation = _java_toolchain_impl,
-    initializer = _java_toolchain_initializer,
     doc = """
 <p>
 Specifies the configuration for the Java compiler. Which toolchain to be used can be changed through
@@ -614,7 +582,6 @@ removes it. Please see the Javac documentation on the -Xlint options for more in
             default = configuration_field(fragment = "java", name = "local_java_optimization_configuration"),
             allow_files = True,
         ),
-        "_legacy_any_type_attrs": attr.string_list(default = _LEGACY_ANY_TYPE_ATTRS),
     },
     fragments = ["java"],
 )
