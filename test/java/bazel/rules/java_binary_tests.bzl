@@ -141,7 +141,7 @@ def _test_java_binary_javacopts_location_expansion(name):
         java_binary,
         name = name + "/bin",
         srcs = ["A.java"],
-        javacopts = ["-XepOpt:foo=$(location :A.java)"],
+        javacopts = ["-XepOpt:foo=$(rootpath :A.java)"],
     )
 
     analysis_test(

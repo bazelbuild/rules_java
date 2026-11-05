@@ -108,7 +108,7 @@ def compile_action(
       native_libraries: (list[CcInfo]) C++ native library dependencies that are
         needed for this library.
       javacopts: (list[str]) A list of the desired javac options. The options
-        may contain `$(location ..)` templates that will be expanded.
+        may contain `$(execpath ..)` / `$(rootpath ..)` templates that will be expanded.
       neverlink: (bool) Whether or not this library should be used only for
         compilation and not at runtime.
       strict_deps: (str) A string that specifies how to handle strict deps.

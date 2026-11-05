@@ -223,7 +223,7 @@ is no build-time check.
         "jvm_flags": attr.string_list(
             doc = """
 A list of flags to embed in the wrapper script generated for running this binary.
-Subject to <a href="${link make-variables#location}">$(location)</a> and
+Subject to <a href="${link make-variables#location}">"Location"</a> and
 <a href="make-variables.html">"Make variable"</a> substitution, and
 <a href="common-definitions.html#sh-tokenization">Bourne shell tokenization</a>.
 

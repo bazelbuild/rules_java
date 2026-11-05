@@ -360,8 +360,8 @@ def _test_location_expansion_in_jvm_opts(name):
         name = name + "/toolchain",
         tools = [name + "/jsr305.jar", name + "/javac"],
         jvm_opts = [
-            "--patch-module=jdk.compiler=$(location " + name + "/javac)",
-            "--patch-module=java.xml.ws.annotation=$(location " + name + "/jsr305.jar)",
+            "--patch-module=jdk.compiler=$(rootpath " + name + "/javac)",
+            "--patch-module=java.xml.ws.annotation=$(rootpath " + name + "/jsr305.jar)",
         ],
         javabuilder_jvm_opts = ["-Xshare:auto"],
     )
@@ -397,7 +397,7 @@ def _test_location_expansion_with_multiple_artifacts_fails(name):
         mock_java_toolchain,
         name = name + "/toolchain",
         tools = [name + "/fg"],
-        javabuilder_jvm_opts = ["$(location " + name + "/fg)"],
+        javabuilder_jvm_opts = ["$(rootpath " + name + "/fg)"],
     )
 
     analysis_test(
@@ -409,7 +409,7 @@ def _test_location_expansion_with_multiple_artifacts_fails(name):
 
 def _test_location_expansion_with_multiple_artifacts_fails_impl(env, target):
     env.expect.that_target(target).failures().contains_predicate(
-        matching.contains("$(location) expression expands to more than one file"),
+        matching.contains("expression expands to more than one file"),
     )
 
 def _test_timezone_data_with_multiple_artifacts_fails(name):
@@ -568,8 +568,8 @@ def _test_javabuilder_location_expansion_with_multiple_artifacts(name):
         name = name + "/toolchain",
         javabuilder_data = [name + "/fg1", name + "/fg2"],
         javabuilder_jvm_opts = [
-            "$(locations " + name + "/fg1)",
-            "$(locations " + name + "/fg2)",
+            "$(rootpaths " + name + "/fg1)",
+            "$(rootpaths " + name + "/fg2)",
         ],
     )
     util.helper_target(
