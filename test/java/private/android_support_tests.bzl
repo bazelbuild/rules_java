@@ -23,13 +23,17 @@ load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 
 def _impl(ctx):
     return [
-        android_support.enable_implicit_sourceless_deps_exports_compatibility(ctx.attr.dep[JavaInfo]),
+        android_support.enable_implicit_sourceless_deps_exports_compatibility(
+            ctx.attr.dep[JavaInfo],
+            neverlink = ctx.attr.neverlink,
+        ),
     ]
 
 my_rule = rule(
     implementation = _impl,
     attrs = {
         "dep": attr.label(),
+        "neverlink": attr.bool(),
     },
 )
 
@@ -50,6 +54,12 @@ def _test_enable_implicit_sourceless_deps_exports_compatibility(name):
         name = "transformed",
         dep = ":base",
     )
+    util.helper_target(
+        my_rule,
+        name = "transformed_neverlink",
+        dep = ":base",
+        neverlink = True,
+    )
 
     analysis_test(
         name = name,
@@ -57,15 +67,21 @@ def _test_enable_implicit_sourceless_deps_exports_compatibility(name):
         targets = {
             "base": Label(":base"),
             "transformed": Label(":transformed"),
+            "transformed_neverlink": Label(":transformed_neverlink"),
         },
     )
 
 def _test_enable_implicit_sourceless_deps_exports_compatibility_impl(env, targets):
     base_info = java_info_subject.from_target(env, targets.base)
     transformed_info = java_info_subject.from_target(env, targets.transformed)
+    transformed_neverlink_info = java_info_subject.from_target(env, targets.transformed_neverlink)
     transformed_info.compilation_args().equals_subject(base_info.compilation_args())
     base_info.plugins().processor_jars().contains_exactly(["{package}/libmy_plugin.jar"])
     transformed_info.plugins().processor_jars().contains_exactly([])
+    transformed_info.transitive_neverlink_jars().contains_exactly([])
+    transformed_neverlink_info.is_neverlink().equals(True)
+    transformed_neverlink_info.compilation_args().transitive_runtime_jars().contains_exactly([])
+    transformed_neverlink_info.transitive_neverlink_jars().contains_exactly(["{package}/libbase.jar"])
 
 def android_support_tests(name):
     test_suite(

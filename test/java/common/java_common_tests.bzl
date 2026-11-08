@@ -967,8 +967,26 @@ def _test_compile_with_neverlink_deps(name):
     target_name = name + "/custom"
     util.helper_target(
         java_library,
+        name = target_name + "/transitive_dep",
+        srcs = ["Transitive.java"],
+    )
+    util.helper_target(
+        java_library,
         name = target_name + "/neverlink_dep",
         srcs = ["B.java"],
+        deps = [target_name + "/transitive_dep"],
+        neverlink = True,
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/neverlink_rdep",
+        srcs = ["C.java"],
+        neverlink = True,
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/neverlink_export",
+        srcs = ["D.java"],
         neverlink = True,
     )
     util.helper_target(
@@ -976,6 +994,8 @@ def _test_compile_with_neverlink_deps(name):
         name = target_name,
         srcs = ["A.java"],
         deps = [target_name + "/neverlink_dep"],
+        runtime_deps = [target_name + "/neverlink_rdep"],
+        exports = [target_name + "/neverlink_export"],
     )
 
     analysis_test(
@@ -991,11 +1011,65 @@ def _test_compile_with_neverlink_deps_impl(env, target):
     ])
     assert_java_info.transitive_source_jars().contains_exactly([
         "{package}/lib{name}-src.jar",
+        "{package}/lib{name}/neverlink_rdep-src.jar",
+        "{package}/lib{name}/neverlink_export-src.jar",
         "{package}/lib{name}/neverlink_dep-src.jar",
+        "{package}/lib{name}/transitive_dep-src.jar",
     ])
     assert_java_info.compilation_args().transitive_compile_time_jars().contains_exactly([
         "{package}/lib{name}-hjar.jar",
+        "{package}/lib{name}/neverlink_export-hjar.jar",
         "{package}/lib{name}/neverlink_dep-hjar.jar",
+        "{package}/lib{name}/transitive_dep-hjar.jar",
+    ])
+    assert_java_info.transitive_neverlink_jars().contains_exactly([
+        "{package}/lib{name}/neverlink_rdep.jar",
+        "{package}/lib{name}/neverlink_export.jar",
+        "{package}/lib{name}/neverlink_dep.jar",
+        "{package}/lib{name}/transitive_dep.jar",
+    ])
+
+def _test_compile_neverlink_with_deps_runtime_deps_and_exports(name):
+    target_name = name + "/custom"
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_dep",
+        srcs = ["B.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_rdep",
+        srcs = ["C.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_export",
+        srcs = ["D.java"],
+    )
+    util.helper_target(
+        custom_library,
+        name = target_name,
+        srcs = ["A.java"],
+        deps = [target_name + "/lib_dep"],
+        runtime_deps = [target_name + "/lib_rdep"],
+        exports = [target_name + "/lib_export"],
+        neverlink = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_neverlink_with_deps_runtime_deps_and_exports_impl,
+        target = target_name,
+    )
+
+def _test_compile_neverlink_with_deps_runtime_deps_and_exports_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.compilation_args().transitive_runtime_jars().contains_exactly([])
+    assert_java_info.transitive_neverlink_jars().contains_exactly([
+        "{package}/lib{name}.jar",
+        "{package}/lib{name}/lib_export.jar",
+        "{package}/lib{name}/lib_dep.jar",
+        "{package}/lib{name}/lib_rdep.jar",
     ])
 
 def _test_compile_output_jar_not_in_runtime_path_without_sources_defined(name):
@@ -1147,6 +1221,7 @@ def java_common_tests(name):
             _test_strict_java_deps_error,
             _test_compile_output_jar_has_manifest_proto,
             _test_compile_with_neverlink_deps,
+            _test_compile_neverlink_with_deps_runtime_deps_and_exports,
             _test_compile_output_jar_not_in_runtime_path_without_sources_defined,
             _test_java_runtime_provider_files,
             _test_custom_library_with_wrong_java_toolchain_type,

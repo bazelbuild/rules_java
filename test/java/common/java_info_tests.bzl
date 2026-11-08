@@ -200,11 +200,16 @@ def _with_deps_and_neverlink_test(name):
     )
 
 def _with_deps_and_neverlink_test_impl(env, target):
-    assert_compilation_args = java_info_subject.from_target(env, target).compilation_args()
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_compilation_args = assert_java_info.compilation_args()
 
     assert_compilation_args.compile_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
     assert_compilation_args.full_compile_jars().contains_exactly(["{package}/{name}/my_starlark_rule_lib.jar"])
     assert_compilation_args.transitive_runtime_jars().contains_exactly([])
+    assert_java_info.transitive_neverlink_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/my_java_lib_direct.jar",
+    ])
     assert_compilation_args.transitive_compile_time_jars().contains_exactly([
         "{package}/{name}/my_starlark_rule_lib.jar",
         "{package}/lib{name}/my_java_lib_direct-hjar.jar",
@@ -1302,7 +1307,103 @@ def _java_common_merge_with_neverlink_test(name):
     )
 
 def _java_common_merge_with_neverlink_test_impl(env, target):
-    java_info_subject.from_target(env, target).is_neverlink().equals(True)
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.is_neverlink().equals(True)
+    assert_java_info.compilation_args().transitive_runtime_jars().contains_exactly([
+        "{package}/{name}/without_neverlink.jar",
+    ])
+    assert_java_info.transitive_neverlink_jars().contains_exactly([
+        "{package}/{name}/with_neverlink.jar",
+    ])
+
+def _with_neverlink_and_all_dep_attributes_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_dep",
+        srcs = ["java/A.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_rdep",
+        srcs = ["java/B.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/lib_export",
+        srcs = ["java/C.java"],
+    )
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        dep = [target_name + "/lib_dep"],
+        dep_runtime = [target_name + "/lib_rdep"],
+        dep_exports = [target_name + "/lib_export"],
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+        neverlink = True,
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_neverlink_and_all_dep_attributes_test_impl,
+        target = target_name,
+    )
+
+def _with_neverlink_and_all_dep_attributes_test_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.compilation_args().transitive_runtime_jars().contains_exactly([])
+    assert_java_info.transitive_neverlink_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+        "{package}/lib{name}/lib_export.jar",
+        "{package}/lib{name}/lib_dep.jar",
+        "{package}/lib{name}/lib_rdep.jar",
+    ])
+
+def _with_neverlink_deps_across_attributes_test(name):
+    target_name = name + "/my_starlark_rule"
+    util.helper_target(
+        java_library,
+        name = target_name + "/neverlink_dep",
+        srcs = ["java/A.java"],
+        neverlink = True,
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/neverlink_rdep",
+        srcs = ["java/B.java"],
+        neverlink = True,
+    )
+    util.helper_target(
+        java_library,
+        name = target_name + "/neverlink_export",
+        srcs = ["java/C.java"],
+        neverlink = True,
+    )
+    util.helper_target(
+        custom_java_info_rule,
+        name = target_name,
+        dep = [target_name + "/neverlink_dep"],
+        dep_runtime = [target_name + "/neverlink_rdep"],
+        dep_exports = [target_name + "/neverlink_export"],
+        output_jar = target_name + "/my_starlark_rule_lib.jar",
+    )
+
+    analysis_test(
+        name = name,
+        impl = _with_neverlink_deps_across_attributes_test_impl,
+        target = target_name,
+    )
+
+def _with_neverlink_deps_across_attributes_test_impl(env, target):
+    assert_java_info = java_info_subject.from_target(env, target)
+    assert_java_info.compilation_args().transitive_runtime_jars().contains_exactly([
+        "{package}/{name}/my_starlark_rule_lib.jar",
+    ])
+    assert_java_info.transitive_neverlink_jars().contains_exactly([
+        "{package}/lib{name}/neverlink_rdep.jar",
+        "{package}/lib{name}/neverlink_export.jar",
+        "{package}/lib{name}/neverlink_dep.jar",
+    ])
 
 def _java_common_compile_with_neverlink_test(name):
     target_name = name + "/compiled"
@@ -1460,6 +1561,8 @@ def java_info_tests(name):
             _output_source_jars_returns_depset_test,
             _java_info_constructor_with_neverlink_test,
             _java_common_merge_with_neverlink_test,
+            _with_neverlink_and_all_dep_attributes_test,
+            _with_neverlink_deps_across_attributes_test,
             _java_common_compile_with_neverlink_test,
             _java_common_compile_native_libraries_propagate_test,
             _test_merge_runtime_output_jars,

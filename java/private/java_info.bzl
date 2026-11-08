@@ -118,6 +118,7 @@ def merge(
     full_compile_jars = []  # [depset[File]]
     _transitive_full_compile_time_jars = []  # [depset[File]]
     _compile_time_java_dependencies = []  # [depset[File]]
+    _transitive_neverlink_jars = []  # [depset[File]]
     add_exports = []  # [depset[str]]
     add_opens = []  # [depset[str]]
     _neverlink = False
@@ -136,6 +137,7 @@ def merge(
         full_compile_jars.append(p.full_compile_jars)
         _transitive_full_compile_time_jars.append(p._transitive_full_compile_time_jars)
         _compile_time_java_dependencies.append(p._compile_time_java_dependencies)
+        _transitive_neverlink_jars.append(p._transitive_neverlink_jars)
         add_exports.append(p.module_flags_info.add_exports)
         add_opens.append(p.module_flags_info.add_opens)
         _neverlink = _neverlink or p._neverlink
@@ -154,6 +156,7 @@ def merge(
         "full_compile_jars": depset(order = "preorder", transitive = full_compile_jars),
         "_transitive_full_compile_time_jars": depset(order = "preorder", transitive = _transitive_full_compile_time_jars),
         "_compile_time_java_dependencies": depset(order = "preorder", transitive = _compile_time_java_dependencies),
+        "_transitive_neverlink_jars": depset(order = "preorder", transitive = _transitive_neverlink_jars),
         # runtime_output_jars is a list so we uniquify to avoid https://github.com/bazelbuild/bazel/issues/17170
         "runtime_output_jars": depset(runtime_output_jars).to_list(),
         # source_jars is a list so we uniquify to avoid https://github.com/bazelbuild/bazel/issues/17170
@@ -206,6 +209,7 @@ def to_java_binary_info(java_info, compilation_info):
         "full_compile_jars": depset(),
         "_transitive_full_compile_time_jars": depset(),
         "_compile_time_java_dependencies": depset(),
+        "_transitive_neverlink_jars": depset(),
         "runtime_output_jars": [],
         "plugins": _EMPTY_PLUGIN_DATA,
         "api_generating_plugins": _EMPTY_PLUGIN_DATA,
@@ -263,6 +267,10 @@ def to_implicit_exportable(java_info, neverlink = False):
         "full_compile_jars": java_info.full_compile_jars,
         "_transitive_full_compile_time_jars": java_info._transitive_full_compile_time_jars,
         "_compile_time_java_dependencies": java_info._compile_time_java_dependencies,
+        "_transitive_neverlink_jars": depset(
+            order = "preorder",
+            transitive = [java_info.transitive_runtime_jars, java_info._transitive_neverlink_jars],
+        ) if neverlink else java_info._transitive_neverlink_jars,
         "_neverlink": neverlink,
         # unset defaults
         "source_jars": [],
@@ -477,19 +485,11 @@ def java_info_for_compilation(
         generated_source_jar,
         native_libraries,
         neverlink,
+        direct_runtime_jars,
         header_compilation_jar,
     )
 
-    # this differs ever so slightly from the usual JavaInfo in that direct_runtime_jars
-    # does not contain the output_jar is there were no sources/resources
-    transitive_runtime_jars = depset() if neverlink else depset(
-        order = "preorder",
-        direct = direct_runtime_jars,
-        transitive = [dep.transitive_runtime_jars for dep in concatenated_deps.exports_deps + runtime_deps],
-    )
     result.update(
-        runtime_output_jars = direct_runtime_jars,
-        transitive_runtime_jars = transitive_runtime_jars,
         transitive_source_jars = depset(
             direct = [source_jar] if source_jar else [],
             # only differs from the usual java_info.transitive_source_jars in the order of deps
@@ -570,6 +570,7 @@ def _javainfo_init_base(
         generated_source_jar,
         native_libraries,
         neverlink,
+        direct_runtime_jars,
         header_compilation_jar = None):
     _validate_provider_list(deps, "deps", JavaInfo)
     _validate_provider_list(runtime_deps, "runtime_deps", JavaInfo)
@@ -590,6 +591,20 @@ def _javainfo_init_base(
         direct = [compile_jar] if compile_jar else [],
         transitive = [dep.transitive_compile_time_jars for dep in concatenated_deps.exports_deps],
     )
+
+    # For java_info_for_compilation, direct_runtime_jars does not contain the
+    # output_jar if there were no sources/resources.
+    runtime_jars = depset(
+        order = "preorder",
+        direct = direct_runtime_jars,
+        transitive = [dep.transitive_runtime_jars for dep in concatenated_deps.exports_deps + runtime_deps],
+    )
+    transitive_runtime_jars = depset() if neverlink else runtime_jars
+    _transitive_neverlink_jars = depset(
+        order = "preorder",
+        transitive = ([runtime_jars] if neverlink else []) +
+                     [dep._transitive_neverlink_jars for dep in concatenated_deps.runtimedeps_exports_deps],
+    )
     java_outputs = [_JavaOutputInfo(
         class_jar = output_jar,
         compile_jar = compile_jar,
@@ -605,6 +620,8 @@ def _javainfo_init_base(
         source_jar = source_jar,  # deprecated
     )]
     result = {
+        "transitive_runtime_jars": transitive_runtime_jars,
+        "_transitive_neverlink_jars": _transitive_neverlink_jars,
         "transitive_compile_time_jars": transitive_compile_time_jars,
         "compile_jars": depset(
             order = "preorder",
@@ -625,7 +642,7 @@ def _javainfo_init_base(
             ],
         ),
         "source_jars": source_jars,
-        "runtime_output_jars": [output_jar],
+        "runtime_output_jars": direct_runtime_jars,
         "plugins": plugin_info.plugins,
         "api_generating_plugins": plugin_info.api_generating_plugins,
         "java_outputs": java_outputs,
@@ -774,17 +791,9 @@ def _javainfo_init(
         generated_source_jar,
         native_libraries,
         neverlink,
+        [output_jar],
         header_compilation_jar = header_compilation_jar,
     )
-
-    if neverlink:
-        transitive_runtime_jars = depset()
-    else:
-        transitive_runtime_jars = depset(
-            order = "preorder",
-            direct = [output_jar],
-            transitive = [dep.transitive_runtime_jars for dep in concatenated_deps.exports_deps + runtime_deps],
-        )
 
     # For backward compatibility, we use deps_exports for add_exports/add_opens
     # for the JavaInfo constructor rather than runtimedeps_exports_deps (used
@@ -799,7 +808,6 @@ def _javainfo_init(
         module_flags_deps = concatenated_deps.runtimedeps_exports_deps
 
     result.update(
-        transitive_runtime_jars = transitive_runtime_jars,
         transitive_source_jars = depset(
             direct = [source_jar] if source_jar else [],
             # TODO(hvd): native also adds source jars from deps, but this should be unnecessary
@@ -878,6 +886,7 @@ JavaInfo, _new_javainfo = provider(
                Java/Java-like target.""",
         "_transitive_full_compile_time_jars": "internal API, do not use",
         "_compile_time_java_dependencies": "internal API, do not use",
+        "_transitive_neverlink_jars": "internal API, do not use",
         "_neverlink": "internal API, do not use",
         "_constraints": "internal API, do not use",
         "_is_binary": "internal API, do not use",
