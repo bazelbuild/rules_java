@@ -780,6 +780,25 @@ def _test_java_binary_invalid_deploy_env_impl(env, target):
         matching.str_matches("does not have mandatory providers: 'JavaRuntimeClasspathInfo'"),
     )
 
+def _test_java_binary_invalid_deploy_env_artifact(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/bin",
+        srcs = ["Bin.java"],
+        deploy_env = ["a.foo"],
+    )
+    analysis_test(
+        name = name,
+        expect_failure = True,
+        impl = _test_java_binary_invalid_deploy_env_artifact_impl,
+        target = name + "/bin",
+    )
+
+def _test_java_binary_invalid_deploy_env_artifact_impl(env, target):
+    env.expect.that_target(target).failures().contains_predicate(
+        matching.str_matches("source file '*:a.foo' is misplaced here (expected no files)"),
+    )
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -806,5 +825,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_runtime_deps_are_not_on_classpath,
             _test_java_binary_neverlink_transitivity,
             _test_java_binary_invalid_deploy_env,
+            _test_java_binary_invalid_deploy_env_artifact,
         ],
     )
