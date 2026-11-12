@@ -115,6 +115,7 @@ def _android_lint_action(ctx, source_files, source_jars, compilation_info, is_li
     args.add_all("--lint_rules", compilation_info.plugins.processor_jars)
     args.add("--target_label", ctx.label)
     args.add("--library", str(is_library).lower())
+    args.add_all(linter.runner_opts)
 
     javac_opts = compilation_info.javac_options
     if javac_opts:
