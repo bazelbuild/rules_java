@@ -799,6 +799,53 @@ def _test_java_binary_invalid_deploy_env_artifact_impl(env, target):
         matching.str_matches("source file '*:a.foo' is misplaced here (expected no files)"),
     )
 
+def _test_java_binary_deploy_env(name):
+    util.helper_target(
+        java_binary,
+        name = name + "/app",
+        srcs = ["App.java"],
+        deps = [name + "/lib"],
+    )
+    util.helper_target(
+        java_binary,
+        name = name + "/plugin",
+        srcs = ["Plugin.java"],
+        deploy_env = [name + "/app"],
+        deps = [
+            name + "/lib",
+            name + "/extra_lib",
+        ],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["Lib.java"],
+        deps = [name + "/deep_lib"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/deep_lib",
+        srcs = ["Deep.java"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/extra_lib",
+        srcs = ["Extra.java"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_java_binary_deploy_env_impl,
+        target = name + "/plugin",
+    )
+
+def _test_java_binary_deploy_env_impl(env, target):
+    _expect_that_deploy_jar_action_inputs(env, target, "jar").contains_exactly([
+        # lib.jar and deep_lib.jar are filtered out
+        "{package}/lib{test_name}/extra_lib.jar",
+        "{package}/{test_name}/plugin.jar",
+    ])
+
 def java_binary_launcher_tests(name):
     test_suite(
         name = name,
@@ -826,5 +873,6 @@ def java_binary_launcher_tests(name):
             _test_java_binary_neverlink_transitivity,
             _test_java_binary_invalid_deploy_env,
             _test_java_binary_invalid_deploy_env_artifact,
+            _test_java_binary_deploy_env,
         ],
     )
