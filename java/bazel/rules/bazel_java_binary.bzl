@@ -27,6 +27,7 @@ load("//java/common/rules/impl:java_binary_deploy_jar.bzl", "create_deploy_archi
 load("//java/common/rules/impl:java_binary_impl.bzl", "basic_java_binary", "binary_provider_helper")
 load("//java/common/rules/impl:java_helper.bzl", "helper")
 load("//java/private:java_info.bzl", "JavaInfo")
+load(":runfiles_group_support.bzl", "JAVA_RUNTIME_TOOLCHAIN_TYPE", "describer_attrs")
 
 def _bazel_java_binary_impl(ctx):
     return bazel_base_binary_impl(ctx, is_test_rule_class = False) + binary_provider_helper.executable_providers(ctx)
@@ -378,6 +379,10 @@ logic as the Java package of source files. For example, a source file at
             executable = True,
         ),
     } if not bazel_features.rules._has_launcher_maker_toolchain else {},
+    describer_attrs(
+        Label("//java/bazel/rules:java_binary_runfiles_group_describer"),
+        [JAVA_RUNTIME_TOOLCHAIN_TYPE],
+    ),
 )
 
 def make_java_binary(executable):
