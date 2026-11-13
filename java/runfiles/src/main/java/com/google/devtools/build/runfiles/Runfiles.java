@@ -248,30 +248,49 @@ public final class Runfiles {
    *   <li>directory-based, meaning it looks up runfile paths under a given directory path
    * </ul>
    *
-   * <p>If {@code env} contains "RUNFILES_MANIFEST_ONLY" with value "1", this method returns a
-   * manifest-based implementation. The manifest's path is defined by the "RUNFILES_MANIFEST_FILE"
-   * key's value in {@code env}.
+   * <p>If {@code env} contains "RUNFILES_MANIFEST_FILE" and it points to an existing file, this
+   * method returns a manifest-based implementation backed by that file.
    *
-   * <p>Otherwise this method returns a directory-based implementation. The directory's path is
-   * defined by the value in {@code env} under the "RUNFILES_DIR" key, or if absent, then under the
-   * "JAVA_RUNFILES" key.
+   * <p>Otherwise, if {@code env} contains "RUNFILES_DIR" (or, if absent, "JAVA_RUNFILES") and it
+   * points to an existing directory, this method returns a directory-based implementation backed by
+   * that directory.
    *
    * <p>Note about performance: the manifest-based implementation eagerly reads and caches the whole
    * manifest file upon instantiation.
    *
-   * @throws java.io.IOException if RUNFILES_MANIFEST_ONLY=1 is in {@code env} but there's no
-   *     "RUNFILES_MANIFEST_FILE", "RUNFILES_DIR", or "JAVA_RUNFILES" key in {@code env} or their
-   *     values are empty, or some IO error occurs
+   * @throws java.io.IOException if neither a runfiles manifest nor a runfiles directory could be
+   *     found, or some IO error occurs
    */
   public static Preloaded preload(Map<String, String> env) throws IOException {
-    if (isManifestOnly(env)) {
-      // On Windows, Bazel sets RUNFILES_MANIFEST_ONLY=1.
-      // On every platform, Bazel also sets RUNFILES_MANIFEST_FILE, but on Linux and macOS it's
-      // faster to use RUNFILES_DIR.
-      return new ManifestBased(getManifestPath(env));
-    } else {
-      return new DirectoryBased(getRunfilesDir(env));
+    // A manifest and a directory may both be named: the process that set up the environment knows
+    // which of the two it staged, and communicates that by only naming the one that is usable.
+    // Values that name something that isn't there are dropped rather than trusted, since a launcher
+    // or parent process may have derived them from a build-time flag that doesn't account for the
+    // runfiles directory having been materialized by the sandbox or by remote execution.
+    String manifestPathValue = env.get("RUNFILES_MANIFEST_FILE");
+    String runfilesDirValue = env.get("RUNFILES_DIR");
+    if (Util.isNullOrEmpty(runfilesDirValue)) {
+      // The java_binary launcher script only exports JAVA_RUNFILES, so for a process it starts,
+      // this is the only variable that names the runfiles directory.
+      runfilesDirValue = env.get("JAVA_RUNFILES");
     }
+
+    boolean hasManifest =
+        !Util.isNullOrEmpty(manifestPathValue) && new File(manifestPathValue).isFile();
+    boolean hasDirectory =
+        !Util.isNullOrEmpty(runfilesDirValue) && new File(runfilesDirValue).isDirectory();
+
+    if (hasManifest) {
+      return new ManifestBased(manifestPathValue, hasDirectory ? runfilesDirValue : null);
+    }
+    if (hasDirectory) {
+      return new DirectoryBased(runfilesDirValue);
+    }
+    throw new IOException(
+        String.format(
+            "Cannot find runfiles: $RUNFILES_MANIFEST_FILE (%s) does not name an existing file and"
+                + " $RUNFILES_DIR / $JAVA_RUNFILES (%s) does not name an existing directory",
+            manifestPathValue, runfilesDirValue));
   }
 
   /**
@@ -297,20 +316,13 @@ public final class Runfiles {
    *   <li>directory-based, meaning it looks up runfile paths under a given directory path
    * </ul>
    *
-   * <p>If {@code env} contains "RUNFILES_MANIFEST_ONLY" with value "1", this method returns a
-   * manifest-based implementation. The manifest's path is defined by the "RUNFILES_MANIFEST_FILE"
-   * key's value in {@code env}.
-   *
-   * <p>Otherwise this method returns a directory-based implementation. The directory's path is
-   * defined by the value in {@code env} under the "RUNFILES_DIR" key, or if absent, then under the
-   * "JAVA_RUNFILES" key.
+   * <p>See {@link #preload(java.util.Map)} for how the implementation is chosen.
    *
    * <p>Note about performance: the manifest-based implementation eagerly reads and caches the whole
    * manifest file upon instantiation.
    *
-   * @throws IOException if RUNFILES_MANIFEST_ONLY=1 is in {@code env} but there's no
-   *     "RUNFILES_MANIFEST_FILE", "RUNFILES_DIR", or "JAVA_RUNFILES" key in {@code env} or their
-   *     values are empty, or some IO error occurs
+   * @throws IOException if neither a runfiles manifest nor a runfiles directory could be found, or
+   *     some IO error occurs
    * @deprecated Use {@link #preload(java.util.Map)} instead. With {@code --enable_bzlmod}, this
    *     function does not work correctly.
    */
@@ -380,44 +392,20 @@ public final class Runfiles {
             apparentRepositoryName);
   }
 
-  /** Returns true if the platform supports runfiles only via manifests. */
-  private static boolean isManifestOnly(Map<String, String> env) {
-    return "1".equals(env.get("RUNFILES_MANIFEST_ONLY"));
-  }
-
-  private static String getManifestPath(Map<String, String> env) throws IOException {
-    String value = env.get("RUNFILES_MANIFEST_FILE");
-    if (Util.isNullOrEmpty(value)) {
-      throw new IOException(
-          "Cannot load runfiles manifest: $RUNFILES_MANIFEST_ONLY is 1 but"
-              + " $RUNFILES_MANIFEST_FILE is empty or undefined");
-    }
-    return value;
-  }
-
-  private static String getRunfilesDir(Map<String, String> env) throws IOException {
-    String value = env.get("RUNFILES_DIR");
-    if (Util.isNullOrEmpty(value)) {
-      value = env.get("JAVA_RUNFILES");
-    }
-    if (Util.isNullOrEmpty(value)) {
-      throw new IOException(
-          "Cannot find runfiles: $RUNFILES_DIR and $JAVA_RUNFILES are both unset or empty");
-    }
-    return value;
-  }
-
   /** {@link Runfiles} implementation that parses a runfiles-manifest file to look up runfiles. */
   private static final class ManifestBased extends Preloaded {
 
     private final Map<String, String> runfiles;
     private final String manifestPath;
+    private final String runfilesDir;
     private final RepositoryMapping repoMapping;
 
-    ManifestBased(String manifestPath) throws IOException {
+    ManifestBased(String manifestPath, String runfilesDir) throws IOException {
       Util.checkArgument(manifestPath != null);
       Util.checkArgument(!manifestPath.isEmpty());
       this.manifestPath = manifestPath;
+      this.runfilesDir =
+          Util.isNullOrEmpty(runfilesDir) ? findRunfilesDir(manifestPath) : runfilesDir;
       this.runfiles = loadRunfiles(manifestPath);
       this.repoMapping = RepositoryMapping.readFromFile(rlocationChecked("_repo_mapping"));
     }
@@ -444,9 +432,12 @@ public final class Runfiles {
     @Override
     protected Map<String, String> getEnvVars() {
       HashMap<String, String> result = new HashMap<>(4);
-      result.put("RUNFILES_MANIFEST_ONLY", "1");
       result.put("RUNFILES_MANIFEST_FILE", manifestPath);
-      String runfilesDir = findRunfilesDir(manifestPath);
+      // Runfiles libraries that decide between the two implementations based on this variable
+      // instead of on which of the other two names an existing path need it to use the manifest.
+      result.put("RUNFILES_MANIFEST_ONLY", "1");
+      // The runfiles directory is not fully materialized in this case, but language launchers locate
+      // their own runtime data relative to it, so pass it on if it is known.
       result.put("RUNFILES_DIR", runfilesDir);
       // TODO(laszlocsomor): remove JAVA_RUNFILES once the Java launcher can pick up RUNFILES_DIR.
       result.put("JAVA_RUNFILES", runfilesDir);
@@ -537,16 +528,21 @@ public final class Runfiles {
 
     @Override
     protected Map<String, String> getEnvVars() {
-      HashMap<String, String> result = new HashMap<>(2);
+      HashMap<String, String> result = new HashMap<>(4);
       result.put("RUNFILES_DIR", runfilesRoot);
       // TODO(laszlocsomor): remove JAVA_RUNFILES once the Java launcher can pick up RUNFILES_DIR.
       result.put("JAVA_RUNFILES", runfilesRoot);
+      // Clear values inherited from an ancestor process, which describe how that process' runfiles
+      // were staged and not how this process' runfiles were. Since the variables are set to the
+      // empty string rather than to a path, a subprocess that doesn't recognize them is unaffected.
+      result.put("RUNFILES_MANIFEST_FILE", "");
+      result.put("RUNFILES_MANIFEST_ONLY", "");
       return result;
     }
   }
 
   static Preloaded createManifestBasedForTesting(String manifestPath) throws IOException {
-    return new ManifestBased(manifestPath);
+    return new ManifestBased(manifestPath, /* runfilesDir= */ null);
   }
 
   static Preloaded createDirectoryBasedForTesting(String runfilesDir) throws IOException {
