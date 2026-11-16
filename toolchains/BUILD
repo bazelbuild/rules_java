@@ -1,3 +1,4 @@
+load("@bazel_features//:features.bzl", "bazel_features")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag", "string_setting")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
@@ -60,8 +61,14 @@ bool_flag(
 #
 # Obtain the associated JavaToolchainInfo via:
 #   ctx.toolchains["@bazel_tools//tools/jdk:toolchain_type"].java
-# TODO: migrate away from using @bazel_tools//tools/jdk:toolchain_type ?
-# toolchain_type(name = "toolchain_type")
+# buildifier: disable=no-effect
+toolchain_type(
+    name = "toolchain_type",
+) if bazel_features.java._toolchain_type_in_rules_java else alias(
+    # buildifier: disable=duplicated-name
+    name = "toolchain_type",
+    actual = "@bazel_tools//tools/jdk:toolchain_type",
+)
 
 # The Java runtime that executable Java compilation outputs (e.g., java_binary with
 # create_executable = True) will run on.
@@ -72,8 +79,14 @@ bool_flag(
 #
 # Obtain the associated JavaRuntimeInfo via:
 #   ctx.toolchains["@bazel_tools//tools/jdk:runtime_toolchain_type"].java_runtime
-# TODO: migrate away from using @bazel_tools//tools/jdk:runtime_toolchain_type ?
-# toolchain_type(name = "runtime_toolchain_type")
+# buildifier: disable=no-effect
+toolchain_type(
+    name = "runtime_toolchain_type",
+) if bazel_features.java._toolchain_type_in_rules_java else alias(
+    # buildifier: disable=duplicated-name
+    name = "runtime_toolchain_type",
+    actual = "@bazel_tools//tools/jdk:runtime_toolchain_type",
+)
 
 # The Java runtime to extract the bootclasspath from that is then used to compile Java sources.
 #
@@ -84,8 +97,14 @@ bool_flag(
 #
 # Toolchains of this type are only consumed internally by the bootclasspath rule and should not be
 # accessed from Starlark.
-# TODO: migrate away from using @bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type ?
-# toolchain_type(name = "bootstrap_runtime_toolchain_type")
+# buildifier: disable=no-effect
+toolchain_type(
+    name = "bootstrap_runtime_toolchain_type",
+) if bazel_features.java._toolchain_type_in_rules_java else alias(
+    # buildifier: disable=duplicated-name
+    name = "bootstrap_runtime_toolchain_type",
+    actual = "@bazel_tools//tools/jdk:bootstrap_runtime_toolchain_type",
+)
 
 # Points to toolchain[":runtime_toolchain_type"] (was :legacy_current_java_runtime)
 java_runtime_alias(name = "current_java_runtime")
