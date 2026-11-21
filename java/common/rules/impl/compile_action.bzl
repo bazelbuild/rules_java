@@ -60,7 +60,8 @@ def compile_action(
         add_exports = [],
         add_opens = [],
         bootclasspath = None,
-        javabuilder_jvm_flags = None):
+        javabuilder_jvm_flags = None,
+        declared_deps = None):
     """
     Creates actions that compile Java sources, produce source jar, and produce header jar and returns JavaInfo.
 
@@ -163,6 +164,7 @@ def compile_action(
         add_opens = add_opens,
         bootclasspath = bootclasspath,
         javabuilder_jvm_flags = javabuilder_jvm_flags,
+        declared_deps = declared_deps,
     )
 
     compilation_info = struct(
