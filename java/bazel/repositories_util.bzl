@@ -19,8 +19,6 @@ _RELEASE_CONFIGS = {
     "8": {
         "zulu": {
             "release": "8.98.0.201-ca-jdk8.0.514",
-            # Azul hasn't published the 2026-11-17 out-of-band release for macOS yet.
-            "release_overrides": {"macos": "8.98.0.107-ca-jdk8.0.512"},
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -37,8 +35,6 @@ _RELEASE_CONFIGS = {
     "11": {
         "zulu": {
             "release": "11.92.201-ca-jdk11.0.33.1",
-            # Azul hasn't published the 2026-11-17 out-of-band release for macOS yet.
-            "release_overrides": {"macos": "11.92.109-ca-jdk11.0.33"},
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -61,8 +57,6 @@ _RELEASE_CONFIGS = {
     "17": {
         "zulu": {
             "release": "17.70.201-ca-jdk17.0.21.1",
-            # Azul hasn't published the 2026-11-17 out-of-band release for macOS yet.
-            "release_overrides": {"macos": "17.70.111-ca-jdk17.0.21"},
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -79,8 +73,6 @@ _RELEASE_CONFIGS = {
     "21": {
         "zulu": {
             "release": "21.54.201-ca-jdk21.0.13.1",
-            # Azul hasn't published the 2026-11-17 out-of-band release for macOS yet.
-            "release_overrides": {"macos": "21.54.107-ca-jdk21.0.13"},
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -97,8 +89,6 @@ _RELEASE_CONFIGS = {
     "25": {
         "zulu": {
             "release": "25.38.201-ca-jdk25.0.5.1",
-            # Azul hasn't published the 2026-11-17 out-of-band release for macOS yet.
-            "release_overrides": {"macos": "25.38.107-ca-jdk25.0.5"},
             "platforms": {
                 "linux": ["aarch64", "x86_64"],
                 "macos": ["aarch64", "x86_64"],
@@ -188,8 +178,8 @@ def _flatten_configs():
     result = []
     for version, all_for_version in _RELEASE_CONFIGS.items():
         for distrib, distrib_cfg in all_for_version.items():
+            release = distrib_cfg["release"]
             for os, cpus in distrib_cfg["platforms"].items():
-                release = distrib_cfg.get("release_overrides", {}).get(os, distrib_cfg["release"])
                 for cpu in cpus:
                     name = _name_for_remote_jdk(version, os, cpu)
                     patch_cmds = []
