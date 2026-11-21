@@ -300,34 +300,35 @@ def _java_toolchain_label(java_toolchain):
     get_internal_java_common().check_provider_instances([java_toolchain], "java_toolchain", JavaToolchainInfo)
     return java_toolchain.label
 
-def _make_java_common():
-    methods = {
-        "provider": JavaInfo,
-        "compile": _compile,
-        "compile_header": _compile_header,
-        "run_ijar": _run_ijar,
-        "stamp_jar": _stamp_jar,
-        "pack_sources": _pack_sources,
-        "default_javac_opts": _default_javac_opts,
-        "default_javac_opts_depset": _default_javac_opts_depset,
-        "merge": _merge,
-        "JavaPluginInfo": JavaPluginInfo,
-        "JavaToolchainInfo": JavaToolchainInfo,
-        "JavaRuntimeInfo": JavaRuntimeInfo,
-        "BootClassPathInfo": BootClassPathInfo,
-        "JavaRuntimeClasspathInfo": JavaRuntimeClasspathInfo,
-    }
+def _conditional_java_common_fields():
+    fields = {}
     if get_internal_java_common().google_legacy_api_enabled():
-        methods.update(
+        fields.update(
             MessageBundleInfo = _get_message_bundle_info(),  # struct field that is None in bazel
             get_constraints = _get_constraints,
             set_annotation_processing = _set_annotation_processing,
             java_toolchain_label = _java_toolchain_label,
         )
     if semantics.IS_BAZEL:
-        methods.update(
+        fields.update(
             make_non_strict = _make_non_strict,
         )
-    return struct(**methods)
+    return fields
 
-java_common = _make_java_common()
+java_common = struct(
+    provider = JavaInfo,
+    compile = _compile,
+    compile_header = _compile_header,
+    run_ijar = _run_ijar,
+    stamp_jar = _stamp_jar,
+    pack_sources = _pack_sources,
+    default_javac_opts = _default_javac_opts,
+    default_javac_opts_depset = _default_javac_opts_depset,
+    merge = _merge,
+    JavaPluginInfo = JavaPluginInfo,
+    JavaToolchainInfo = JavaToolchainInfo,
+    JavaRuntimeInfo = JavaRuntimeInfo,
+    BootClassPathInfo = BootClassPathInfo,
+    JavaRuntimeClasspathInfo = JavaRuntimeClasspathInfo,
+    **_conditional_java_common_fields()
+)
