@@ -43,6 +43,9 @@ def _compatible_javac_options(*_args):
 def _check_java_info_opens_exports():
     pass
 
+def _check_javac_opts(*_args):
+    pass
+
 def _minimize_cc_info(cc_info):
     return cc_info
 
@@ -112,6 +115,7 @@ semantics = struct(
     IS_BAZEL = True,
     get_default_resource_path = _get_default_resource_path,
     compatible_javac_options = _compatible_javac_options,
+    check_javac_opts = _check_javac_opts,
     LAUNCHER_FLAG_LABEL = Label("@bazel_tools//tools/jdk:launcher_flag_alias"),
     PROGUARD_ALLOWLISTER_LABEL = "@bazel_tools//tools/jdk:proguard_whitelister",
     TOOLS_TEST_DEFAULT_TEST_TOOLCHAIN_TYPE = "@bazel_tools//tools/test:default_test_toolchain_type",

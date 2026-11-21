@@ -38,6 +38,7 @@ _STRICT_DEPS_VALUES = [
 ]
 
 def _construct_javac_opts(ctx, java_toolchain, plugin_info, javac_opts, bootclasspath, add_exports = []):
+    semantics.check_javac_opts(ctx, java_toolchain, javac_opts)
     all_javac_opts = []  # [depset[str]]
     all_javac_opts.append(java_toolchain._javacopts)
     all_javac_opts.append(ctx.fragments.java.default_javac_flags_depset)
