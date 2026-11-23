@@ -78,6 +78,18 @@ JavaToolchainInfo, _new_javatoolchaininfo = provider(
     init = _java_toolchain_info_init,
 )
 
+# Providers rather than structs since Bazel stores the depsets in their fields without the Depset
+# wrapper objects.
+_JavaToolchainToolInfo = provider(
+    doc = "An executable tool of the Java toolchain.",
+    fields = ["tool", "data", "jvm_opts"],
+)
+
+_AndroidLinterInfo = provider(
+    doc = "The Android Lint tool of the Java toolchain.",
+    fields = ["tool", "tools", "data", "jvm_opts", "lint_opts", "runner_opts", "package_config"],
+)
+
 def _java_toolchain_impl(ctx):
     javac_opts_list = _get_javac_opts(ctx)
     bootclasspath_info = _get_bootclasspath_info(ctx)
@@ -176,7 +188,7 @@ def _get_android_lint_tool(ctx):
     files_to_run = ctx.attr.android_lint_runner[DefaultInfo].files_to_run
     if not files_to_run or not files_to_run.executable:
         fail(ctx.attr.android_lint_runner.label, "does not refer to a valid executable target")
-    return struct(
+    return _AndroidLinterInfo(
         tool = files_to_run,
         tools = depset(ctx.files.android_lint_tools),
         data = depset(ctx.files.android_lint_data),
@@ -194,7 +206,7 @@ def _get_tool_from_ctx(ctx, tool_attr, data_attr, opts_attr):
     if not files_to_run or not files_to_run.executable:
         fail(dep.label, "does not refer to a valid executable target")
     data = getattr(ctx.attr, data_attr)
-    return struct(
+    return _JavaToolchainToolInfo(
         tool = files_to_run,
         data = depset(getattr(ctx.files, data_attr)),
         jvm_opts = depset([ctx.expand_location(opt, data) for opt in getattr(ctx.attr, opts_attr)]),
@@ -207,7 +219,7 @@ def _get_tool_from_executable(ctx, attr_name, data = [], jvm_opts = []):
     files_to_run = dep[DefaultInfo].files_to_run
     if not files_to_run or not files_to_run.executable:
         fail(dep.label, "does not refer to a valid executable target")
-    return struct(tool = files_to_run, data = depset(data), jvm_opts = depset(jvm_opts))
+    return _JavaToolchainToolInfo(tool = files_to_run, data = depset(data), jvm_opts = depset(jvm_opts))
 
 def _get_compatible_javacopts(ctx):
     result = {}
