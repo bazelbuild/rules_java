@@ -60,6 +60,7 @@ JavaToolchainInfo, _new_javatoolchaininfo = provider(
         "_header_compiler_direct": _PRIVATE_API_DOC_STRING,
         "_javabuilder": _PRIVATE_API_DOC_STRING,
         "_javacopts": _PRIVATE_API_DOC_STRING,
+        "_javacopts_allowlist": _PRIVATE_API_DOC_STRING,
         "_javacopts_list": _PRIVATE_API_DOC_STRING,
         "_javac_supports_workers": _PRIVATE_API_DOC_STRING,
         "_javac_supports_multiplex_workers": _PRIVATE_API_DOC_STRING,
@@ -124,6 +125,7 @@ def _java_toolchain_impl(ctx):
         ),
         _javabuilder = _get_tool_from_ctx(ctx, "javabuilder", "javabuilder_data", "javabuilder_jvm_opts"),
         _javacopts = helper.detokenize_javacopts(javac_opts_list),
+        _javacopts_allowlist = ctx.attr._javacopts_allowlist[PackageSpecificationInfo] if ctx.attr._javacopts_allowlist else None,
         _javacopts_list = javac_opts_list,
         _javac_supports_workers = ctx.attr.javac_supports_workers,
         _javac_supports_multiplex_workers = ctx.attr.javac_supports_multiplex_workers,
@@ -583,6 +585,11 @@ removes it. Please see the Javac documentation on the -Xlint options for more in
             cfg = "exec",
             executable = True,
             default = configuration_field(fragment = "java", name = "java_toolchain_bytecode_optimizer"),
+        ),
+        "_javacopts_allowlist": attr.label(
+            cfg = "exec",
+            default = semantics.JAVACOPTS_ALLOWLIST_LABEL,
+            providers = [PackageSpecificationInfo],
         ),
         "_local_java_optimization_configuration": attr.label(
             cfg = "exec",
