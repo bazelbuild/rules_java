@@ -22,6 +22,6 @@ http_jar(name = "foo", urls = [...])
 ```
 """
 
-load("@compatibility_proxy//:proxy.bzl", _http_jar = "http_jar")
+load("//java/bazel:http_jar.bzl", _http_jar = "http_jar")
 
 http_jar = _http_jar

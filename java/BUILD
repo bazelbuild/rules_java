@@ -79,7 +79,7 @@ bzl_library(
     name = "http_jar_bzl",
     srcs = ["http_jar.bzl"],
     visibility = ["//visibility:public"],
-    deps = ["@compatibility_proxy//:proxy_bzl"],
+    deps = ["//java/bazel:http_jar_bzl"],
 )
 
 filegroup(
