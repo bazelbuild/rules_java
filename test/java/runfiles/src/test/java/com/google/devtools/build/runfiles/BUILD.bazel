@@ -9,6 +9,7 @@ java_test(
     test_class = "com.google.devtools.build.runfiles.RunfilesTest",
     deps = [
         ":guava",
+        ":jsr305",
         ":truth",
         "//java/runfiles",
     ],
@@ -28,6 +29,11 @@ java_test(
 java_import(
     name = "guava",
     jars = ["@guava//file"],
+)
+
+java_import(
+    name = "jsr305",
+    jars = ["@jsr305//file"],
 )
 
 java_import(

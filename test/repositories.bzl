@@ -20,6 +20,12 @@ def test_repositories():
         integrity = "sha256-Ushs3a3DG8hFfB4VaJ/Gt14ul84qg9i1S3ldVW1In4w=",
         downloaded_file_path = "truth.jar",
     )
+    http_file(
+        name = "jsr305",
+        url = "https://repo1.maven.org/maven2/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar",
+        integrity = "sha256-dmrSoHg/JoeWLIrXTO7MOKKLn3Ki0IXuQ4t4E+ko0Mc=",
+        downloaded_file_path = "jsr305.jar",
+    )
     local_repository(
         name = "other_repo",
         path = "test/testdata/other_repo",
