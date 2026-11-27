@@ -12,10 +12,12 @@ load("//java:java_plugin.bzl", "java_plugin")
 load("//java/common:java_common.bzl", "java_common")
 load("//java/common:java_info.bzl", "JavaInfo")
 load("//java/common:java_plugin_info.bzl", "JavaPluginInfo")
+load("//java/toolchains:java_package_configuration.bzl", "java_package_configuration")
 load("//java/toolchains:java_runtime.bzl", "java_runtime")
 load("//test/java/testutil:artifact_closure.bzl", "artifact_closure")
 load("//test/java/testutil:java_info_subject.bzl", "java_info_subject")
 load("//test/java/testutil:javac_action_subject.bzl", "javac_action_subject")
+load("//test/java/testutil:mock_java_toolchain.bzl", "mock_java_toolchain")
 load("//test/java/testutil:rules/custom_library.bzl", "custom_library")
 load("//test/java/testutil:rules/custom_library_extended_compile_jdeps.bzl", "CompileJdepsInfo", "custom_library_extended_jdeps")
 load("//test/java/testutil:rules/custom_library_with_additional_inputs.bzl", "custom_library_with_additional_inputs")
@@ -1185,6 +1187,51 @@ def _test_compile_resource_jars_is_private_api(name):
 def _test_run_ijar_output_is_private_api(name):
     _test_private_api(name, private_run_ijar_api_usage, "output")
 
+def _test_compile_unused_deps(name):
+    native.package_group(
+        name = name + "_group",
+        packages = ["//..."],
+    )
+    util.helper_target(
+        java_package_configuration,
+        name = name + "/package_config",
+        unused_deps_mode = "warn",
+        packages = [name + "_group"],
+    )
+    util.helper_target(
+        mock_java_toolchain,
+        name = name + "/toolchain",
+        package_configuration = [name + "/package_config"],
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/dep",
+    )
+    util.helper_target(
+        java_library,
+        name = name + "/lib",
+        srcs = ["Foo.java"],
+        deps = [name + "/dep"],
+    )
+
+    analysis_test(
+        name = name,
+        impl = _test_compile_unused_deps_impl,
+        target = name + "/lib",
+        config_settings = {"//command_line_option:extra_toolchains": [Label(name + "/toolchain")]},
+        # Requires extra args support
+        attr_values = {"tags": ["min_bazel_9"]},
+    )
+
+def _test_compile_unused_deps_impl(env, target):
+    p = str(target.label).split(":")[0]
+    javac_action_subject.of(env, target).argv().contains_at_least([
+        "--experimental_check_unused_deps",
+        "WARN",
+        "--target_declared_deps",
+        ("@" if p.startswith("@") else "") + p + ":{test_name}/dep",
+    ])
+
 def java_common_tests(name):
     test_suite(
         name = name,
@@ -1234,5 +1281,6 @@ def java_common_tests(name):
             _test_compile_include_compilation_info_is_private_api,
             _test_compile_resource_jars_is_private_api,
             _test_run_ijar_output_is_private_api,
+            _test_compile_unused_deps,
         ],
     )
