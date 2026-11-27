@@ -13,6 +13,6 @@
 # limitations under the License.
 """JavaInfo provider"""
 
-load("@compatibility_proxy//:proxy.bzl", _JavaInfo = "JavaInfo")
+load("//java/private:java_info.bzl", _JavaInfo = "JavaInfo")
 
 JavaInfo = _JavaInfo
