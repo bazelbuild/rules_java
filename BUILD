@@ -20,6 +20,7 @@ filegroup(
         "WORKSPACE",
         "//java:srcs",
         "//toolchains:srcs",
+        "//toolchains/definitions:srcs",
     ],
     visibility = ["//visibility:public"],
 )

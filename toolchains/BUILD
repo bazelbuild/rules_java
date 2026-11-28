@@ -21,6 +21,7 @@ load(
     "java_runtime_version_alias",
     "java_toolchain_alias",
 )
+load(":java_versions.bzl", "RELEASES", "toolchain_name")
 load(":utf8_environment.bzl", "utf8_environment")
 
 package(
@@ -403,14 +404,13 @@ alias(
     actual = ":toolchain",
 )
 
-RELEASES = (8, 9, 10, 11, 17, 21, 25)
-
 [
     default_java_toolchain(
-        name = ("toolchain_java%d" if release <= 11 else "toolchain_jdk_%d") % release,
+        name = toolchain_name(release),
         configuration = DEFAULT_TOOLCHAIN_CONFIGURATION,
         source_version = "%s" % release,
         target_version = "%s" % release,
+        toolchain_definition = False,
     )
     for release in RELEASES
 ]
