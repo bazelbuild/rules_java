@@ -23,6 +23,7 @@ load(
     "remote_jdk21_repos",
     "remote_jdk25_repos",
     "remote_jdk8_repos",
+    "remote_jdk_toolchain_configs",
 )
 load("//toolchains:extensions.bzl", _java_repository = "java_repository")
 
@@ -34,6 +35,7 @@ def _toolchains_impl(module_ctx):
     remote_jdk17_repos()
     remote_jdk21_repos()
     remote_jdk25_repos()
+    remote_jdk_toolchain_configs(name = "remote_jdk_toolchains")
 
     if bazel_features.external_deps.extension_metadata_has_reproducible:
         return module_ctx.extension_metadata(reproducible = True)

@@ -18,7 +18,12 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 load("//toolchains:jdk_build_file.bzl", "JDK_BUILD_TEMPLATE")
 load("//toolchains:local_java_repository.bzl", "local_java_repository")
-load("//toolchains:remote_java_repository.bzl", "remote_java_repository")
+load(
+    "//toolchains:remote_java_repository.bzl",
+    "remote_java_repository",
+    "remote_java_toolchain_config",
+    "remote_java_toolchain_configs",
+)
 
 # visible for tests
 JAVA_TOOLS_CONFIG = {
@@ -437,6 +442,25 @@ def _remote_jdk_repos_for_version(version):
             version = item.version,
             patch_cmds = getattr(item, "patch_cmds", []),
         )
+
+def remote_jdk_toolchain_configs(name):
+    """Imports one repository with the toolchain definitions of every remote JDK.
+
+    Each JDK's toolchains live in the package named after its repository, so
+    `@<name>//remotejdk21_linux:all` matches `@remotejdk21_linux_toolchain_config_repo//:all`.
+
+    Args:
+        name: The name of the repository.
+    """
+    maybe(
+        remote_java_toolchain_configs,
+        name = name,
+        build_files = {
+            item.name: remote_java_toolchain_config(item.name, item.version, item.target_compatible_with)
+            for items in REMOTE_JDK_CONFIGS.values()
+            for item in items
+        },
+    )
 
 def remote_jdk8_repos(name = ""):
     """Imports OpenJDK 8 repositories.
