@@ -1,0 +1,24 @@
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
+
+genquery(
+    name = "other_toolchains_buildfiles",
+    expression = " ".join([
+        "let t = //toolchains/definitions:toolchain_jdk_21_definition in buildfiles($t) except",
+        "filter('^//toolchains/definitions:BUILD$|^//toolchains:java_versions[.]bzl$', buildfiles($t))",
+    ]),
+    scope = ["//toolchains/definitions:toolchain_jdk_21_definition"],
+)
+
+write_file(
+    name = "no_buildfiles",
+    out = "no_buildfiles.txt",
+    content = [],
+)
+
+diff_test(
+    name = "toolchains_load_free_test",
+    size = "small",
+    file1 = ":other_toolchains_buildfiles",
+    file2 = ":no_buildfiles",
+)

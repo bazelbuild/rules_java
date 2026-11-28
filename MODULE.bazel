@@ -25,7 +25,7 @@ single_version_override(
     version = "32.1",
 )
 
-register_toolchains("//toolchains:all")
+register_toolchains("//toolchains/definitions:all")
 
 toolchains = use_extension("//java:extensions.bzl", "toolchains")
 

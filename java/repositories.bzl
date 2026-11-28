@@ -481,7 +481,7 @@ def rules_java_toolchains(name = "toolchains"):
     java_tools_repos()
 
     native.register_toolchains(
-        "//toolchains:all",
+        "//toolchains/definitions:all",
         "@local_jdk//:runtime_toolchain_definition",
         "@local_jdk//:bootstrap_runtime_toolchain_definition",
     )

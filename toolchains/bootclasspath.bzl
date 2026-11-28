@@ -16,13 +16,12 @@
 
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load("//java/common:java_common.bzl", "java_common")
+load(":java_versions.bzl", _DEFAULT_JAVA_LANGUAGE_VERSION = "DEFAULT_JAVA_LANGUAGE_VERSION")
 load(":utf8_environment.bzl", "Utf8EnvironmentInfo")
 
 visibility("private")
 
-# If this is changed, the docs for "{,tool_}java_language_version" also
-# need to be updated in the Bazel user manual
-DEFAULT_JAVA_LANGUAGE_VERSION = "11"
+DEFAULT_JAVA_LANGUAGE_VERSION = _DEFAULT_JAVA_LANGUAGE_VERSION
 
 # TODO: This provider and is only necessary since --java_{language,runtime}_version
 # are not available directly to Starlark.
