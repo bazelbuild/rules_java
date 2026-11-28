@@ -110,7 +110,11 @@ REMOTE_JDK_REPOS = [(("remote_jdk" if version == "8" else "remotejdk") + version
     repo + "_toolchain_config_repo",
 ) for repo in REMOTE_JDK_REPOS]
 
-[register_toolchains("@" + name + "_toolchain_config_repo//:all") for name in REMOTE_JDK_REPOS]
+# One repository holds every remote JDK's toolchains, so registering them fetches one repository
+# rather than one per JDK.
+use_repo(toolchains, "remote_jdk_toolchains")
+
+[register_toolchains("@remote_jdk_toolchains//" + name + ":all") for name in REMOTE_JDK_REPOS]
 
 # Compatibility layer
 compat = use_extension("//java:rules_java_deps.bzl", "compatibility_proxy")
