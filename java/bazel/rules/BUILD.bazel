@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
+load(
+    ":runfiles_group_support.bzl",
+    "java_binary_runfiles_group_describer",
+    "java_import_runfiles_group_describer",
+    "java_library_runfiles_group_describer",
+)
 
 package(default_applicable_licenses = ["@rules_java//:license"])
 
@@ -36,6 +42,7 @@ bzl_library(
         "@bazel_skylib//lib:paths",
         "@rules_cc//cc:find_cc_toolchain_bzl",
         "@rules_cc//cc/common",
+        "@rules_runfiles_group//runfiles_group:lib",
     ],
 )
 
@@ -59,6 +66,21 @@ filegroup(
         ":rules",
     ],
     visibility = ["//java:__pkg__"],
+)
+
+java_library_runfiles_group_describer(
+    name = "java_library_runfiles_group_describer",
+    visibility = ["//visibility:public"],
+)
+
+java_import_runfiles_group_describer(
+    name = "java_import_runfiles_group_describer",
+    visibility = ["//visibility:public"],
+)
+
+java_binary_runfiles_group_describer(
+    name = "java_binary_runfiles_group_describer",
+    visibility = ["//visibility:public"],
 )
 
 # TODO: remove this in the next major version (rules_java 9.x / Bazel 9.x)
